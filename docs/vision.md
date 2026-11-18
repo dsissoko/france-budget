@@ -16,13 +16,19 @@ L'ensemble des administrations publiques (État, administrations de sécurité s
 Photographie de l'exercice 2025 : recettes, dépenses, déficit, catégories citoyennes (dix au maximum par côté) et trajectoire annuelle. Des explications courtes remplacent le jargon. L'origine et le statut des données doivent rester visibles.
 
 ### 2. Comparer
-Sélectionner une référence ou un ensemble de mesures publiées par un parti ; voir les impacts *différentiels* par thème (pouvoir d'achat, retraites, fiscalité, immigration, écologie, éducation, santé, etc.). Les sources, dates et périmètres des mesures sont accessibles ; un contre-budget incomplet est accepté. Une mesure annoncée en 2026 n'est pas un constat pour 2025.
+Comparer deux budgets A/B parmi les budgets publics mis en avant (10 maximum), sans présélection. La galerie commune permet de choisir et remplacer les deux budgets ; les résultats restent masqués tant que les deux ne sont pas sélectionnés. Trois cartes affichent le solde de référence INSEE 2025, celui de A et celui de B, leurs écarts au solde de référence et l'écart A/B. Les recettes et dépenses sont représentées par trois séries (référence grise, A bleue, B orange), suivies des mesures respectives et des trajectoires indicatives. Aucun bouton de personnalisation dans Comparer : cette fonction appartient à Mon budget. Les sources, dates et limites de chiffrage restent visibles.
 
 ### 3. Mon budget
-Partir de la référence ou copier un scénario. Modifier les grandes catégories via des curseurs, activer/désactiver des mesures et voir l'écart, le déficit et la projection pluriannuelle. Réinitialiser facilement. L'état local persiste dans le navigateur.
+Partir par défaut de la référence INSEE 2025, ou choisir facultativement un budget public (parti ou citoyen) ou un budget personnel enregistré comme point de départ. La copie est indépendante ; le changement demande confirmation si des modifications non enregistrées existent. Modifier les grandes catégories via des curseurs, activer/désactiver des mesures et voir l'écart, le déficit et la projection pluriannuelle. Réinitialiser facilement. L'état local persiste dans le navigateur.
 
 ### 4. Lecture expert (optionnelle)
 Voir les correspondances officielles des postes et les écarts économiques, ainsi que les limites de ventilation. Un thème politique peut traverser plusieurs postes ; il n'est jamais additionné comme un poste comptable autonome.
+
+### 5. Voter
+Consulter les budgets publiés, ouvrir leur fiche détaillée et les soutenir. Le détail conserve l'action de vote sans redirection « Ouvrir dans Comparer ».
+
+### Navigation
+Le changement d'onglet et le lien « Découvrir les propositions politiques » repositionnent la lecture en haut de page.
 
 ## Principes d'interface
 - Look sobre inspiré de la maquette initiale ChatGPT : fond clair, cards blanches, fine bordure grise, onglets segmentés, typographie lisible, accent vert pour les recettes et corail pour les dépenses.
