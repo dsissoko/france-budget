@@ -26,16 +26,16 @@
 ## Référentiel unifié — migration 2026-11
 
 - `reference_categories` : catégories de recettes et dépenses, libellés, montants de référence, descriptions, codes canoniques, millésime et ordre d'affichage.
-- `reference_measures` : mesures des partis, attribution, thèmes, montants, sources, années et statut de vérification.
-- `budgets` : **même modèle** pour les budgets politiques (`origin='party'`) et les publications citoyennes (`origin='citizen'`). `scenario` contient les identifiants des mesures et les ajustements catégoriels.
-- `measures` : propositions détaillées attachées aux publications citoyennes ; ne pas confondre avec le catalogue `reference_measures`.
+- `reference_measures` : ancienne table conservée temporairement pour migration/retour arrière ; elle n'est plus interrogée par l'API.
+- `budgets` : **même modèle** pour les budgets politiques (`origin='party'`) et les publications citoyennes (`origin='citizen'`). `scenario` contient les identifiants des mesures et les ajustements catégoriels. `featured BOOLEAN NOT NULL DEFAULT false` pilote la mise en avant dans Comparer ; `featured_order INTEGER` règle l'ordre. Seul un administrateur de la base peut modifier ces colonnes.
+- `measures` : **table commune des propositions des partis et des citoyens**, liées à `budgets.id` ; les propositions politiques conservent `legacy_id`, `theme`, `source`, `reference_year`, `status`, `revenue_delta`, `expense_delta`. Les mesures citoyennes utilisent les champs communs `category_code`, `kind`, `delta_amount`, `reference_amount`, `title`, `description`. Les règles de ventilation restent dans `src/projection.ts`.
 - `votes` : suffrages de popularité sur les scénarios publiés ; ne constituent pas un scrutin électoral.
 
 ### Circulation des données
 
 1. Les 25 catégories et 8 mesures de l'ancien `src/data.ts` ont été copiées dans Neon, en conservant leur caractère indicatif et leurs sources.
-2. `GET /api/reference` charge catégories et mesures depuis Neon ; le frontend attend sa réponse avant d'afficher les données.
-3. `GET /api/budgets` retourne budgets des partis et citoyens publiés, avec votes ; les deux onglets **Comparer** et **Voter** utilisent cette API.
+2. `GET /api/reference` charge catégories et mesures depuis Neon (la table `measures` pour les partis) ; le frontend attend sa réponse avant d'afficher les données.
+3. `GET /api/budgets` retourne budgets des partis et citoyens publiés, avec votes et indicateurs `featured`/`featured_order`. **Comparer** affiche en premier les budgets mis en avant et permet aussi de sélectionner tout budget public ; **Voter** affiche tous les budgets publics. Les deux vues utilisent la même API.
 4. `POST /api/budgets` valide les montants contre `reference_categories` dans Neon ; `POST /api/votes` enregistre les votes.
 5. `src/projection.ts` conserve le moteur de calcul côté navigateur pour la réactivité des jauges, alimenté par les références récupérées via l'API.
 
@@ -44,3 +44,17 @@
 - `src/data.ts` conserve une **copie statique historique** utilisée notamment par les tests et comme fixture de migration ; elle ne doit plus être considérée comme source de vérité pour l'interface. À terme, remplacer cette fixture par un jeu de données de test dédié.
 - Les règles de ventilation de `src/projection.ts` sont encore dans le code. Pour une centralisation intégrale des règles de projection, les versionner dans Neon et les exposer via l'API.
 - Les budgets locaux non publiés restent volontairement dans `localStorage` : ils ne sont pas stockés dans Neon.
+
+### Mise en avant éditoriale
+
+- Les trois budgets politiques initiaux sont `featured=true`, ordonnés RN (10), LFI (20), Horizons (30).
+- Les budgets citoyens publiés restent `featured=false` par défaut, mais peuvent être promus sans changer leur modèle ni leur API.
+- La sélection éditoriale ne doit pas être confondue avec le nombre de votes : elle est indépendante de la popularité et de l'origine.
+- Aucun endpoint public n'autorise la modification de `featured` ou `featured_order`.
+
+### Migration des propositions
+
+- Les huit mesures politiques ont été copiées de `reference_measures` vers `measures`, chacune rattachée au budget politique correspondant.
+- La colonne `legacy_id` préserve les identifiants utilisés par les scénarios et le moteur de projection.
+- L'ancienne table reste disponible pour vérification avant suppression future ; **elle n'est plus source de lecture**.
+- La modélisation détaillée des impacts multiples par mesure (`measure_impacts`) reste à implémenter ; elle permettra de supprimer les règles de ventilation codées en dur.
