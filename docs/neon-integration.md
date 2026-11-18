@@ -22,3 +22,25 @@
 - Le dispositif anti-abus est volontairement léger et ne résiste pas à une attaque coordonnée : prévoir CAPTCHA/WAF ou modération si l'application gagne en visibilité.
 - Ne pas présenter les simulations comme des prévisions officielles ; les ventilations de référence restent indicatives.
 - Vérifier les fonctions Vercel et le parcours utilisateur en production après déploiement.
+
+## Référentiel unifié — migration 2026-11
+
+- `reference_categories` : catégories de recettes et dépenses, libellés, montants de référence, descriptions, codes canoniques, millésime et ordre d'affichage.
+- `reference_measures` : mesures des partis, attribution, thèmes, montants, sources, années et statut de vérification.
+- `budgets` : **même modèle** pour les budgets politiques (`origin='party'`) et les publications citoyennes (`origin='citizen'`). `scenario` contient les identifiants des mesures et les ajustements catégoriels.
+- `measures` : propositions détaillées attachées aux publications citoyennes ; ne pas confondre avec le catalogue `reference_measures`.
+- `votes` : suffrages de popularité sur les scénarios publiés ; ne constituent pas un scrutin électoral.
+
+### Circulation des données
+
+1. Les 25 catégories et 8 mesures de l'ancien `src/data.ts` ont été copiées dans Neon, en conservant leur caractère indicatif et leurs sources.
+2. `GET /api/reference` charge catégories et mesures depuis Neon ; le frontend attend sa réponse avant d'afficher les données.
+3. `GET /api/budgets` retourne budgets des partis et citoyens publiés, avec votes ; les deux onglets **Comparer** et **Voter** utilisent cette API.
+4. `POST /api/budgets` valide les montants contre `reference_categories` dans Neon ; `POST /api/votes` enregistre les votes.
+5. `src/projection.ts` conserve le moteur de calcul côté navigateur pour la réactivité des jauges, alimenté par les références récupérées via l'API.
+
+### Dette technique explicite
+
+- `src/data.ts` conserve une **copie statique historique** utilisée notamment par les tests et comme fixture de migration ; elle ne doit plus être considérée comme source de vérité pour l'interface. À terme, remplacer cette fixture par un jeu de données de test dédié.
+- Les règles de ventilation de `src/projection.ts` sont encore dans le code. Pour une centralisation intégrale des règles de projection, les versionner dans Neon et les exposer via l'API.
+- Les budgets locaux non publiés restent volontairement dans `localStorage` : ils ne sont pas stockés dans Neon.
