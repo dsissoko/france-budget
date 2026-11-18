@@ -2,12 +2,14 @@ export type Category={id:string;label:string;amount:number;canonical:string;desc
 export type Measure={id:string;party:'RN'|'LFI'|'Horizons';theme:string;title:string;revenueDelta:number;expenseDelta:number;source:string;year:number;status:'publié'|'illustration';description:string};
 // Totaux officiels APU 2025 INSEE : dépenses 1 714,1 Md€, recettes 1 561,6 Md€, déficit 152,5 Md€.
 // La répartition par catégorie est indicative ; les lignes d'ajustement rendent les totaux exacts.
+// Soutien aux entreprises : reclassement PÉDAGOGIQUE de 30 Md€ depuis « économie » ; ce montant n'est PAS une statistique officielle des aides.
 // Source : https://www.insee.fr/fr/statistiques/8956575
 export const expenses:Category[]=[
 {id:'social',label:'Retraites et solidarité',amount:620,canonical:'COFOG 10 — Protection sociale',description:'Retraites, prestations sociales et solidarité.'},
 {id:'health',label:'Santé',amount:280,canonical:'COFOG 07 — Santé',description:'Hôpitaux, soins et politique de santé.'},
 {id:'education',label:'Éducation',amount:180,canonical:'COFOG 09 — Enseignement',description:'Écoles, universités et formation.'},
-{id:'economy',label:'Économie et transports',amount:155,canonical:'COFOG 04 — Affaires économiques',description:'Infrastructures, aides économiques, transports.'},
+{id:'economy',label:'Économie et transports',amount:125,canonical:'COFOG 04 — Affaires économiques (ventilation indicative)',description:'Transports, infrastructures et autres affaires économiques, hors soutien aux entreprises isolé ci-dessous.'},
+{id:'enterprise-support',label:'Soutien public aux entreprises',amount:30,canonical:'Sous-ensemble indicatif de COFOG 04 — Affaires économiques',description:'Aides directes et soutien à l’innovation ou à la R&D des entreprises. Enveloppe pédagogique de 30 Md€ reclassée depuis Économie et transports : non certifiée, hors avantages fiscaux et allègements de cotisations.'},
 {id:'general',label:'Services publics généraux',amount:150,canonical:'COFOG 01 — Services publics généraux',description:'Administration générale, dette et autres services.'},
 {id:'defense',label:'Défense',amount:65,canonical:'COFOG 02 — Défense',description:'Armées et défense nationale.'},
 {id:'safety',label:'Sécurité et justice',amount:55,canonical:'COFOG 03 — Ordre et sécurité publics',description:'Police, justice et sécurité.'},
