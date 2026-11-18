@@ -1,4 +1,4 @@
-import { db, reply, method } from './_db';
+import { db, reply, method } from './_db.js';
 export default async function handler(req:any,res:any){
  if(!method(req,'GET',res))return;
  try{
