@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import { db, reply, method, jsonBody } from '../_db';
+import { db, reply, method, jsonBody } from '../_db.js';
 export default async function handler(req: any, res: any) {
  try {
   const sql=db();
