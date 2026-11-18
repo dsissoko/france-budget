@@ -11,6 +11,15 @@ describe('projection de contre-budgets',()=>{
   expect(base.expenseTotal).toBeCloseTo(1714.1,8);
   expect(base.deficit).toBeCloseTo(152.5,8);
  });
+ it('affiche le même axe entreprises dans la référence et le budget simulé, sans double compte',()=>{
+  const axis=expenses.find(c=>c.id==='enterprise-support');
+  expect(axis?.amount).toBe(30);
+  expect(expenses.find(c=>c.id==='economy')?.amount).toBe(125);
+  expect(sum(expenses)).toBeCloseTo(1714.1,8);
+  const changed=calculateScenario([],{revenues:{},expenses:{'enterprise-support':20}});
+  expect(changed.expenses['enterprise-support']).toBe(20);
+  expect(changed.deficit).toBeCloseTo(142.5,8);
+ });
  it('reproduit les 5 montants revendiqués RN / LFI sans confondre cette égalité avec une preuve économique',()=>{
   const published=measures.filter(m=>m.status==='publié');
   expect(published).toHaveLength(5);
