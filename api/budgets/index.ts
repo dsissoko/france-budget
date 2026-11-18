@@ -1,7 +1,5 @@
 import { createHash } from 'node:crypto';
 import { db, reply, method, jsonBody } from '../_db';
-import { expenses, revenues } from '../../src/data';
-const categories = new Map([...expenses.map(x=>['expense:'+x.id,x.amount] as const),...revenues.map(x=>['revenue:'+x.id,x.amount] as const)]);
 export default async function handler(req: any, res: any) {
  try {
   const sql=db();
@@ -16,6 +14,8 @@ export default async function handler(req: any, res: any) {
   const origin=req.headers.origin;const host=req.headers.host;
   if(origin&&new URL(origin).host!==host)return reply(res,403,{error:'Origine non autorisée'});
   const b=jsonBody(req);
+  const refs=await sql`SELECT id,side,amount::float8 AS amount FROM reference_categories WHERE reference_year=2025`;
+  const categories=new Map(refs.map((x:any)=>[(x.side==='revenues'?'revenue:':'expense:')+x.id,x.amount]));
   if(typeof b.title!=='string'||b.title.trim().length<3||b.title.length>100||
     typeof b.description!=='string'||b.description.length>500||
     b.referenceYear!==2025||!Array.isArray(b.measures)||b.measures.length>100||
@@ -29,7 +29,7 @@ export default async function handler(req: any, res: any) {
     categories.get(m.kind+':'+m.categoryCode)===m.referenceAmount&&
     m.deltaAmount>=-m.referenceAmount&&m.deltaAmount<=m.referenceAmount))
     return reply(res,400,{error:'Mesures invalides'});
-  const expected=new Map([...revenues.map(x=>['revenue:'+x.id,x.amount] as const),...expenses.map(x=>['expense:'+x.id,x.amount] as const)]);
+  const expected=categories;
   if(!b.scenario.budget.revenues||!b.scenario.budget.expenses||
     !['revenues','expenses'].every(kind=>Object.entries(b.scenario.budget[kind]).every(([id,value])=>{
       const base=expected.get((kind==='revenues'?'revenue:':'expense:')+id);
