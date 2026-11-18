@@ -57,3 +57,16 @@ BEGIN
  INSERT INTO publication_limits(fingerprint) VALUES(fingerprint);
  RETURN new_id;
 END $$;
+
+-- Référentiel canonique versionné (données 2025 et mesures politiques)
+CREATE TABLE IF NOT EXISTS reference_categories (
+ id text PRIMARY KEY, side text NOT NULL CHECK(side IN ('revenues','expenses')),
+ label text NOT NULL,amount numeric(18,3) NOT NULL,canonical text NOT NULL,
+ description text NOT NULL,reference_year int NOT NULL DEFAULT 2025,sort_order int NOT NULL
+);
+CREATE TABLE IF NOT EXISTS reference_measures (
+ id text PRIMARY KEY,party text NOT NULL,theme text NOT NULL,title text NOT NULL,
+ revenue_delta numeric(18,3) NOT NULL,expense_delta numeric(18,3) NOT NULL,
+ source text NOT NULL,year int NOT NULL,status text NOT NULL,description text NOT NULL,
+ sort_order int NOT NULL
+);
