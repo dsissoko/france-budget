@@ -12,7 +12,7 @@
 - Publication anonyme et définitive, avec titre et description non identifiants ; la copie locale reste modifiable.
 - Limite globale de 50 publications citoyennes, imposée par une fonction SQL transactionnelle avec verrou consultatif.
 - Limite de 2 publications par 24 h et par empreinte de connexion ; les IP ne sont pas enregistrées en clair.
-- Onglet Voter : choix d'un budget parmi 50, consultation, comparaison, vote.
+- Onglet Voter : galerie unifiée des budgets publics (partis et citoyens), filtres d'origine, tris popularité/date/proximité de l'équilibre, clic sur une carte ouvrant une fiche en bottom sheet avec les détails de Comparer, puis vote. La limite de 50 concerne les publications citoyennes, pas les budgets politiques.
 - Cookie aléatoire HttpOnly/Secure/SameSite ; unicité (budget, empreinte du cookie) en base. **Un navigateur peut effacer ses cookies : un vote par personne n'est pas garanti.**
 - L'API ne fournit aucun droit de modification ou suppression aux visiteurs. Un retrait administratif reste possible pour les contenus abusifs.
 
@@ -58,3 +58,10 @@
 - La colonne `legacy_id` préserve les identifiants utilisés par les scénarios et le moteur de projection.
 - L'ancienne table reste disponible pour vérification avant suppression future ; **elle n'est plus source de lecture**.
 - La modélisation détaillée des impacts multiples par mesure (`measure_impacts`) reste à implémenter ; elle permettra de supprimer les règles de ventilation codées en dur.
+
+## UX Voter, auteur public et V2
+
+- Les nouvelles publications citoyennes exigent un nom ou pseudo public de 2 à 60 caractères, enregistré dans `scenario.author` ; le backend valide ce champ. Les publications historiques restent compatibles et affichent « Auteur anonyme ».
+- Le clic sur une carte ouvre une fiche détaillée sans navigation, reprenant les indicateurs, écarts par poste, mesures et trajectoire de Comparer. La liste est filtrable Tous/Partis/Citoyens et triable par votes, date ou proximité de l'équilibre.
+- V1 : un badge maximum par carte, « À l'équilibre » si |déficit| ≤ 1 Md€, sinon « Déficit réduit » si le déficit diminue d'au moins 1 Md€ face à la référence. Aucune affirmation de soutenabilité à partir de la projection mécanique.
+- V2 : projection à cinq ans avec dette/PIB, intérêts, hypothèses macroéconomiques et analyses de sensibilité. Le badge « Désendettement à 5 ans » sera calculé seulement quand le modèle pluriannuel sera disponible et validé ; ne pas l'afficher par anticipation. Les autres indicateurs restent dans le détail, pas dans une accumulation de badges.
