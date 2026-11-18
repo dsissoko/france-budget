@@ -1,0 +1,143 @@
+{
+  "schemaVersion": 1,
+  "note": "Inventaire de sources et extraction partielle; n'est pas encore branché sur l'interface. Montants revendiqués par leurs auteurs, pas validés indépendamment. Les mesures 2026 ciblent le projet gouvernemental d'octobre 2025, non les comptes réalisés 2025 ni la loi votée en février 2026.",
+  "references": [
+    {
+      "id": "apu-execution-2025",
+      "label": "Comptes publics 2025 exécutés",
+      "year": 2025,
+      "status": "executed",
+      "scope": "APU",
+      "source": "https://www.insee.fr/fr/statistiques/8997691",
+      "deficitBillion": 152.5,
+      "deficitPctGdp": 5.1
+    },
+    {
+      "id": "plf-plfss-2026-initial",
+      "label": "Projet gouvernemental PLF/PLFSS 2026 initial, octobre 2025",
+      "year": 2026,
+      "status": "draft-as-filed",
+      "scope": "APU",
+      "source": "https://www.assemblee-nationale.fr/dyn/17/dossiers/PLF_2026",
+      "note": "Base historique indispensable à la comparaison de contre-budgets publiés à l'automne 2025. Reconstruction complète APU et PLFSS à compléter."
+    },
+    {
+      "id": "lfi-2026-voted",
+      "label": "Loi de finances initiale de l'État 2026, promulguée le 19 février 2026",
+      "year": 2026,
+      "status": "voted",
+      "scope": "State",
+      "source": "https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000053508155",
+      "note": "La loi votée ne peut pas remplacer silencieusement le PLF initial comme base des contre-budgets 2026."
+    }
+  ],
+  "programs": [
+    {
+      "id": "rn-2026",
+      "party": "RN",
+      "year": 2026,
+      "sourceDate": "2025-10-23",
+      "baseReferenceId": "plf-plfss-2026-initial",
+      "source": "https://rassemblementnational.fr/documents/GRN-CONTRE-BUDGET-2026.pdf",
+      "status": "partial-extraction",
+      "claimedBalanceImprovementBillion": 36,
+      "measures": [
+        {
+          "id": "rn-2026-vat-energy",
+          "theme": "Pouvoir d'achat",
+          "label": "Baisse de la TVA sur les énergies",
+          "revenueDeltaBillion": -10.96,
+          "expenseDeltaBillion": 0,
+          "sourcePage": 4
+        },
+        {
+          "id": "rn-2026-vat-products",
+          "theme": "Pouvoir d'achat",
+          "label": "Suppression de la TVA sur cent produits de première nécessité",
+          "revenueDeltaBillion": -3.5,
+          "expenseDeltaBillion": 0,
+          "sourcePage": 4
+        },
+        {
+          "id": "rn-2026-solidarity",
+          "theme": "Immigration",
+          "label": "Condition de cinq ans de travail à temps plein pour certaines prestations de solidarité",
+          "revenueDeltaBillion": 0,
+          "expenseDeltaBillion": -6.1,
+          "sourcePage": 3
+        },
+        {
+          "id": "rn-2026-agencies",
+          "theme": "Dépenses publiques",
+          "label": "Réduire certains financements d'agences et opérateurs",
+          "revenueDeltaBillion": 0,
+          "expenseDeltaBillion": -7.7,
+          "sourcePage": 3
+        },
+        {
+          "id": "rn-2026-wealth",
+          "theme": "Fiscalité",
+          "label": "Impôt sur la fortune financière",
+          "revenueDeltaBillion": 4,
+          "expenseDeltaBillion": 0,
+          "sourcePage": 3
+        },
+        {
+          "id": "rn-2026-share-buybacks",
+          "theme": "Fiscalité",
+          "label": "Taxe sur les rachats d'actions",
+          "revenueDeltaBillion": 8.4,
+          "expenseDeltaBillion": 0,
+          "sourcePage": 3
+        },
+        {
+          "id": "rn-2026-pensions",
+          "theme": "Retraites",
+          "label": "Indexation des retraites et dégel des prestations",
+          "revenueDeltaBillion": 0,
+          "expenseDeltaBillion": 3.61,
+          "sourcePage": 4
+        }
+      ]
+    },
+    {
+      "id": "lfi-2026",
+      "party": "LFI",
+      "year": 2026,
+      "sourceDate": "2025-10-24",
+      "baseReferenceId": "plf-plfss-2026-initial",
+      "source": "https://lafranceinsoumise.fr/wp-content/uploads/2025/10/Budget-2026_LFI_web_pages.pdf",
+      "status": "summary-verified-detail-pending",
+      "claimedTotals": {
+        "additionalRevenuesBillion": 183.6,
+        "revenueLossBillion": 4.5,
+        "additionalSpendingBillion": 167.9,
+        "spendingSavingsBillion": 15.4,
+        "claimedBalanceImprovementBillion": 26.7
+      },
+      "measures": []
+    },
+    {
+      "id": "lfi-2027",
+      "party": "LFI",
+      "year": 2027,
+      "sourceDate": "2026-10-14",
+      "baseReferenceId": null,
+      "source": "https://lcp.fr/actualites/contre-budget-lfi-propose-1064-milliards-d-euros-de-recettes-supplementaires-et-817",
+      "status": "secondary-source-partial",
+      "claimedTotals": {
+        "additionalRevenuesBillion": 106.4,
+        "additionalSpendingBillion": 81.7
+      },
+      "measures": []
+    }
+  ],
+  "extractionRules": [
+    "Ne jamais appliquer directement des deltas PLF 2026 aux comptes exécutés 2025.",
+    "Ne pas traiter une mesure absente comme montant zéro : statut non chiffré/incomplet.",
+    "Ne pas sommer le total publié et ses mesures détaillées.",
+    "Conserver source, millésime, base, périmètre, page et degré de vérification.",
+    "Reventiler les mesures transversales sur une nomenclature canonique seulement avec une règle et un périmètre explicites.",
+    "Une mesure non pleinement applicable la première année nécessite une trajectoire annuelle."
+  ]
+}
