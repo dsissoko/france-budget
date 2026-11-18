@@ -1,39 +1,74 @@
-# France Budget
+# Mon Budget Citoyen
 
-[![Statut du site sur Vercel](https://img.shields.io/website?url=https%3A%2F%2Fmon-budget-citoyen.vercel.app&label=Vercel&logo=vercel&logoColor=white)](https://mon-budget-citoyen.vercel.app)
+[![Site Vercel](https://img.shields.io/website?url=https%3A%2F%2Fmon-budget-citoyen.vercel.app&label=Vercel&logo=vercel&logoColor=white)](https://mon-budget-citoyen.vercel.app)
 
-**Application en ligne : [Mon Budget Citoyen](https://mon-budget-citoyen.vercel.app)**
+**Application : [mon-budget-citoyen.vercel.app](https://mon-budget-citoyen.vercel.app)**
 
-Un simulateur citoyen open source pour **comprendre**, **comparer** les propositions politiques et **construire son propre budget**.
+Simulateur citoyen open source et non partisan pour **comprendre** les finances publiques, **comparer** deux budgets, **construire** son propre scénario et **voter** pour des budgets publiés.
 
-> **V1 de démonstration** : les agrégats utilisés dans l'interface sont fictifs et ne représentent pas l'exécution réelle 2025. Les mesures sont des illustrations thématiques et ne constituent pas des chiffrages validés des partis.
+> **Statut : V1 en recette.** Les agrégats de recettes (1 561,6 Md€), de dépenses (1 714,1 Md€) et le déficit (152,5 Md€) correspondent à la référence INSEE 2025 utilisée par le projet. La ventilation des catégories est **indicative et pédagogique**, non une extraction comptable certifiée. Les mesures politiques ont des sources et statuts distincts ; les simulations sont mécaniques, non des prévisions économiques.
 
-## Vision
-Voir [docs/vision.md](docs/vision.md).
+## Parcours
 
-## Lancer localement
+- **Comprendre** : agrégats INSEE 2025, catégories de recettes et de dépenses, explications et trajectoire indicative.
+- **Comparer** : choisir un budget A puis un budget B **en deux clics** parmi les budgets mis en avant (10 maximum) ; comparaison à la référence INSEE ; **Réinitialiser** pour recommencer.
+- **Mon budget** : partir de la référence ou d'un budget existant, modifier les postes, ajouter des propositions, enregistrer des scénarios dans le navigateur ou publier.
+- **Voter** : explorer les budgets politiques et citoyens publiés, filtrer, consulter le détail et soutenir un budget. Le vote n'est pas une élection représentative.
+
+## Architecture actuelle
+
+```text
+Navigateur (React 19 / Vite / TypeScript / CSS / Recharts)
+    ├── localStorage : brouillons et scénarios personnels non publiés
+    ├── GET /api/reference : catégories et mesures politiques
+    ├── GET /api/budgets : budgets publics, sélection éditoriale et votes
+    ├── POST /api/budgets : publication citoyenne
+    └── POST /api/votes : soutien d'un budget
+              │
+       Fonctions serverless Vercel (Node.js)
+              │ DATABASE_URL (secret serveur)
+              ▼
+          Neon PostgreSQL
+```
+
+**Neon est la source de vérité** pour les catégories budgétaires, les mesures et les budgets publics. Les budgets politiques et citoyens utilisent le même modèle `budgets` + `measures`, différenciés par `origin`. Les règles de ventilation du moteur de projection restent **partiellement codées** dans `src/projection.ts` : leur migration est suivie par [l'issue #22](https://github.com/dsissoko/france-budget/issues/22).
+
+Les scénarios **enregistrés** restent locaux au navigateur/profil : ils ne sont ni synchronisés entre appareils ni publiés automatiquement. Une **publication** crée une copie indépendante dans Neon. Le site n'impose pas de compte utilisateur ; un nom/pseudonyme public est demandé lors de la publication.
+
+## Développement
+
+Prérequis : Node.js compatible avec Vite 6 et npm.
+
 ```bash
 npm install
 npm run dev
+npm run check
+npm test
+npm run build
 ```
-Vérifier : `npm run check && npm run build`.
 
-## Architecture
-- Vite + React + TypeScript + CSS léger + Recharts + Lucide.
-- Données mockées et catégorisées : `src/data.ts`.
-- Simulateur interactif sans serveur ; réglages citoyens enregistrés localement.
-- Nomenclatures canoniques illustratives accessibles dans « Mon budget ».
-- Aucune donnée personnelle collectée.
+Le frontend utilise les routes `/api/*` : `vite dev` seul ne fournit pas les fonctions Vercel ni Neon. Pour tester les parcours avec base de données, utiliser un environnement Vercel adapté et une `DATABASE_URL` **côté serveur uniquement**, jamais avec le préfixe `VITE_`. Ne pas pointer les tests d'écriture vers la production.
 
-## CI/CD
-GitHub Actions réalise le typecheck et la compilation. Vercel est connecté nativement à ce dépôt : chaque push sur `main` déclenche la production, chaque pull request une preview. Aucun secret ou token de déploiement dans GitHub Actions.
+## Documentation
 
-## Feuille de route
-1. Intégrer comptes publics Insee 2025 complets et rapprochements vérifiés.
-2. Indexer des contre-budgets sourcés RN, LFI, Horizons, avec métadonnées et statut du chiffrage.
-3. Ajouter un modèle de correspondance fiable COFOG/SEC 2010/LOLF, par périmètre.
-4. Documenter hypothèses macroéconomiques, incompatibilités et recouvrements de mesures.
-5. Ajouter des tests de données, accessibilité et parcours mobile.
+- [Vision produit et versions](docs/vision.md)
+- [Architecture et modèle de données](docs/architecture.md)
+- [Intégration Neon, publication et sécurité](docs/neon-integration.md)
+- [Schéma SQL versionné](db/schema.sql)
+- [Issues et recette](https://github.com/dsissoko/france-budget/issues) : `v1.0.0` en validation, `v1.1.0` pour les évolutions de projection.
+
+## Livraison
+
+GitHub `main` déclenche les déploiements Vercel via l'intégration Git native. GitHub Actions vérifie la compilation et les contrôles définis dans les workflows ; aucun jeton de déploiement Vercel n'est requis dans les actions. Les publications et votes existants dans Neon ne sont pas réinitialisés par les déploiements du frontend.
+
+## Limites connues
+
+- Ventilation des catégories indicative, même lorsque les agrégats sont officiels.
+- Interactions entre mesures, effets macroéconomiques et risques de double compte non modélisés exhaustivement.
+- Limitation des votes par cookie/navigateur, sans garantie d'unicité par personne.
+- Migration des règles de projection vers Neon inachevée (issue #22).
+- La qualification du désendettement, de la dette/PIB et des intérêts relève de `v1.1.0`.
 
 ## Licence
-MIT. Les données et documents tiers restent sous leurs licences respectives.
+
+MIT. Les données et documents tiers conservent leurs propres licences.
