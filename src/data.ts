@@ -5,7 +5,10 @@ export type Measure={id:string;party:'RN'|'LFI'|'Horizons';theme:string;title:st
 // Soutien aux entreprises : reclassement PÉDAGOGIQUE de 30 Md€ depuis « économie » ; ce montant n'est PAS une statistique officielle des aides.
 // Source : https://www.insee.fr/fr/statistiques/8956575
 export const expenses:Category[]=[
-{id:'social',label:'Retraites et solidarité',amount:620,canonical:'COFOG 10 — Protection sociale',description:'Retraites, prestations sociales et solidarité.'},
+{id:'social',label:'Retraites et pensions',amount:400,canonical:'COFOG 10.2 — Vieillesse et 10.3 — Survivants (ventilation indicative)',description:'Pensions de retraite et pensions de réversion. Montant indicatif issu du reclassement de l’ancien poste de 620 Md€, non certifié.'},
+{id:'family',label:'Famille et enfance',amount:65,canonical:'COFOG 10.4 — Famille et enfants (ventilation indicative)',description:'Allocations familiales et soutien à la parentalité et à l’enfance. Montant indicatif, non certifié.'},
+{id:'unemployment',label:'Chômage et insertion',amount:50,canonical:'COFOG 10.5 — Chômage (ventilation indicative)',description:'Indemnisation du chômage et dispositifs d’insertion associés. Montant indicatif, non certifié.'},
+{id:'solidarity',label:'Solidarité et autonomie',amount:105,canonical:'COFOG 10 — Autres fonctions de protection sociale (ventilation indicative)',description:'RSA, prime d’activité, handicap, invalidité, dépendance et autres protections sociales. Regroupement pédagogique, non certifié.'},
 {id:'health',label:'Santé',amount:280,canonical:'COFOG 07 — Santé',description:'Hôpitaux, soins et politique de santé.'},
 {id:'education',label:'Éducation',amount:180,canonical:'COFOG 09 — Enseignement',description:'Écoles, universités et formation.'},
 {id:'economy',label:'Économie et transports',amount:125,canonical:'COFOG 04 — Affaires économiques (ventilation indicative)',description:'Transports, infrastructures et autres affaires économiques, hors soutien aux entreprises isolé ci-dessous.'},
