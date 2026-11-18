@@ -20,6 +20,12 @@ describe('projection de contre-budgets',()=>{
   expect(changed.expenses['enterprise-support']).toBe(20);
   expect(changed.deficit).toBeCloseTo(142.5,8);
  });
+ it('ventile les 620 Md€ indicatifs en quatre postes sans changer le total',()=>{
+  expect(['social','family','unemployment','solidarity'].map(id=>expenses.find(c=>c.id===id)?.amount)).toEqual([400,65,50,105]);
+  expect(sum(expenses)).toBeCloseTo(1714.1,8);
+  const result=calculateScenario([],{revenues:{},expenses:{family:60}});
+  expect(result.deficit).toBeCloseTo(147.5,8);
+ });
  it('reproduit les 5 montants revendiqués RN / LFI sans confondre cette égalité avec une preuve économique',()=>{
   const published=measures.filter(m=>m.status==='publié');
   expect(published).toHaveLength(5);
