@@ -7,7 +7,7 @@ type Tab='comprendre'|'comparer'|'budget'|'voter';
 type Custom={revenues:Record<string,number>;expenses:Record<string,number>};
 type CitizenMeasure={id:string;title:string;description:string;kind:'revenues'|'expenses';categoryId:string;delta:number};
 type SavedScenario={id:string;name:string;createdAt:string;budget:Custom;picked:string[];citizenMeasures?:CitizenMeasure[]};
-type PublishedBudget={id:string;title:string;description:string;origin:'party'|'citizen';published_at:string;votes:number;scenario:{budget:Custom;picked:string[];citizenMeasures?:CitizenMeasure[]}};
+type PublishedBudget={id:string;title:string;description:string;origin:'party'|'citizen';featured:boolean;featured_order:number|null;published_at:string;votes:number;scenario:{budget:Custom;picked:string[];citizenMeasures?:CitizenMeasure[]}};
 const loadSaved=():SavedScenario[]=>{try{const v=JSON.parse(localStorage.getItem('france-budget-scenarios')||'[]');return Array.isArray(v)?v:[]}catch{return []}};
 
 const defaults:Custom={revenues:{},expenses:{}};
