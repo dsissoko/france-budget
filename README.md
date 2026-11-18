@@ -1,5 +1,9 @@
 # France Budget
 
+[![Statut du site sur Vercel](https://img.shields.io/website?url=https%3A%2F%2Fmon-budget-citoyen.vercel.app&label=Vercel&logo=vercel&logoColor=white)](https://mon-budget-citoyen.vercel.app)
+
+**Application en ligne : [Mon Budget Citoyen](https://mon-budget-citoyen.vercel.app)**
+
 Un simulateur citoyen open source pour **comprendre**, **comparer** les propositions politiques et **construire son propre budget**.
 
 > **V1 de démonstration** : les agrégats utilisés dans l'interface sont fictifs et ne représentent pas l'exécution réelle 2025. Les mesures sont des illustrations thématiques et ne constituent pas des chiffrages validés des partis.
