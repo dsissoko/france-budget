@@ -1,5 +1,8 @@
 export type Category={id:string;label:string;amount:number;canonical:string;description:string};
 export type Measure={id:string;party:'RN'|'LFI'|'Horizons';theme:string;title:string;revenueDelta:number;expenseDelta:number;source:string;year:number;status:'publié'|'illustration';description:string};
+// Totaux officiels APU 2025 INSEE : dépenses 1 714,1 Md€, recettes 1 561,6 Md€, déficit 152,5 Md€.
+// La répartition par catégorie est indicative ; les lignes d'ajustement rendent les totaux exacts.
+// Source : https://www.insee.fr/fr/statistiques/8956575
 export const expenses:Category[]=[
 {id:'social',label:'Retraites et solidarité',amount:620,canonical:'COFOG 10 — Protection sociale',description:'Retraites, prestations sociales et solidarité.'},
 {id:'health',label:'Santé',amount:280,canonical:'COFOG 07 — Santé',description:'Hôpitaux, soins et politique de santé.'},
@@ -10,7 +13,8 @@ export const expenses:Category[]=[
 {id:'safety',label:'Sécurité et justice',amount:55,canonical:'COFOG 03 — Ordre et sécurité publics',description:'Police, justice et sécurité.'},
 {id:'culture',label:'Culture et loisirs',amount:40,canonical:'COFOG 08 — Loisirs, culture et culte',description:'Culture, sport et loisirs.'},
 {id:'housing',label:'Logement',amount:55,canonical:'COFOG 06 — Logement et équipements collectifs',description:'Logement et équipements collectifs.'},
-{id:'environment',label:'Environnement',amount:50,canonical:'COFOG 05 — Protection de l’environnement',description:'Actions de protection de l’environnement.'}
+{id:'environment',label:'Environnement',amount:50,canonical:'COFOG 05 — Protection de l’environnement',description:'Actions de protection de l’environnement.'},
+{id:'other-expenses',label:'Autres dépenses et ajustement',amount:64.1,canonical:'Ventilation indicative — solde de rapprochement INSEE 2025',description:'Complément de ventilation pour retrouver exactement les dépenses publiques 2025 ; répartition fonctionnelle à consolider.'}
 ];
 export const revenues:Category[]=[
 {id:'vat',label:'TVA et consommation',amount:260,canonical:'SEC 2010 — Impôts sur produits',description:'Fiscalité sur les achats et la consommation.'},
@@ -22,7 +26,7 @@ export const revenues:Category[]=[
 {id:'energy',label:'Énergie et environnement',amount:45,canonical:'SEC 2010 — Impôts sur produits',description:'Fiscalité énergétique et environnementale.'},
 {id:'otherTax',label:'Autres impôts',amount:95,canonical:'SEC 2010 — Impôts divers',description:'Autres recettes fiscales.'},
 {id:'nontax',label:'Recettes non fiscales',amount:80,canonical:'SEC 2010 — Revenus de la propriété, ventes et transferts',description:'Dividendes, services, revenus divers.'},
-{id:'other',label:'Autres recettes',amount:0,canonical:'SEC 2010 — Autres recettes',description:'Autres catégories de recettes.'}
+{id:'other',label:'Autres recettes et ajustement',amount:41.6,canonical:'Ventilation indicative — solde de rapprochement INSEE 2025',description:'Complément de ventilation pour retrouver exactement les recettes publiques 2025 ; répartition économique à consolider.'}
 ];
 // Mesures de démonstration uniquement : intitulés inspirés de débats publics,
 // montants fictifs, jamais présentés comme chiffrages des formations.
