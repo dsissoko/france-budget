@@ -53,3 +53,11 @@ Pas de prévision macroéconomique, d'affirmation sur la faisabilité politique,
 
 ## Architecture et livraison
 React + Vite + TypeScript à terme, Tailwind/shadcn envisageables ; V1 légère sans backend. GitHub main -> Vercel production, branches/PR -> previews ; GitHub Actions assure les vérifications (build). Aucun jeton Vercel dans GitHub Actions : intégration Git native.
+
+## Architecture de données unifiée (Neon / Vercel)
+
+La source de vérité pour le référentiel budgétaire et les scénarios publiés est **Neon PostgreSQL**, accessible au navigateur **uniquement via les API Vercel**. Les catégories et mesures politiques proviennent de `GET /api/reference`. Les budgets des partis et citoyens proviennent de `GET /api/budgets` ; leur différence métier est l'attribut `origin`, pas un modèle ou un moteur distinct. Les vues « Comprendre », « Comparer », « Mon budget » et « Voter » réutilisent les mêmes catégories et projections.
+
+Un scénario budgétaire possède un identifiant, un titre, une origine (`party` ou `citizen`), une année de référence, une description, une visibilité et une définition JSON (`picked`, `budget`, propositions citoyennes). Les mesures du catalogue politique ont leur propre table `reference_measures` et une provenance documentaire ; les propositions citoyennes publiées sont conservées dans `measures`. Les règles de calcul sont encore implémentées dans `src/projection.ts` et devront être externalisées pour obtenir une centralisation totale des hypothèses.
+
+La sauvegarde personnelle reste locale, hors Neon. La publication est une copie indépendante et définitive. Voir `docs/neon-integration.md` et `db/schema.sql`.
