@@ -17,11 +17,13 @@
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "lucide-react": "^0.468.0",
-    "recharts": "^2.15.0"
+    "recharts": "^2.15.0",
+    "@neondatabase/serverless": "^1.0.0"
   },
   "devDependencies": {
     "@types/react": "^19.1.0",
     "@types/react-dom": "^19.1.0",
-    "vitest": "^3.2.4"
+    "vitest": "^3.2.4",
+    "@types/node": "^22.15.0"
   }
 }

@@ -8,3 +8,9 @@
 
 /* Comparaison visuelle : mêmes échelles pour les deux scénarios d'une famille. */
 .compare-group{margin-top:22px}.compare-group h4{font-size:13px;margin:0 0 12px}.compare-item{margin:0 0 17px}.compare-item .bar-head{align-items:center}.compare-track{display:flex;flex-direction:column;gap:3px;margin:7px 0}.compare-baseline,.compare-scenario{height:8px;border-radius:4px}.compare-baseline{background:#c6c6c2}.compare-scenario.green{background:#279b89}.compare-scenario.coral{background:#d98971}.compare-item .legend{font-size:10px}
+
+/* Publication citoyenne */
+[role='dialog'] input,[role='dialog'] textarea{display:block;width:100%;box-sizing:border-box;border:1px solid #d8dcd9;border-radius:8px;padding:11px;margin:8px 0 16px;font:inherit;background:#fff;color:#333}
+[role='dialog'] textarea{min-height:90px;resize:vertical}
+[role='dialog'] label{display:block;font-weight:600;font-size:13px}
+@media(max-width:760px){.tabs{overflow-x:auto}.tabs button{flex-shrink:0}.check-row{flex-wrap:wrap}}
