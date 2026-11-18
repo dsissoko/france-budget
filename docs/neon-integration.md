@@ -1,8 +1,8 @@
-# France Budget — publication citoyenne (Neon + Vercel)
+# Mon Budget Citoyen — intégration Neon, publication et votes (v1.0.0)
 
 ## Architecture
 - Frontend React/Vite, sauvegarde locale conservée.
-- Fonctions Vercel `/api/budgets` (GET, POST) et `/api/votes` (POST).
+- Fonctions Vercel `/api/reference` (GET), `/api/budgets` (GET, POST) et `/api/votes` (POST).
 - PostgreSQL Neon à Francfort, avec un rôle applicatif `france_budget_app` à droits limités.
 - `DATABASE_URL` est configuré comme secret serveur dans Vercel (production + preview). **Ne jamais utiliser le préfixe `VITE_` pour ce secret.**
 - Schéma versionné dans `db/schema.sql`.
@@ -59,9 +59,17 @@
 - L'ancienne table reste disponible pour vérification avant suppression future ; **elle n'est plus source de lecture**.
 - La modélisation détaillée des impacts multiples par mesure (`measure_impacts`) reste à implémenter ; elle permettra de supprimer les règles de ventilation codées en dur.
 
-## UX Voter, auteur public et V2
+## UX Voter, auteur public et v1.1.0
 
 - Les nouvelles publications citoyennes exigent un nom ou pseudo public de 2 à 60 caractères, enregistré dans `scenario.author` ; le backend valide ce champ. Les publications historiques restent compatibles et affichent « Auteur anonyme ».
 - Le clic sur une carte ouvre une fiche détaillée sans navigation, reprenant les indicateurs, écarts par poste, mesures et trajectoire de Comparer. La liste est filtrable Tous/Partis/Citoyens et triable par votes, date ou proximité de l'équilibre.
 - V1 : un badge maximum par carte, « À l'équilibre » si |déficit| ≤ 1 Md€, sinon « Déficit réduit » si le déficit diminue d'au moins 1 Md€ face à la référence. Aucune affirmation de soutenabilité à partir de la projection mécanique.
-- V2 : projection à cinq ans avec dette/PIB, intérêts, hypothèses macroéconomiques et analyses de sensibilité. Le badge « Désendettement à 5 ans » sera calculé seulement quand le modèle pluriannuel sera disponible et validé ; ne pas l'afficher par anticipation. Les autres indicateurs restent dans le détail, pas dans une accumulation de badges.
+- v1.1.0 : projection à cinq ans avec dette/PIB, intérêts, hypothèses macroéconomiques et analyses de sensibilité. Le badge « Désendettement à 5 ans » sera calculé seulement quand le modèle pluriannuel sera disponible et validé ; ne pas l'afficher par anticipation. Les autres indicateurs restent dans le détail, pas dans une accumulation de badges.
+
+## Sélection A/B et versions
+
+En v1.0.0, **Comparer** utilise les budgets `featured` issus de Neon : premier clic = A, deuxième clic = B, puis sélection verrouillée. Un bouton **Réinitialiser** vide le duo. Les cartes déjà choisies ne sont pas des commandes de désélection. La référence INSEE reste indépendante des deux choix. Cette ergonomie est suivie dans [l'issue #26](https://github.com/dsissoko/france-budget/issues/26) jusqu'à recette.
+
+Le moteur `src/projection.ts` continue de contenir les règles de ventilation codées en dur ; leur migration vers des paramètres versionnés en base est **inachevée** ([issue #22](https://github.com/dsissoko/france-budget/issues/22)). Le moteur de calcul TypeScript peut rester côté navigateur. Les budgets personnels sauvegardés dans `localStorage` ne font volontairement pas partie de cette migration.
+
+Pour la vue complète des tables, contraintes, flux et limites, voir [architecture.md](architecture.md) et [../db/schema.sql](../db/schema.sql).
