@@ -87,3 +87,15 @@
 .proposal-range{width:100%;accent-color:#239a84}
 .proposal-range.expense{accent-color:#dc806b}
 .proposal-range.revenue{accent-color:#239a84}
+
+/* Vote gallery: aligned content bands across cards, regardless of copy length. */
+.vote-card-main{display:grid;grid-template-rows:64px 52px 72px 30px 24px;align-content:start;min-height:0}
+.vote-card-top{margin:0;min-height:0;align-self:start}
+.vote-card-top .vote-author{min-width:0}
+.vote-card-top .vote-author strong{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+.vote-card h3{margin:0;line-height:1.35;max-height:2.7em;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;overflow-wrap:anywhere}
+.vote-card p{margin:0;line-height:1.5;max-height:4.5em;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden;overflow-wrap:anywhere}
+.vote-meta{margin:0;align-self:center;min-width:0}
+.vote-details-link{align-self:end}
+.vote-action{margin-top:auto;min-height:42px}
+@media(max-width:390px){.vote-card{padding:16px}.vote-card-main{grid-template-rows:70px 56px 76px 34px 24px}.vote-meta{font-size:11px;gap:6px}}
