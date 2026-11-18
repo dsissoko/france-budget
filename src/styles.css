@@ -122,3 +122,12 @@
 .impact-tag{display:inline-flex;align-items:center;font-style:normal;font-size:11px;font-weight:600;line-height:1.4;padding:4px 7px;border-radius:6px;background:#f2f2ef;color:#666}
 .impact-tag.revenue{background:#e9f7f2;color:#167a65}
 .impact-tag.expense{background:#fff0eb;color:#ad604a}
+
+/* Convention globale : vert = recettes, corail = dépenses. Les mesures mixtes affichent les deux. */
+.measure-with-impact:has(.impact-tag.revenue):not(:has(.impact-tag.expense)){border-left:3px solid #239a84}
+.measure-with-impact:has(.impact-tag.expense):not(:has(.impact-tag.revenue)){border-left:3px solid #dc806b}
+.measure-with-impact:has(.impact-tag.revenue):has(.impact-tag.expense){border-left:3px solid #239a84;border-right:3px solid #dc806b}
+.check-row:has(.impact-tag.revenue):not(:has(.impact-tag.expense)){border-left:3px solid #239a84}
+.check-row:has(.impact-tag.expense):not(:has(.impact-tag.revenue)){border-left:3px solid #dc806b}
+.check-row:has(.impact-tag.revenue):has(.impact-tag.expense){border-left:3px solid #239a84;border-right:3px solid #dc806b}
+.check-row .measure-impact-tags{display:flex;flex-direction:row;flex-wrap:wrap;gap:5px;margin-top:7px}
