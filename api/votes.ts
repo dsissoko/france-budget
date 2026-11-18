@@ -17,7 +17,7 @@ export default async function handler(req: any, res: any) {
     const sql = db();
     const rows = await sql`INSERT INTO votes (budget_id,voter_hash)
       SELECT id,${hash} FROM budgets WHERE id=${body.budgetId}::uuid
-      AND origin='citizen' AND visibility='public'
+      AND origin IN ('citizen','party') AND visibility='public'
       ON CONFLICT (budget_id,voter_hash) DO NOTHING RETURNING id`;
     return reply(res, rows.length ? 201 : 409, { voted: rows.length > 0 });
   } catch {
