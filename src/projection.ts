@@ -1,0 +1,116 @@
+import { expenses, revenues, measures, type Category, type Measure } from './data';
+
+/**
+ * Les règles traduisent des mesures politiques en lignes budgétaires.
+ * Ce sont des INTERPRÉTATIONS documentées, jamais des évaluations opposables.
+ * Toutes les unités financières sont en Md€.
+ */
+export type Side = 'revenues' | 'expenses';
+export type Override = { revenues: Record<string, number>; expenses: Record<string, number> };
+export type Entry = { measureId: string; side: Side; categoryId: string; amount: number; rationale: string };
+export type Rule = {
+  kind: 'allocate' | 'specific';
+  target?: { side: Side; categoryId: string; share: number }[];
+  explanation: string;
+  assumption?: string;
+};
+export type Result = {
+  entries: Entry[];
+  revenues: Record<string, number>;
+  expenses: Record<string, number>;
+  revenueTotal: number;
+  expenseTotal: number;
+  deficit: number;
+  balanceDelta: number;
+  warnings: string[];
+};
+
+/**
+ * Un même thème peut solliciter des règles différentes.
+ * Une nouvelle proposition simple se configure ici sans nouvelle fonction.
+ * Une proposition complexe peut être branchée sur un calcul spécifique.
+ */
+export const rules: Record<string, Rule> = {
+  'rn-vat': { kind: 'allocate', target: [{ side: 'revenues', categoryId: 'vat', share: 1 }], explanation: 'Baisse de recettes affectée à la TVA et consommation.' },
+  'rn-social': { kind: 'specific', explanation: 'Projection interprétative : effet direct sur la protection sociale ; effets sur le marché du travail non quantifiés en V1.', assumption: 'Aucun effet automatique sur chômage, PIB, cotisations ou TVA.' },
+  'rn-agencies': { kind: 'allocate', target: [{ side: 'expenses', categoryId: 'general', share: 1 }], explanation: 'Économie affectée par approximation aux services publics généraux.' },
+  'lfi-wealth': { kind: 'allocate', target: [{ side: 'revenues', categoryId: 'property', share: 1 }], explanation: 'Recettes nouvelles affectées aux prélèvements sur le patrimoine.' },
+  'lfi-school': { kind: 'allocate', target: [{ side: 'expenses', categoryId: 'education', share: 1 }], explanation: 'Dépense affectée à la fonction enseignement.' },
+  'lfi-green': { kind: 'allocate', target: [{ side: 'expenses', categoryId: 'environment', share: 0.4 }, { side: 'expenses', categoryId: 'economy', share: 0.6 }], explanation: 'Répartition conventionnelle 40 % environnement, 60 % économie/transports ; aucun fondement comptable officiel.' },
+  'hor-admin': { kind: 'allocate', target: [{ side: 'expenses', categoryId: 'general', share: 1 }], explanation: 'Économie indicative sur les services publics généraux.' },
+  'hor-tax': { kind: 'allocate', target: [{ side: 'revenues', categoryId: 'otherTax', share: 1 }], explanation: 'Baisse de recettes affectée aux autres impôts, faute de ventilation précise.' },
+};
+const round = (n: number) => Math.round(n * 100) / 100;
+const sum = (values: Record<string, number>) => Object.values(values).reduce((a, b) => a + b, 0);
+const baseline = (items: Category[]) => Object.fromEntries(items.map(c => [c.id, c.amount]));
+const categoryExists = (side: Side, id: string) => (side === 'revenues' ? revenues : expenses).some(c => c.id === id);
+
+/** 
+ * Point d'extension des règles spécifiques : ici une approximation directe seulement.
+ * Un futur modèle macro peut calculer plusieurs écritures et expliciter ses hypothèses.
+ */
+function specific(measure: Measure): Entry[] {
+  switch (measure.id) {
+    case 'rn-social':
+      return [{ measureId: measure.id, side: 'expenses', categoryId: 'social', amount: measure.expenseDelta,
+        rationale: 'Économie imputée à la protection sociale ; effets indirects sur emploi et recettes exclus.' }];
+    default:
+      throw new Error('Règle spécifique non implémentée : ' + measure.id);
+  }
+}
+export function projectMeasure(measure: Measure): Entry[] {
+  const rule = rules[measure.id];
+  if (!rule) throw new Error('Règle absente pour ' + measure.id);
+  if (rule.kind === 'specific') return specific(measure);
+  const targets = rule.target || [];
+  if (!targets.length) throw new Error('Ventilation vide : ' + measure.id);
+  const shares = targets.reduce((a, t) => a + t.share, 0);
+  if (Math.abs(shares - 1) > 0.000001) throw new Error('Parts non équilibrées : ' + measure.id);
+  return targets.map(t => {
+    if (!categoryExists(t.side, t.categoryId)) throw new Error('Catégorie inconnue : ' + t.categoryId);
+    const amount = (t.side === 'revenues' ? measure.revenueDelta : measure.expenseDelta) * t.share;
+    return { measureId: measure.id, side: t.side, categoryId: t.categoryId, amount,
+      rationale: rule.explanation };
+  });
+}
+export function calculateScenario(selectedIds: string[], citizen: Override = { revenues: {}, expenses: {} }): Result {
+  const revenueValues = baseline(revenues), expenseValues = baseline(expenses);
+  const entries: Entry[] = [];
+  const warnings: string[] = [];
+  for (const id of new Set(selectedIds)) {
+    const measure = measures.find(m => m.id === id);
+    if (!measure) { warnings.push('Mesure inconnue ignorée : ' + id); continue; }
+    try {
+      const projected = projectMeasure(measure);
+      entries.push(...projected);
+      if (measure.status === 'illustration') warnings.push('Chiffrage fictif : ' + measure.title);
+      if (rules[measure.id].kind === 'specific') warnings.push('Hypothèse spécifique : ' + rules[measure.id].explanation);
+    } catch (err) { warnings.push(String(err)); }
+  }
+  for (const entry of entries) {
+    const target = entry.side === 'revenues' ? revenueValues : expenseValues;
+    target[entry.categoryId] += entry.amount;
+  }
+  // Les modifications citoyennes sont des écarts au référentiel initial.
+  // Elles s'ajoutent aux écritures de projection, pas aux totaux deux fois.
+  for (const [side, overrides, values, categories] of [
+    ['revenues', citizen.revenues, revenueValues, revenues],
+    ['expenses', citizen.expenses, expenseValues, expenses],
+  ] as const) {
+    for (const [id, value] of Object.entries(overrides ?? {})) {
+      const original = categories.find(c => c.id === id);
+      if (!original || !Number.isFinite(value)) { warnings.push('Ajustement invalide : ' + side + '.' + id); continue; }
+      values[id] += value - original.amount;
+    }
+  }
+  const revenueTotal = round(sum(revenueValues)), expenseTotal = round(sum(expenseValues));
+  const originalBalance = sum(baseline(revenues)) - sum(baseline(expenses));
+  if (Object.values(revenueValues).some(v => v < 0) || Object.values(expenseValues).some(v => v < 0))
+    warnings.push('Au moins un poste négatif : projection non réaliste sur cette référence.');
+  const years = new Set(selectedIds.map(id => measures.find(m => m.id === id)?.year).filter(Boolean));
+  if (years.size > 1) warnings.push('Mesures de millésimes différents : addition illustrative, pas un budget annuel homogène.');
+  if (selectedIds.length > 1) warnings.push('Les interactions et risques de double compte ne sont pas évalués.');
+  return { entries, revenues: revenueValues, expenses: expenseValues, revenueTotal, expenseTotal,
+    deficit: round(expenseTotal - revenueTotal),
+    balanceDelta: round((revenueTotal - expenseTotal) - originalBalance), warnings };
+}
