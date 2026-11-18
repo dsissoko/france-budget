@@ -49,3 +49,8 @@
 .budget-sheet>.card,.budget-sheet>.stats{margin-top:18px}
 .sheet-actions{position:sticky;bottom:-36px;background:#fafaf9;border-top:1px solid #e6e7e2;padding:16px 0 24px;display:flex;justify-content:flex-end;gap:12px;flex-wrap:wrap}
 @media(max-width:600px){.vote-list{grid-template-columns:1fr}.vote-toolbar{align-items:stretch}.vote-sort{justify-content:space-between}.budget-sheet{height:94dvh;border-radius:18px 18px 0 0}.sheet-actions{justify-content:stretch}.sheet-actions button{flex:1}}
+
+/* Introduction unifiée */
+.intro-unified{max-width:850px;margin-bottom:26px}
+.intro-unified p{margin:0 0 12px}
+.intro-unified .text-button{margin:0;padding:7px 0}
