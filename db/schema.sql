@@ -9,6 +9,8 @@ CREATE TABLE IF NOT EXISTS budgets (
  reference_year integer NOT NULL CHECK (reference_year BETWEEN 2000 AND 2100),
  reference_data_version text,
  scenario jsonb NOT NULL DEFAULT '{}'::jsonb CHECK (jsonb_typeof(scenario)='object'),
+ featured boolean NOT NULL DEFAULT false,
+ featured_order integer,
  published_at timestamptz NOT NULL DEFAULT now()
 );
 CREATE TABLE IF NOT EXISTS measures (
@@ -20,8 +22,17 @@ CREATE TABLE IF NOT EXISTS measures (
  kind text NOT NULL CHECK (kind IN ('revenue','expense')),
  delta_amount numeric(18,3) NOT NULL,
  reference_amount numeric(18,3) NOT NULL CHECK (reference_amount >= 0),
+ legacy_id text,
+ theme text,
+ source text,
+ reference_year integer,
+ status text,
+ revenue_delta numeric(18,3),
+ expense_delta numeric(18,3),
  created_at timestamptz NOT NULL DEFAULT now()
 );
+CREATE UNIQUE INDEX IF NOT EXISTS idx_measures_budget_legacy ON measures(budget_id,legacy_id) WHERE legacy_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_budgets_featured ON budgets(featured_order,published_at DESC) WHERE featured=true AND visibility='public';
 CREATE TABLE IF NOT EXISTS votes (
  id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
  budget_id uuid NOT NULL REFERENCES budgets(id) ON DELETE CASCADE,
@@ -64,6 +75,8 @@ CREATE TABLE IF NOT EXISTS reference_categories (
  label text NOT NULL,amount numeric(18,3) NOT NULL,canonical text NOT NULL,
  description text NOT NULL,reference_year int NOT NULL DEFAULT 2025,sort_order int NOT NULL
 );
+-- Ancienne table reference_measures : conserver uniquement pour migration et rollback.
+-- Le catalogue courant des mesures politiques est désormais dans measures.
 CREATE TABLE IF NOT EXISTS reference_measures (
  id text PRIMARY KEY,party text NOT NULL,theme text NOT NULL,title text NOT NULL,
  revenue_delta numeric(18,3) NOT NULL,expense_delta numeric(18,3) NOT NULL,
