@@ -1,5 +1,5 @@
 import { createHash, randomBytes } from 'node:crypto';
-import { db, reply, method, jsonBody } from './_db';
+import { db, reply, method, jsonBody } from './_db.js';
 export default async function handler(req: any, res: any) {
   if (!method(req, 'POST', res)) return;
   const origin=req.headers.origin; if(origin&&new URL(origin).host!==req.headers.host)return reply(res,403,{error:'Origine non autorisée'});
