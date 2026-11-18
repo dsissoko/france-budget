@@ -18,7 +18,7 @@ export default async function handler(req: any, res: any) {
   const categories=new Map(refs.map((x:any)=>[(x.side==='revenues'?'revenue:':'expense:')+x.id,x.amount]));
   if(typeof b.title!=='string'||b.title.trim().length<3||b.title.length>100||
     typeof b.description!=='string'||b.description.length>500||
-    b.referenceYear!==2025||!Array.isArray(b.measures)||b.measures.length>100||
+    b.referenceYear!==2025||typeof b.scenario?.author!=='string'||b.scenario.author.trim().length<2||b.scenario.author.length>60||!Array.isArray(b.measures)||b.measures.length>100||
     !b.scenario||typeof b.scenario!=='object'||Array.isArray(b.scenario)||
     !b.scenario.budget||!Array.isArray(b.scenario.picked)||b.scenario.picked.length>30)
     return reply(res,400,{error:'Budget invalide'});
