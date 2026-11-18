@@ -1,7 +1,16 @@
 import {describe,it,expect} from 'vitest';
-import {measures} from './data';
+import {measures,expenses,revenues,sum} from './data';
 import {auditMeasure,calculateScenario,projectMeasure} from './projection';
 describe('projection de contre-budgets',()=>{
+ it('retrouve exactement les agrégats officiels APU 2025 INSEE',()=>{
+  expect(sum(revenues)).toBeCloseTo(1561.6,8);
+  expect(sum(expenses)).toBeCloseTo(1714.1,8);
+  expect(sum(expenses)-sum(revenues)).toBeCloseTo(152.5,8);
+  const base=calculateScenario([]);
+  expect(base.revenueTotal).toBeCloseTo(1561.6,8);
+  expect(base.expenseTotal).toBeCloseTo(1714.1,8);
+  expect(base.deficit).toBeCloseTo(152.5,8);
+ });
  it('reproduit les 5 montants revendiqués RN / LFI sans confondre cette égalité avec une preuve économique',()=>{
   const published=measures.filter(m=>m.status==='publié');
   expect(published).toHaveLength(5);
