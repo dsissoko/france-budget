@@ -80,3 +80,5 @@
 .budget-origin{display:flex;align-items:center;gap:12px;flex-wrap:wrap;font-size:13px;color:#777771;margin-bottom:16px}
 .budget-origin strong{color:#292924}
 @media(max-width:650px){.compare-gallery,.compare-measures{grid-template-columns:1fr}.compare-slots{gap:8px}.compare-slot{padding:11px}.compare-slot.selected{padding:10px}.compare-triple-line{grid-template-columns:35px minmax(0,1fr) 75px;gap:6px}}
+
+.save-notice{font-size:13px;color:#176f60;background:#eef8f4;border:1px solid #cce6da;border-radius:10px;padding:12px 14px;margin:0 0 14px}
