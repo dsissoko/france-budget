@@ -99,3 +99,20 @@
 .vote-details-link{align-self:end}
 .vote-action{margin-top:auto;min-height:42px}
 @media(max-width:390px){.vote-card{padding:16px}.vote-card-main{grid-template-rows:70px 56px 76px 34px 24px}.vote-meta{font-size:11px;gap:6px}}
+
+/* Comparer : deux choix séquentiels, pas de désélection implicite. */
+.compare-picker-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.compare-picker-heading h3{margin:0}
+.compare-reset{display:inline-flex;align-items:center;gap:7px}
+.compare-reset:disabled{opacity:.45;cursor:not-allowed}
+.compare-slot{cursor:default;min-height:105px}
+.compare-slot.awaiting{border:2px dashed #238d80;background:#f5fbf9;padding:15px}
+.compare-slot.filled-a{border:2px solid #287fbc;background:#f2f8fc;padding:15px}
+.compare-slot.filled-b{border:2px solid #d18a38;background:#fff8ed;padding:15px}
+.compare-choice.chosen-a{border-color:#287fbc;background:#f2f8fc}
+.compare-choice.chosen-b{border-color:#d18a38;background:#fff8ed}
+.compare-choice.chosen-a .compare-choice-mark{color:#287fbc}
+.compare-choice.chosen-b .compare-choice-mark{color:#b46b20}
+.compare-choice:disabled{cursor:default;opacity:.7}
+.compare-choice.chosen-a:disabled,.compare-choice.chosen-b:disabled{opacity:1}
+@media(max-width:650px){.compare-slot{min-height:118px}}
