@@ -114,3 +114,47 @@ export function calculateScenario(selectedIds: string[], citizen: Override = { r
     deficit: round(expenseTotal - revenueTotal),
     balanceDelta: round((revenueTotal - expenseTotal) - originalBalance), warnings };
 }
+
+/**
+ * Rapprochement de traçabilité : vérifie si la projection comptabilise
+ * le même delta que celui REVENDIQUÉ par l'auteur.
+ * Une égalité n'est ni une validation macroéconomique, ni une preuve de faisabilité.
+ */
+export type Audit = {
+  measureId: string;
+  claimBalanceDelta: number;
+  projectedBalanceDelta: number;
+  discrepancy: number;
+  status: 'reproduced' | 'gap' | 'illustration' | 'unavailable';
+  explanation: string;
+  entries: Entry[];
+};
+export function auditMeasure(measure: Measure): Audit {
+  const claimBalanceDelta = round(measure.revenueDelta - measure.expenseDelta);
+  let entries: Entry[] = [];
+  try {
+    entries = projectMeasure(measure);
+    const projectedBalanceDelta = round(entries.reduce((s, e) =>
+      s + (e.side === 'revenues' ? e.amount : -e.amount), 0));
+    const discrepancy = round(projectedBalanceDelta - claimBalanceDelta);
+    const status: Audit['status'] = measure.status === 'illustration'
+      ? 'illustration' : Math.abs(discrepancy) <= 0.01 ? 'reproduced' : 'gap';
+    return { measureId: measure.id, claimBalanceDelta, projectedBalanceDelta,
+      discrepancy, status, explanation: status === 'reproduced'
+        ? 'Chiffrage annoncé intégralement ventilé : égalité comptable, pas validation économique.'
+        : status === 'illustration'
+        ? 'Chiffrage fictif : aucune revendication officielle à valider.'
+        : 'La ventilation ne reproduit pas entièrement le montant annoncé.',
+      entries };
+  } catch (error) {
+    return { measureId: measure.id, claimBalanceDelta, projectedBalanceDelta: 0,
+      discrepancy: -claimBalanceDelta, status: 'unavailable', entries,
+      explanation: 'Projection indisponible : ' + String(error) };
+  }
+}
+export function auditSelected(ids: string[]): Audit[] {
+  return [...new Set(ids)].flatMap(id => {
+    const measure = measures.find(m => m.id === id);
+    return measure ? [auditMeasure(measure)] : [];
+  });
+}
