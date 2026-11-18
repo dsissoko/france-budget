@@ -116,3 +116,9 @@
 .compare-choice:disabled{cursor:default;opacity:.7}
 .compare-choice.chosen-a:disabled,.compare-choice.chosen-b:disabled{opacity:1}
 @media(max-width:650px){.compare-slot{min-height:118px}}
+
+/* Nature et sens des impacts des propositions politiques dans Mon budget. */
+.measure-impact-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px}
+.impact-tag{display:inline-flex;align-items:center;font-style:normal;font-size:11px;font-weight:600;line-height:1.4;padding:4px 7px;border-radius:6px;background:#f2f2ef;color:#666}
+.impact-tag.revenue{background:#e9f7f2;color:#167a65}
+.impact-tag.expense{background:#fff0eb;color:#ad604a}
