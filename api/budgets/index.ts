@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { db, reply, method, jsonBody } from '../_db';
 import { expenses, revenues } from '../../src/data';
 const categories = new Map([...expenses.map(x=>['expense:'+x.id,x.amount] as const),...revenues.map(x=>['revenue:'+x.id,x.amount] as const)]);
@@ -12,6 +13,8 @@ export default async function handler(req: any, res: any) {
    return reply(res,200,{budgets:rows,limit:50});
   }
   if(!method(req,'POST',res))return;
+  const origin=req.headers.origin;const host=req.headers.host;
+  if(origin&&new URL(origin).host!==host)return reply(res,403,{error:'Origine non autorisée'});
   const b=jsonBody(req);
   if(typeof b.title!=='string'||b.title.trim().length<3||b.title.length>100||
     typeof b.description!=='string'||b.description.length>500||
@@ -26,12 +29,21 @@ export default async function handler(req: any, res: any) {
     categories.get(m.kind+':'+m.categoryCode)===m.referenceAmount&&
     m.deltaAmount>=-m.referenceAmount&&m.deltaAmount<=m.referenceAmount))
     return reply(res,400,{error:'Mesures invalides'});
+  const expected=new Map([...revenues.map(x=>['revenue:'+x.id,x.amount] as const),...expenses.map(x=>['expense:'+x.id,x.amount] as const)]);
+  if(!b.scenario.budget.revenues||!b.scenario.budget.expenses||
+    !['revenues','expenses'].every(kind=>Object.entries(b.scenario.budget[kind]).every(([id,value])=>{
+      const base=expected.get((kind==='revenues'?'revenue:':'expense:')+id);
+      return base!==undefined&&typeof value==='number'&&Number.isFinite(value)&&value>=0&&value<=base*2;
+    })))return reply(res,400,{error:'Montants invalides'});
   const canonical=JSON.stringify(b.scenario);
   if(canonical.length>25000)return reply(res,413,{error:'Budget trop volumineux'});
-  const rows=await sql`SELECT public.publish_citizen_budget(${JSON.stringify({title:b.title.trim(),description:b.description,referenceYear:b.referenceYear,scenario:b.scenario,measures:b.measures})}::jsonb) AS id`;
+  const ip=String(req.headers['x-forwarded-for']||'').split(',')[0].trim();
+  const fingerprint=createHash('sha256').update((process.env.DATABASE_URL||'')+':'+ip).digest('hex');
+  const rows=await sql`SELECT public.publish_citizen_budget(${JSON.stringify({title:b.title.trim(),description:b.description,referenceYear:b.referenceYear,scenario:b.scenario,measures:b.measures})}::jsonb,${fingerprint}) AS id`;
   return reply(res,201,{id:rows[0].id});
  }catch(e){
   if(String(e).includes('publication_limit_reached'))return reply(res,409,{error:'Les 50 places sont occupées'});
+  if(String(e).includes('publication_rate_limited'))return reply(res,429,{error:'Limite de 2 publications par 24 h atteinte'});
   return reply(res,500,{error:'Publication momentanément indisponible'});
  }
 }
