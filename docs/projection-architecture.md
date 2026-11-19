@@ -82,7 +82,7 @@ La même logique de simulation alimente Comprendre, Mon budget, Voter et Compare
 
 Les cas initiaux à zéro ou en excédent sont qualifiés prioritairement par leur état final. Pas de vert pour une **simple diminution relative au scénario de référence** ; la courbe doit réellement baisser ou **la hausse doit réellement décélérer**. Une hausse décélérante reste une hausse : le titre doit le dire.
 
-Les seuils numériques de tolérance sont documentés et testés. La distinction d'accélération prend en compte les variations **des pentes annuelles après l'année d'activation des mesures** ; le saut ponctuel de 2026 ne doit pas être qualifié de décélération structurelle. Une série trop courte ou incohérente retourne `UNDETERMINED` (gris). Pour les courbes fluctuantes, la classification doit être prudente et ne pas déduire de causalité. La qualification n'a aucune prétention prédictive.
+Les seuils numériques de tolérance sont documentés et testés. La **direction** et la distinction d'accélération prennent en compte les variations **des pentes annuelles après l'année d'activation des mesures** ; le saut ponctuel de 2026 ne doit ni être qualifié de baisse durable, ni de décélération structurelle. Les transitions vers l'équilibre, l'excédent ou le déficit sont toujours évaluées sur les états initial et final. Une série trop courte ou incohérente retourne `UNDETERMINED` (gris). Pour les courbes fluctuantes, la classification doit être prudente et ne pas déduire de causalité. La qualification n'a aucune prétention prédictive.
 
 ## Présentation ultracompacte
 

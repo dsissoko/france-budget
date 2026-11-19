@@ -27,10 +27,11 @@ export const assessmentService: AssessmentService={
   const fallback:Assessment={code:'UNDETERMINED',direction:'stable',momentum:'steady'};
   if(rows.length<2||rows.some((r,i)=>!Number.isFinite(r.deficit)||!Number.isFinite(r.year)||(i>0&&r.year<=rows[i-1].year)))return fallback;
   const first=rows[0].deficit,last=rows[rows.length-1].deficit;
-  const direction=cmp(last-first,CHANGE_THRESHOLD);
-  // Ignore the first transition, which contains V1's one-off activation of measures.
+  // Exclude the one-time activation jump (2025→2026) from direction and momentum.
+  // A lower final deficit than in 2025 is not a sustained decrease if it rises after 2026.
+  const afterActivation=rows.length>=3?rows.slice(1):rows;
+  const direction=cmp(last-afterActivation[0].deficit,CHANGE_THRESHOLD);
   // Analyse at least THREE subsequent annual differences before inferring curvature.
-  const afterActivation=rows.slice(1);
   const slopes=afterActivation.slice(1).map((r,i)=>(r.deficit-afterActivation[i].deficit)/(r.year-afterActivation[i].year));
   let momentum:Momentum='steady';
   if(slopes.length>=3){
