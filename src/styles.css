@@ -107,12 +107,12 @@
 .compare-reset:disabled{opacity:.45;cursor:not-allowed}
 .compare-slot{cursor:default;min-height:105px}
 .compare-slot.awaiting{border:2px dashed #238d80;background:#f5fbf9;padding:15px}
-.compare-slot.filled-a{border:2px solid #287fbc;background:#f2f8fc;padding:15px}
-.compare-slot.filled-b{border:2px solid #d18a38;background:#fff8ed;padding:15px}
-.compare-choice.chosen-a{border-color:#287fbc;background:#f2f8fc}
-.compare-choice.chosen-b{border-color:#d18a38;background:#fff8ed}
-.compare-choice.chosen-a .compare-choice-mark{color:#287fbc}
-.compare-choice.chosen-b .compare-choice-mark{color:#b46b20}
+.compare-slot.filled-a{border:2px solid #777770;background:#f7f7f5;padding:15px}
+.compare-slot.filled-b{border:2px solid #777770;background:#f7f7f5;padding:15px}
+.compare-choice.chosen-a{border-color:#777770;background:#f7f7f5}
+.compare-choice.chosen-b{border-color:#777770;background:#f7f7f5}
+.compare-choice.chosen-a .compare-choice-mark{color:#555550}
+.compare-choice.chosen-b .compare-choice-mark{color:#555550}
 .compare-choice:disabled{cursor:default;opacity:.7}
 .compare-choice.chosen-a:disabled,.compare-choice.chosen-b:disabled{opacity:1}
 @media(max-width:650px){.compare-slot{min-height:118px}}
