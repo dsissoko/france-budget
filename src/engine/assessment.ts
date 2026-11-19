@@ -13,7 +13,7 @@ export interface Assessment {
 }
 export interface YearlyDeficit {year:number;deficit:number}
 export interface AssessmentService {
-  assess(rows: ReadonlyArray<YearlyDeficit>): Assessment;
+  assess(rows: ReadonlyArray<YearlyDeficit>,applicationYear?:number): Assessment;
 }
 
 // Md€ tolerance prevents tiny numerical differences from changing the public label.
@@ -23,14 +23,15 @@ export const MOMENTUM_THRESHOLD=0.50;
 const sign=(n:number)=>n>BALANCE_THRESHOLD?'deficit':n< -BALANCE_THRESHOLD?'surplus':'balance';
 const cmp=(n:number,t:number):Direction=>n>t?'increasing':n< -t?'decreasing':'stable';
 export const assessmentService: AssessmentService={
- assess(rows) {
+ assess(rows,applicationYear=rows[1]?.year) {
   const fallback:Assessment={code:'UNDETERMINED',direction:'stable',momentum:'steady'};
   if(rows.length<2||rows.some((r,i)=>!Number.isFinite(r.deficit)||!Number.isFinite(r.year)||(i>0&&r.year<=rows[i-1].year)))return fallback;
   const first=rows[0].deficit,last=rows[rows.length-1].deficit;
-  // Exclude the one-time activation jump (2025→2026) from direction and momentum.
-  // A lower final deficit than in 2025 is not a sustained decrease if it rises after 2026.
-  const afterActivation=rows.length>=3?rows.slice(1):rows;
-  const direction=cmp(last-afterActivation[0].deficit,CHANGE_THRESHOLD);
+  // Exclude every pre-application year and the first policy activation jump.
+  // Analyse only the sustained trajectory from the application year onward.
+  const afterActivation=rows.filter(row=>row.year>=applicationYear);
+  if(afterActivation.length<2)return fallback;
+  const direction=cmp(afterActivation[afterActivation.length-1].deficit-afterActivation[0].deficit,CHANGE_THRESHOLD);
   // Analyse at least THREE subsequent annual differences before inferring curvature.
   const slopes=afterActivation.slice(1).map((r,i)=>(r.deficit-afterActivation[i].deficit)/(r.year-afterActivation[i].year));
   let momentum:Momentum='steady';
