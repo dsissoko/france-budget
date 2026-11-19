@@ -1,5 +1,5 @@
 import {describe,it,expect} from 'vitest';
-import {measures,expenses,revenues,sum} from './data';
+import {measures,expenses,revenues,offBudget,sum} from './data';
 import {auditMeasure,calculateScenario,projectMeasure} from './projection';
 describe('projection de contre-budgets',()=>{
  it('retrouve exactement les agrégats officiels APU 2025 INSEE',()=>{
@@ -20,7 +20,35 @@ describe('projection de contre-budgets',()=>{
   expect(changed.expenses['enterprise-support']).toBe(20);
   expect(changed.deficit).toBeCloseTo(142.5,8);
  });
- it('ventile les 620 Md€ indicatifs en quatre postes sans changer le total',()=>{
+ it('adds off-budget reliefs only as revenue variations, without shifting 2025 baseline',()=>{
+  expect(offBudget.map(c=>c.amount)).toEqual([49.7,69.1]);
+  const original=calculateScenario([]);
+  expect(original.offBudget['business-tax-relief']).toBe(49.7);
+  expect(original.offBudget['business-social-relief']).toBe(69.1);
+  expect(original.deficit).toBeCloseTo(152.5);
+  const cut=calculateScenario([],{revenues:{},expenses:{},offBudget:{'business-tax-relief':39.7}});
+  expect(cut.revenues.business).toBe(120);
+  expect(cut.revenueTotal).toBeCloseTo(1571.6);
+  expect(cut.expenseTotal).toBeCloseTo(1714.1);
+  expect(cut.deficit).toBeCloseTo(142.5);
+  expect(cut.balanceDelta).toBeCloseTo(10);
+  const increase=calculateScenario([],{revenues:{},expenses:{},offBudget:{'business-social-relief':79.1}});
+  expect(increase.revenues.contributions).toBe(510);
+  expect(increase.deficit).toBeCloseTo(162.5);
+ });
+ it('enforces 0 to twice baseline for every off-budget adjustment',()=>{
+  const below=calculateScenario([],{revenues:{},expenses:{},offBudget:{'business-tax-relief':-1}});
+  const above=calculateScenario([],{revenues:{},expenses:{},offBudget:{'business-tax-relief':100}});
+  expect(below.deficit).toBeCloseTo(152.5);
+  expect(above.deficit).toBeCloseTo(152.5);
+  expect(below.warnings.join(' ')).toContain('hors budget invalide');
+  expect(above.warnings.join(' ')).toContain('hors budget invalide');
+  const zero=calculateScenario([],{revenues:{},expenses:{},offBudget:{'business-tax-relief':0}});
+  const max=calculateScenario([],{revenues:{},expenses:{},offBudget:{'business-tax-relief':99.4}});
+  expect(zero.deficit).toBeCloseTo(102.8);
+  expect(max.deficit).toBeCloseTo(202.2);
+ });
+  it('ventile les 620 Md€ indicatifs en quatre postes sans changer le total',()=>{
   expect(['social','family','unemployment','solidarity'].map(id=>expenses.find(c=>c.id===id)?.amount)).toEqual([400,65,50,105]);
   expect(sum(expenses)).toBeCloseTo(1714.1,8);
   const result=calculateScenario([],{revenues:{},expenses:{family:60}});
