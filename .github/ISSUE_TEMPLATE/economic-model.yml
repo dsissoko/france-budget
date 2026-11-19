@@ -1,0 +1,42 @@
+name: "Moteur économique — proposer une amélioration"
+description: "Proposer un modèle, des hypothèses, une source de données ou un test."
+title: "[économie] "
+body:
+  - type: dropdown
+    id: layer
+    attributes:
+      label: "Niveau concerné"
+      options:
+        - "M1 — cohérence comptable / ventilation"
+        - "M2 — dette, déficit, intérêts et trajectoires"
+        - "M3 — effets macroéconomiques"
+        - "Données / validation / tests"
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: "Question étudiée et changement proposé"
+    validations:
+      required: true
+  - type: textarea
+    id: methodology
+    attributes:
+      label: "Méthode et hypothèses"
+      description: "Équations, unités, périmètre, période et simplifications."
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: "Sources et données vérifiables"
+      description: "Références institutionnelles / scientifiques, licences et millésimes."
+    validations:
+      required: true
+  - type: textarea
+    id: validation
+    attributes:
+      label: "Tests envisagés, incertitudes et limites"
+      description: "Scénarios de contrôle, comparaison à la référence et incertitudes."
+    validations:
+      required: true
