@@ -27,6 +27,11 @@ describe('AssessmentService: exhaustive public qualifications',()=>{
   expect(result.code).toBe(code);
   expect(QUALIFICATIONS[result.code]).toMatchObject({label,tone});
  });
+ it('does not call an initial one-off deficit reduction a lasting decrease',()=>{
+  const budget=assessmentService.assess(samples([152.5,118.5,122.3,126.1,130,133.8]));
+  expect(budget.code).toBe('INCREASE_STEADY');
+  expect(QUALIFICATIONS[budget.code].tone).toBe('warning');
+ });
  it('does not call a one-off decrease a deceleration',()=>{
   expect(assessmentService.assess(samples([100,70,80,90,100,110])).code).toBe('INCREASE_STEADY');
  });
