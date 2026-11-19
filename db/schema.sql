@@ -52,10 +52,10 @@ LANGUAGE plpgsql AS $$
 DECLARE new_id uuid; m jsonb;
 BEGIN
  PERFORM pg_advisory_xact_lock(8729104);
- IF (SELECT count(*) FROM budgets WHERE origin='citizen' AND visibility='public') >= 50 THEN
+ IF (SELECT count(*) FROM budgets WHERE origin='citizen' AND visibility='public') >= 100 THEN
   RAISE EXCEPTION 'publication_limit_reached' USING ERRCODE='P0001';
  END IF;
- IF (SELECT count(*) FROM publication_limits WHERE publication_limits.fingerprint=publish_citizen_budget.fingerprint AND created_at>now()-interval '24 hours') >= 2 THEN
+ IF (SELECT count(*) FROM publication_limits WHERE publication_limits.fingerprint=publish_citizen_budget.fingerprint AND created_at>now()-interval '24 hours') >= 100 THEN
   RAISE EXCEPTION 'publication_rate_limited' USING ERRCODE='P0001';
  END IF;
  INSERT INTO budgets(title,description,origin,visibility,reference_year,scenario)
