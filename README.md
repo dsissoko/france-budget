@@ -49,8 +49,20 @@ npm run build
 
 Le frontend utilise les routes `/api/*` : `vite dev` seul ne fournit pas les fonctions Vercel ni Neon. Pour tester les parcours avec base de données, utiliser un environnement Vercel adapté et une `DATABASE_URL` **côté serveur uniquement**, jamais avec le préfixe `VITE_`. Ne pas pointer les tests d'écriture vers la production.
 
+## Projet collaboratif et roadmap
+
+Le développement s'organise désormais autour de **trois piliers parallèles** :
+
+1. **Participation citoyenne (v1.x)** — améliorer le partage des budgets, l'invitation au vote et la gestion des soutiens, sans refonte de l'interface.
+2. **Crédibilité économique (en démarrage)** — renforcer la ventilation des mesures, les trajectoires de dette et, progressivement, les modèles macroéconomiques documentés et testables.
+3. **Contribution ouverte (en démarrage)** — accueillir les propositions d'économistes, de chercheurs, de développeurs, de formations politiques et les initiatives de diffusion non partisane.
+
+Voir la [roadmap](docs/roadmap.md) et le [guide des contributions](CONTRIBUTING.md). Une équipe politique peut soumettre des corrections sourcées et leur ventilation via une [issue dédiée](.github/ISSUE_TEMPLATE/political-programme.yml) ou une [PR structurée](.github/PULL_REQUEST_TEMPLATE/political-programme.md). Une contribution ne vaut ni certification officielle ni validation scientifique.
+
 ## Documentation
 
+- [Roadmap à trois piliers](docs/roadmap.md)
+- [Participer au projet](CONTRIBUTING.md)
 - [Vision produit et versions](docs/vision.md)
 - [Architecture et modèle de données](docs/architecture.md)
 - [Intégration Neon, publication et sécurité](docs/neon-integration.md)

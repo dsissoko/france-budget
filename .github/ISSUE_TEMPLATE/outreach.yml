@@ -1,0 +1,22 @@
+name: "Diffusion et pédagogie — proposer une contribution"
+description: "Aider à faire connaître le simulateur de façon accessible et non partisane."
+title: "[diffusion] "
+body:
+  - type: textarea
+    id: initiative
+    attributes:
+      label: "Proposition de diffusion ou de pédagogie"
+      description: "Décrivez le public cible, le support et le résultat attendu."
+    validations:
+      required: true
+  - type: textarea
+    id: accuracy
+    attributes:
+      label: "Garanties de neutralité et d'exactitude"
+      description: "Comment présenter les données et les limites des résultats sans soutenir un programme politique ?"
+    validations:
+      required: true
+  - type: textarea
+    id: resources
+    attributes:
+      label: "Ressources ou liens utiles (facultatif)"
