@@ -112,7 +112,8 @@ export function calculateScenario(selectedIds: string[], citizen: Override = { r
     warnings.push('Ajustement hors budget invalide : '+id);continue;
    }
    offBudgetValues[id]=value;
-   revenueValues[id==='business-tax-relief'?'business':'contributions']+=category.amount-value;
+   if(!category.revenueImpactCategory || !(category.revenueImpactCategory in revenueValues))throw new Error('Catégorie de recette non définie : '+id);
+   revenueValues[category.revenueImpactCategory]+=category.amount-value;
   }
     const revenueTotal = round(sum(revenueValues)), expenseTotal = round(sum(expenseValues));
   const originalBalance = sum(baseline(revenues)) - sum(baseline(expenses));
