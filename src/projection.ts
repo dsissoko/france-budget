@@ -5,7 +5,7 @@ import { expenses, revenues, offBudget, measures, type Category, type Measure } 
  * Ce sont des INTERPRÉTATIONS documentées, jamais des évaluations opposables.
  * Toutes les unités financières sont en Md€.
  */
-export type Side = 'revenues' | 'expenses';
+export type Side = 'revenues' | 'expenses' | 'offBudget';
 export type Override = { revenues: Record<string, number>; expenses: Record<string, number>; offBudget?: Record<string,number> };
 export type Entry = { measureId: string; side: Side; categoryId: string; amount: number; rationale: string };
 export type Rule = {
@@ -44,7 +44,7 @@ export const rules: Record<string, Rule> = {
 const round = (n: number) => Math.round(n * 100) / 100;
 const sum = (values: Record<string, number>) => Object.values(values).reduce((a, b) => a + b, 0);
 const baseline = (items: Category[]) => Object.fromEntries(items.map(c => [c.id, c.amount]));
-const categoryExists = (side: Side, id: string) => (side === 'revenues' ? revenues : expenses).some(c => c.id === id);
+const categoryExists = (side: Side, id: string) => (side === 'revenues' ? revenues : side==='expenses'?expenses:offBudget).some(c => c.id === id);
 
 /** 
  * Point d'extension des règles spécifiques : ici une approximation directe seulement.
@@ -69,7 +69,8 @@ export function projectMeasure(measure: Measure): Entry[] {
   if (Math.abs(shares - 1) > 0.000001) throw new Error('Parts non équilibrées : ' + measure.id);
   return targets.map(t => {
     if (!categoryExists(t.side, t.categoryId)) throw new Error('Catégorie inconnue : ' + t.categoryId);
-    const amount = (t.side === 'revenues' ? measure.revenueDelta : measure.expenseDelta) * t.share;
+    // An off-budget advantage is the inverse of an explicitly claimed tax/social revenue change.
+    const amount = (t.side === 'offBudget' ? -measure.revenueDelta : t.side === 'revenues' ? measure.revenueDelta : measure.expenseDelta) * t.share;
     return { measureId: measure.id, side: t.side, categoryId: t.categoryId, amount,
       rationale: rule.explanation };
   });
@@ -89,8 +90,17 @@ export function calculateScenario(selectedIds: string[], citizen: Override = { r
     } catch (err) { warnings.push(String(err)); }
   }
   for (const entry of entries) {
-    const target = entry.side === 'revenues' ? revenueValues : expenseValues;
-    target[entry.categoryId] += entry.amount;
+    if(entry.side==='offBudget'){
+      const category=offBudget.find(c=>c.id===entry.categoryId);
+      if(!category?.revenueImpactCategory || !(category.revenueImpactCategory in revenueValues)){
+        warnings.push('Manque à gagner inconnu : '+entry.categoryId);continue;
+      }
+      offBudgetValues[entry.categoryId]+=entry.amount;
+      revenueValues[category.revenueImpactCategory]-=entry.amount;
+    } else {
+      const target = entry.side === 'revenues' ? revenueValues : expenseValues;
+      target[entry.categoryId] += entry.amount;
+    }
   }
   // Les modifications citoyennes sont des écarts au référentiel initial.
   // Elles s'ajoutent aux écritures de projection, pas aux totaux deux fois.
@@ -111,11 +121,14 @@ export function calculateScenario(selectedIds: string[], citizen: Override = { r
    if(!category||!Number.isFinite(value)||value<0||value>2*category.amount){
     warnings.push('Ajustement hors budget invalide : '+id);continue;
    }
-   offBudgetValues[id]=value;
-   if(!category.revenueImpactCategory || !(category.revenueImpactCategory in revenueValues))throw new Error('Catégorie de recette non définie : '+id);
+   if(!category.revenueImpactCategory || !(category.revenueImpactCategory in revenueValues)){
+    warnings.push('Catégorie de recette non définie : '+id);continue;
+   }
+   offBudgetValues[id]+=value-category.amount;
    revenueValues[category.revenueImpactCategory]+=category.amount-value;
   }
-    const revenueTotal = round(sum(revenueValues)), expenseTotal = round(sum(expenseValues));
+  if(offBudget.some(c=>offBudgetValues[c.id]<0||offBudgetValues[c.id]>2*c.amount)) warnings.push('Au moins un avantage hors budget dépasse les bornes 0–200 % de sa référence.');
+  const revenueTotal = round(sum(revenueValues)), expenseTotal = round(sum(expenseValues));
   const originalBalance = sum(baseline(revenues)) - sum(baseline(expenses));
   if (Object.values(revenueValues).some(v => v < 0) || Object.values(expenseValues).some(v => v < 0))
     warnings.push('Au moins un poste négatif : projection non réaliste sur cette référence.');
