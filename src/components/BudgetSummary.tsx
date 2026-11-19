@@ -1,4 +1,7 @@
+import {useState} from 'react';
+import {Share2} from 'lucide-react';
 import {currency} from '../data';
+import {publishedBudgetUrl} from '../share';
 import './BudgetSummary.css';
 
 type BudgetSummaryProps = {
@@ -8,12 +11,34 @@ type BudgetSummaryProps = {
   expenses: number;
   deficit: number;
   referenceDeficit: number;
+  shareBudget?: {id: string; title: string};
 };
 
 const percent = (value: number) => value.toLocaleString('fr-FR', {maximumFractionDigits: 1});
 const closeToZero = (value: number) => Math.abs(value) < 0.05;
 
-export default function BudgetSummary({title,side,revenues,expenses,deficit,referenceDeficit}:BudgetSummaryProps) {
+export default function BudgetSummary({title,side,revenues,expenses,deficit,referenceDeficit,shareBudget}:BudgetSummaryProps) {
+  const [shareFeedback,setShareFeedback]=useState('');
+  const share=async()=>{
+    if(!shareBudget)return;
+    setShareFeedback('');
+    const url=publishedBudgetUrl(shareBudget.id,window.location.origin);
+    if(typeof navigator.share==='function'){
+      try {
+        await navigator.share({title:shareBudget.title,text:'Découvre ce budget pour la France et soutiens-le sur Mon Budget Citoyen.',url});
+        return;
+      }catch(error){
+        if(error instanceof DOMException && error.name==='AbortError')return;
+      }
+    }
+    try{
+      await navigator.clipboard.writeText(url);
+      setShareFeedback('Lien copié');
+    }catch{
+      setShareFeedback('Copie le lien affiché');
+      window.prompt('Copie le lien vers le budget',url);
+    }
+  };
   // The visual is a proportion of the scenario's expenses, not an estimate of financial sustainability.
   const covered = expenses > 0 ? Math.max(0,Math.min(100,100*revenues/expenses)) : 100;
   const gap = 100-covered;
@@ -26,7 +51,7 @@ export default function BudgetSummary({title,side,revenues,expenses,deficit,refe
   return <article className={'budget-summary budget-summary--'+(side||'personal')} aria-label={'Synthèse du budget '+title}>
     <div className="budget-summary__heading">
       <h3>{side&&<span className="budget-summary__side">{side.toUpperCase()}</span>}{title}</h3>
-      <span className="budget-summary__period">2025 · Md€</span>
+      <div className="budget-summary__heading-actions"><span className="budget-summary__period">2025 · Md€</span>{shareBudget&&<button type="button" className="budget-summary__share" aria-label={'Partager '+shareBudget.title} onClick={()=>void share()}><Share2 size={13}/> Partager</button>}</div>
     </div>
     <div className="budget-summary__figures">
       <div><span>Recettes</span><strong className="green-text">{currency(revenues)}</strong></div>
@@ -40,6 +65,6 @@ export default function BudgetSummary({title,side,revenues,expenses,deficit,refe
       </div>
       <div className="budget-summary__legend"><span>{percent(covered)} % financés</span><span>{percent(gap)} % de déficit</span></div>
     </div>
-    <p className="budget-summary__difference">{trend}</p>
+    <p className="budget-summary__difference">{trend}</p>{shareFeedback&&<p className="budget-summary__share-feedback" role="status">{shareFeedback}</p>}
   </article>;
 }
