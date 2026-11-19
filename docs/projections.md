@@ -45,6 +45,20 @@ Chaque mesure conserve son origine, sa présentation et son montant déclaré da
 
 Les tests automatisés vérifient la conservation des montants et l'arithmétique des scénarios. Ils ne valident pas les hypothèses économiques.
 
+## Manques à gagner hors budget de référence (2024)
+
+Les allègements fiscaux et sociaux recensés dans le jaune **Aides publiques aux entreprises**, annexé au PLF 2027, sont des **postes de référence complémentaires**, et non des dépenses additionnelles. Le référentiel des comptes APU de 2025 reste inchangé : 1 714,1 Md€ de dépenses, 1 561,6 Md€ de recettes et 152,5 Md€ de déficit.
+
+- **Avantages fiscaux aux entreprises : 49,7 Md€ (2024)**, rattachés à la recette « Fiscalité des entreprises ».
+- **Allègements de cotisations des entreprises : 69,1 Md€ (2024)**, rattachés à la recette « Cotisations sociales ».
+- Les **43,3 Md€ d'aides budgétaires** et **4,0 Md€ d'équivalent-aide financier** figurent dans le breakdown descriptif officiel (166,1 Md€ au total), mais ne sont pas transformés en nouvelles dépenses ou recettes fictives. La ligne historique de dépenses « Soutien public aux entreprises » reste une enveloppe pédagogique de **30 Md€**, déjà comptée dans les 1 714,1 Md€ de référence 2025 ; elle n'est pas égale au total budgétaire recensé en 2024.
+
+**Convention uniforme de simulation :** une catégorie hors budget possède un montant de référence et une catégorie de **recette de rattachement** (`revenueImpactCategory`). En scénario, sa nouvelle valeur est ajustable de **0 à 200 %** de sa référence, comme toute catégorie. La baisse de l'avantage (`nouveau - référence < 0`) entraîne mécaniquement **une hausse égale des recettes** ; son augmentation baisse les recettes, sans ajouter l'avantage au budget de référence. Exemple : avantage fiscal de 49,7 à 39,7 Md€ → +10 Md€ de fiscalité des entreprises, déficit réduit de 10 Md€. Les effets comportementaux, d'assiette, de croissance ou de négociation ne sont pas modélisés ; cette projection ne garantit pas le rendement effectif d'une réforme.
+
+L'API et le moteur lisent ces catégories depuis la table séparée `reference_off_budget`. Les mesures citoyennes peuvent les utiliser et sont enregistrées dans `scenario.budget.offBudget` ; les anciens scénarios sans champ `offBudget` restent compatibles. Les budgets des partis, y compris ceux issus des documents 2026, restent inchangés tant qu'aucune mesure ne cible ce nouveau type.
+
+Source : [Jaune budgétaire PLF 2027, aides publiques aux entreprises (exécution 2024)](https://www.budget.gouv.fr/documentation/file-download/34471).
+
 ## Limites reconnues
 - Une égalité automatique sur une règle `allocate` est principalement un **contrôle d'intégrité des données**.
 - Les effets indirects, les changements d'assiette, le comportement économique et les montées en charge sont exclus de la V1.
