@@ -1,37 +1,15 @@
-/**
- * Aides publiques aux entreprises : périmètre élargi du « jaune » budgétaire PLF 2027,
- * chiffres 2024, jamais à additionner aux dépenses publiques APU 2025.
+/** Source: « jaune » Aides publiques aux entreprises, PLF 2027, données 2024.
  * https://www.budget.gouv.fr/documentation/file-download/34471
+ * These categories are informational baselines, NOT additions to the 2025 APU aggregates.
  */
 export const ENTERPRISE_AIDS={
- categoryId:'enterprise-support',
- reportedYear:2024,
+ year:2024,
  total:166.1,
- budget:43.3,
+ directBudget:43.3,
  fiscal:49.7,
  social:69.1,
  financial:4.0,
- // The previous 2025 pedagogical reference already included this 30 Md€ slice
- // in expenses; preserve it exactly rather than fabricating a rebased 2025 account.
- legacyCountedExpense:30,
+ source:'https://www.budget.gouv.fr/documentation/file-download/34471',
 } as const;
-const round=(n:number)=>Math.round(n*100)/100;
-/** 2024 distribution used as an EXPLICIT V1 illustration of a 2027 policy change.
- * Financial interventions cannot safely be converted into a net budget flow.
- */
-export function enterpriseAidProjection(newAidAmount:number){
- const delta=newAidAmount-ENTERPRISE_AIDS.total;
- return {
-  // + aid => more outlays, fewer receipts. The 4.0 Md€ financial component is unmodelled.
-  budgetExpenseDelta:round(delta*ENTERPRISE_AIDS.budget/ENTERPRISE_AIDS.total),
-  taxRevenueDelta:round(-delta*ENTERPRISE_AIDS.fiscal/ENTERPRISE_AIDS.total),
-  contributionRevenueDelta:round(-delta*ENTERPRISE_AIDS.social/ENTERPRISE_AIDS.total),
-  unmodelledFinancialDelta:round(delta*ENTERPRISE_AIDS.financial/ENTERPRISE_AIDS.total),
- };
-}
-export function countedExpenseTotal(values:Readonly<Record<string,number>>):number{
- // Cross-cutting indicator: count only the pre-existing legacy 30 Md€,
- // never double-count the 2024 166.1 Md€ reporting perimeter.
- return Object.entries(values).reduce((sum,[id,value])=>
-  sum+(id===ENTERPRISE_AIDS.categoryId?0:value),ENTERPRISE_AIDS.legacyCountedExpense);
-}
+export const OFF_BUDGET_ACCOUNTING_NOTE=
+ 'Montant hors budget de référence, présent comme avantage ou exonération déjà intégré aux recettes nettes. La simulation applique uniquement la variation du manque à gagner aux recettes publiques : baisse de l’avantage = recettes supplémentaires, hausse = recettes moindres. Hypothèse mécanique sans effet comportemental, ni ajustement de l’assiette.';
