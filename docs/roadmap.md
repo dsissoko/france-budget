@@ -38,6 +38,12 @@ Une proposition politique validée comme *fidèlement retranscrite* par son aute
 - Évaluer la méthode indépendamment des opinions politiques ; mêmes critères pour tous.
 - Les évolutions du moteur et les contributions ne modifient pas automatiquement les scénarios déjà publiés. Prévoir un versionnement et une stratégie de migration avant toute activation.
 
+## Backlog de démarrage
+
+- **Pilier 1 :** [#38 — partage et invitation au vote](https://github.com/dsissoko/france-budget/issues/38) ; [#39 — gestion des soutiens](https://github.com/dsissoko/france-budget/issues/39).
+- **Pilier 2 :** [#22 — ventilation et paramètres](https://github.com/dsissoko/france-budget/issues/22), [#23–25 — trajectoires et validation](https://github.com/dsissoko/france-budget/issues/23), [#41 — effets macroéconomiques M3](https://github.com/dsissoko/france-budget/issues/41).
+- **Pilier 3 :** [#40 — propositions des formations politiques](https://github.com/dsissoko/france-budget/issues/40) ; [#42 — diffusion et pédagogie](https://github.com/dsissoko/france-budget/issues/42).
+
 ## Suivi
 
 Les issues GitHub décrivent les travaux concrets. Cette roadmap est la vue d'ensemble et ne remplace pas les décisions de recette ni les versions historiques documentées dans [vision.md](vision.md).
