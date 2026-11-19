@@ -1,0 +1,12 @@
+id,type,nom,site_public,angle,statut,date_premier_contact,date_relance,canal_contact_verifie,preuve_url,notes
+C001,communaute,r/france,https://www.reddit.com/r/france/,comptes publics et arbitrages,a_qualifier,,,,,Verifer la regle d autopromotion et obtenir accord avant lien
+C002,communaute,r/economie,https://www.reddit.com/r/economie/,discussion economie finances publiques,a_qualifier,,,,,Verifier les regles et activite
+C003,communaute,r/AskFrance,https://www.reddit.com/r/AskFrance/,question ouverte sur budget,a_qualifier,,,,,Respecter format du subreddit
+C004,forum,ForumFr Politique,https://www.forumfr.com/f423-politique.html,discussion chiffrage,a_qualifier,,,,,Verifier conditions de publication
+C005,forum,Politiquemania,https://www.politiquemania.com/forum/,comparaison des programmes,a_qualifier,,,,,Verifier rubriques
+C006,media,Thinkerview,https://www.thinkerview.com/,debats approfondis,a_contacter,,,,,Canal de contact public a verifier
+C007,createur,Idriss Aberkane,https://idrissaberkane.org/,presentation et critique du simulateur,a_contacter,,,,,Canal de contact public a verifier
+C008,media,Le Crayon,https://www.lecrayonmedia.fr/,debats comparatifs,a_contacter,,,,,Canal de contact public a verifier
+C009,media,Blast,https://www.blast-info.fr/,analyse des finances publiques,a_contacter,,,,,Canal de contact public a verifier
+C010,media,Le Media,https://www.lemediatv.fr/,budget et participation citoyenne,a_contacter,,,,,Canal de contact public a verifier
+C011,media,Alternatives Economiques,https://www.alternatives-economiques.fr/,pedagogie economique,a_contacter,,,,,Canal de contact public a verifier
