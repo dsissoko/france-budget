@@ -1,6 +1,6 @@
 import {describe,it,expect} from 'vitest';
 import {measures,expenses,revenues,offBudget,sum} from './data';
-import {auditMeasure,calculateScenario,projectMeasure} from './projection';
+import {auditMeasure,calculateScenario,projectMeasure,rules} from './projection';
 describe('projection de contre-budgets',()=>{
  it('retrouve exactement les agrégats officiels APU 2025 INSEE',()=>{
   expect(sum(revenues)).toBeCloseTo(1561.6,8);
@@ -36,7 +36,21 @@ describe('projection de contre-budgets',()=>{
   expect(increase.revenues.contributions).toBe(510);
   expect(increase.deficit).toBeCloseTo(162.5);
  });
- it('enforces 0 to twice baseline for every off-budget adjustment',()=>{
+ it('lets a political proposal activate an off-budget tax relief without counting it twice',()=>{
+  const measure={id:'test-offbudget-party',party:'RN' as const,theme:'Fiscalité',title:'Réduire un avantage fiscal',revenueDelta:10,expenseDelta:0,source:'test',year:2027,status:'illustration' as const,description:'test'};
+  measures.push(measure);
+  rules[measure.id]={kind:'allocate',target:[{side:'offBudget',categoryId:'business-tax-relief',share:1}],explanation:'Reprise mécanique d’un manque à gagner'};
+  try{
+   const result=calculateScenario([measure.id]);
+   expect(result.offBudget['business-tax-relief']).toBeCloseTo(39.7);
+   expect(result.revenues.business).toBeCloseTo(120);
+   expect(result.deficit).toBeCloseTo(142.5);
+   const user=calculateScenario([measure.id],{revenues:{},expenses:{},offBudget:{'business-tax-relief':44.7}});
+   expect(user.offBudget['business-tax-relief']).toBeCloseTo(34.7);
+   expect(user.deficit).toBeCloseTo(137.5);
+  }finally{measures.splice(measures.indexOf(measure),1);delete rules[measure.id];}
+ });
+  it('enforces 0 to twice baseline for every off-budget adjustment',()=>{
   const below=calculateScenario([],{revenues:{},expenses:{},offBudget:{'business-tax-relief':-1}});
   const above=calculateScenario([],{revenues:{},expenses:{},offBudget:{'business-tax-relief':100}});
   expect(below.deficit).toBeCloseTo(152.5);
