@@ -47,6 +47,7 @@ export const measures:Measure[]=[
 ];
 export const partyNames=['Référence 2025','RN','LFI','Horizons'] as const;
 export type Party=typeof partyNames[number];
-export const years=[2025,2026,2027,2028,2029,2030];
+// Shared business calendar, not a separate UI-defined range.
+export {projectionYears as years} from './engine/simulation';
 export const sum=(items:Category[])=>items.reduce((a,i)=>a+i.amount,0);
 export const currency=(v:number)=>new Intl.NumberFormat('fr-FR',{maximumFractionDigits:1}).format(v)+' Md€';
