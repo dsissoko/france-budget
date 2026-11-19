@@ -7,8 +7,8 @@ export default async function handler(req: any, res: any) {
    const rows=await sql`SELECT b.id,b.title,b.description,b.origin,b.featured,b.featured_order,b.reference_year,b.published_at,b.scenario,
      count(v.id)::int AS votes FROM budgets b LEFT JOIN votes v ON v.budget_id=b.id
      WHERE b.origin IN ('citizen','party') AND b.visibility='public'
-     GROUP BY b.id ORDER BY CASE WHEN b.origin='party' THEN 0 ELSE 1 END, votes DESC,b.published_at DESC LIMIT 53`;
-   return reply(res,200,{budgets:rows,limit:50});
+     GROUP BY b.id ORDER BY CASE WHEN b.origin='party' THEN 0 ELSE 1 END, votes DESC,b.published_at DESC LIMIT 103`;
+   return reply(res,200,{budgets:rows,limit:100});
   }
   if(!method(req,'POST',res))return;
   const origin=req.headers.origin;const host=req.headers.host;
@@ -42,8 +42,8 @@ export default async function handler(req: any, res: any) {
   const rows=await sql`SELECT public.publish_citizen_budget(${JSON.stringify({title:b.title.trim(),description:b.description,referenceYear:b.referenceYear,scenario:b.scenario,measures:b.measures})}::jsonb,${fingerprint}) AS id`;
   return reply(res,201,{id:rows[0].id});
  }catch(e){
-  if(String(e).includes('publication_limit_reached'))return reply(res,409,{error:'Les 50 places sont occupées'});
-  if(String(e).includes('publication_rate_limited'))return reply(res,429,{error:'Limite de 2 publications par 24 h atteinte'});
+  if(String(e).includes('publication_limit_reached'))return reply(res,409,{error:'Les 100 places sont occupées'});
+  if(String(e).includes('publication_rate_limited'))return reply(res,429,{error:'Limite de 100 publications par 24 h atteinte'});
   return reply(res,500,{error:'Publication momentanément indisponible'});
  }
 }
