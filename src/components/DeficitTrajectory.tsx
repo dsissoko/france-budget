@@ -1,6 +1,6 @@
 import {Line,LineChart,XAxis,Tooltip,ResponsiveContainer} from 'recharts';
 import {QUALIFICATIONS,type QualificationTone} from '../engine/qualification';
-import {PROJECTION_CALENDAR,type ProjectionResult} from '../engine/simulation';
+import type {ProjectionResult} from '../engine/simulation';
 import './DeficitTrajectory.css';
 
 type Props={primary:ProjectionResult; secondary?:ProjectionResult; referenceOnly?:boolean};
