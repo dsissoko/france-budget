@@ -37,7 +37,7 @@ AccountingService  ◄────────────── SimulationServi
 ```
 
 - **AccountingService** : encapsule la projection comptable annuelle existante (`calculateScenario`, ventilation, audits), sans modifier les montants.
-- **SimulationService** : génère les mêmes six points 2025–2030, avec les hypothèses V1 explicites ; il pourra coordonner des modèles annuels plus riches.
+- **SimulationService** : génère les huit points 2025–2032, avec les hypothèses V1 explicites ; il pourra coordonner des modèles annuels plus riches.
 - **ImpactService** : interface d'extension et implémentation `no-op` initiale. Une future baisse de coût de financement pourrait dépendre d'un modèle de prime de risque, de l'échéancier de dette et d'autres hypothèses ; ne pas coder cette causalité avant validation scientifique.
 - **AssessmentService** : évalue **la trajectoire du scénario**, pas seulement son écart à la référence ; retourne des codes métier stables, testables, sans connaissances React.
 
@@ -99,13 +99,16 @@ Les cas initiaux à zéro ou en excédent sont qualifiés prioritairement par le
 
 Les seuils numériques de tolérance sont documentés et testés. La **direction** et la distinction d'accélération prennent en compte les variations **des pentes annuelles après l'année d'activation des mesures** ; le saut ponctuel de l'année d'application (2027) ne doit ni être qualifié de baisse durable, ni de décélération structurelle. Les transitions vers l'équilibre, l'excédent ou le déficit sont toujours évaluées sur les états initial et final. Une série trop courte ou incohérente retourne `UNDETERMINED` (gris). Pour les courbes fluctuantes, la classification doit être prudente et ne pas déduire de causalité. La qualification n'a aucune prétention prédictive.
 
-## Présentation ultracompacte
+## Présentation ultra-compacte : slopegraph (2025 → 2032)
 
-- Composant unique `DeficitTrajectory`, réutilisé à **chaque** emplacement de projection pluriannuelle ; même graphique pour une série de référence, un scénario, ou deux budgets A/B.
-- En-tête : titre qualitatif + label en texte, couleurs conformes à la table ci-dessus.
-- Mini-courbe sur **années en abscisse** (2025 à 2032), référence grise et scénarios colorés ; pas d'axe Y chargé, mais valeurs accessibles dans une description ou un infobulle.
-- Légende courte et mention **« Simulation indicative »** ; explication détaillée disponible sans charger visuellement l'écran.
-- Comparer : deux qualifications indépendantes A et B, jamais un badge unique qui masquerait leur divergence.
+- `DeficitTrajectory` est l'unique composant partagé entre **Comprendre, Comparer, Mon budget, Voter**.
+- Vue de référence (Comprendre) : une ligne grise. Projection d'un budget : **référence grise + scénario coloré**. Comparer : **référence + A (plein) + B (tireté)**.
+- Valeurs tracées issues du **SimulationService** uniquement : points 2025, 2026, 2027 et 2032 ; saut des mesures réellement visible en 2027, pas de transition faussement progressive entre 2025 et l'application.
+- Repères textuels **2025 · 2027 · 2032**, sans labels débordant sur mobile. L'échelle Y est resserrée à la plage des valeurs visibles et **identique à toutes les séries du même graphique** ; ce zoom est explicitement signalé et ne doit pas être interprété comme une importance relative.
+- Sous le slopegraph, résultat **2032** : valeur de la référence et, pour chaque budget, montant final, effet vs référence et **qualification intrinsèque** (p. ex. « Hausse persistante » malgré un déficit inférieur à la référence).
+- La couleur de série distingue les budgets ; la couleur du label qualifie la tendance. Ce sont **deux sémantiques différentes**.
+- Ne jamais déplacer artificiellement des lignes qui se recouvrent : lorsqu'un écart est très faible, la valeur chiffrée fait foi. Les descriptions accessibles reprennent les montants.
+- L'intégralité des années et détails d'hypothèses restent présents dans le résultat moteur ; la dataviz n'invente ni nouveau calcul ni nouveau scénario.
 
 ## Non-objectifs de cette itération
 
