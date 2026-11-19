@@ -1,4 +1,4 @@
--- France Budget — schema for Neon PostgreSQL. Apply on a new empty database.
+-- Mon Budget Citoyen — schema for Neon PostgreSQL. Apply on a new empty database.
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 CREATE TABLE IF NOT EXISTS budgets (
  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
