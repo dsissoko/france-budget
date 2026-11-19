@@ -19,8 +19,10 @@ export function createSimulationService(impacts:ImpactService=impactService):Sim
  return {
   simulate(baseDeficit,balanceDelta,years) {
    const rows=years.map((year,i)=>{
-    const reference=round(baseDeficit*(1+V1_ASSUMPTIONS.baselineRatePerIndex*i));
-    const scenarioBeforeImpact=round(baseDeficit*(1+V1_ASSUMPTIONS.baselineRatePerIndex*i)-(i<V1_ASSUMPTIONS.impactStartsAtIndex?0:balanceDelta));
+    const unroundedReference=baseDeficit*(1+V1_ASSUMPTIONS.baselineRatePerIndex*i);
+    const reference=round(unroundedReference);
+    // Round only at the final displayed value: matches the original V1 trajectory.
+    const scenarioBeforeImpact=unroundedReference-(i<V1_ASSUMPTIONS.impactStartsAtIndex?0:balanceDelta);
     const adjustment=impacts.apply({year,referenceDeficit:reference,scenarioDeficit:scenarioBeforeImpact});
     return {year,reference,scenario:round(scenarioBeforeImpact+adjustment)};
    });
