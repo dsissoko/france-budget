@@ -4,7 +4,7 @@
 
 **Un monolithe TypeScript modulaire, quatre responsabilités métier, aucun microservice ni nouvelle infrastructure.** Les quatre vues React restent stables et consomment un résultat de calcul unique. Cette architecture prépare des modèles économiques optionnels, sans en livrer maintenant.
 
-Le calcul annuel actuel est conservé, y compris les règles de ventilation et leurs limites. La trajectoire V1 est une **illustration mécanique** : déficit de référence 2025 prolongé linéairement en facteur `1 + 0,025 × indexAnnée` (et non croissance composée) ; écart annuel de solde constant à partir de 2026. Ce n'est pas une prévision économique ni un modèle de dette.
+Le calcul annuel actuel est conservé, y compris les règles de ventilation et leurs limites. La trajectoire V1 est une **illustration mécanique** : déficit de référence 2025 prolongé linéairement en facteur `1 + 0,025 × (année - 2025)` (et non croissance composée) ; écart annuel de solde **nul en 2025 et 2026** puis constant de 2027 à 2032. Ce n'est pas une prévision économique ni un modèle de dette.
 
 ## Responsabilités et dépendances
 
@@ -41,6 +41,21 @@ AccountingService  ◄────────────── SimulationServi
 - **ImpactService** : interface d'extension et implémentation `no-op` initiale. Une future baisse de coût de financement pourrait dépendre d'un modèle de prime de risque, de l'échéancier de dette et d'autres hypothèses ; ne pas coder cette causalité avant validation scientifique.
 - **AssessmentService** : évalue **la trajectoire du scénario**, pas seulement son écart à la référence ; retourne des codes métier stables, testables, sans connaissances React.
 
+## Calendrier métier explicite
+
+| Dimension | Valeur V1 | Sens |
+| --- | --- | --- |
+| `referenceYear` | **2025** | Comptes publics de référence (agrégats APU) ; ventilations pédagogiques |
+| `budgetYear` | **2027** | Exercice budgétaire simulé, distinct du millésime des sources des mesures |
+| `applicationYear` | **2027** | Première année d'imputation des effets de toutes les mesures V1 |
+| `horizonYear` | **2032** | Horizon politique de comparaison, correspondant à la fin du prochain quinquennat présidentiel |
+
+On affiche **2025–2032 inclus** : 2025 est la référence, 2026 une année mécanique sans mesure, 2027–2032 la période simulée. Le budget 2027 est habituellement préparé et examiné en 2026, **avant** l'élection présidentielle du printemps 2027 ; **2027 ne doit donc pas être présenté comme une année intégralement gouvernée par un programme élu en 2027**. Par ailleurs, 2032 est l'année du changement de quinquennat, pas une année budgétaire intégralement sous le même président. L'horizon 2032 reste un marqueur conventionnel de fin de cycle politique.
+
+Les chiffrages RN et LFI cités proviennent en partie de **contre-budgets 2026** : les transposer à un exercice fictif 2027 est une hypothèse pédagogique, pas une revendication officielle pour 2027. Le `year` d'une mesure indique son **millésime source**, non sa date d'application. Les calendriers de montée en charge (ex. mesure annoncée « dès 2028 ») ne sont **pas** simulés : toute mesure sélectionnée est appliquée à partir de 2027, à montant annuel constant, jusqu'en 2032.
+
+Les quatre valeurs du calendrier sont centralisées dans `src/engine/simulation.ts` (`PROJECTION_CALENDAR`), que l'interface ne redéfinit pas. La qualification des pentes ignore le saut d'application **2026 → 2027** et s'appuie sur la tendance post-2027.
+
 Le sens des dépendances doit rester à sens unique : aucun module métier n'importe React, Recharts ou une feuille CSS. Les services n'accèdent pas directement à Neon ; le chargement des paramètres est une responsabilité de composition.
 
 ## Contrat et extensibilité
@@ -48,7 +63,7 @@ Le sens des dépendances doit rester à sens unique : aucun module métier n'imp
 ```ts
 type ProjectionResult = {
   modelId: string;
-  assumptions: { baselineRatePerIndex: number; impactStartsAtIndex: number };
+  assumptions: { baselineRatePerIndex: number; referenceYear: number; budgetYear: number; applicationYear: number; horizonYear: number };
   rows: { year: number; reference: number; scenario: number }[];
   assessment: {
     code: QualificationCode;
@@ -82,19 +97,19 @@ La même logique de simulation alimente Comprendre, Mon budget, Voter et Compare
 
 Les cas initiaux à zéro ou en excédent sont qualifiés prioritairement par leur état final. Pas de vert pour une **simple diminution relative au scénario de référence** ; la courbe doit réellement baisser ou **la hausse doit réellement décélérer**. Une hausse décélérante reste une hausse : le titre doit le dire.
 
-Les seuils numériques de tolérance sont documentés et testés. La **direction** et la distinction d'accélération prennent en compte les variations **des pentes annuelles après l'année d'activation des mesures** ; le saut ponctuel de 2026 ne doit ni être qualifié de baisse durable, ni de décélération structurelle. Les transitions vers l'équilibre, l'excédent ou le déficit sont toujours évaluées sur les états initial et final. Une série trop courte ou incohérente retourne `UNDETERMINED` (gris). Pour les courbes fluctuantes, la classification doit être prudente et ne pas déduire de causalité. La qualification n'a aucune prétention prédictive.
+Les seuils numériques de tolérance sont documentés et testés. La **direction** et la distinction d'accélération prennent en compte les variations **des pentes annuelles après l'année d'activation des mesures** ; le saut ponctuel de l'année d'application (2027) ne doit ni être qualifié de baisse durable, ni de décélération structurelle. Les transitions vers l'équilibre, l'excédent ou le déficit sont toujours évaluées sur les états initial et final. Une série trop courte ou incohérente retourne `UNDETERMINED` (gris). Pour les courbes fluctuantes, la classification doit être prudente et ne pas déduire de causalité. La qualification n'a aucune prétention prédictive.
 
 ## Présentation ultracompacte
 
 - Composant unique `DeficitTrajectory`, réutilisé à **chaque** emplacement de projection pluriannuelle ; même graphique pour une série de référence, un scénario, ou deux budgets A/B.
 - En-tête : titre qualitatif + label en texte, couleurs conformes à la table ci-dessus.
-- Mini-courbe sur **six années en abscisse** (2025 à 2030), référence grise et scénarios colorés ; pas d'axe Y chargé, mais valeurs accessibles dans une description ou un infobulle.
+- Mini-courbe sur **années en abscisse** (2025 à 2032), référence grise et scénarios colorés ; pas d'axe Y chargé, mais valeurs accessibles dans une description ou un infobulle.
 - Légende courte et mention **« Simulation indicative »** ; explication détaillée disponible sans charger visuellement l'écran.
 - Comparer : deux qualifications indépendantes A et B, jamais un badge unique qui masquerait leur divergence.
 
 ## Non-objectifs de cette itération
 
-Pas de nouvelle hypothèse économique, de dette/PIB, de taux, de rétroaction, de modèle macro, de recalcul de la trajectoire historique, ni de migration Neon. Pas de refonte des autres composants. Le README reste fonctionnel/métier ; les détails d'architecture demeurent dans `docs/`.
+Pas de nouvelle hypothèse économique, de dette/PIB, de taux, de rétroaction, de modèle macro, de recalcul de la trajectoire historique, ni de migration Neon. Pas de refonte des autres composants. Le README reste fonctionnel/métier ; les détails d'architecture et hypothèses demeurent dans `docs/`.
 
 ## Validation
 

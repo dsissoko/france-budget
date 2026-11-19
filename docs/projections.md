@@ -15,8 +15,18 @@ Le moteur réalise des **interprétations pédagogiques**, non opposables. Il ne
 - [Contre-budget LFI 2026](https://lafranceinsoumise.fr/wp-content/uploads/2025/10/Budget-2026_LFI_web_pages.pdf) : 3,6 Md€ de gratuité des services scolaires et 10,6 Md€ de développement des filières françaises d'énergies renouvelables.
 - `data/official-sources.json` conserve l'inventaire des programmes et des références (extraction partielle). Il ne constitue pas encore un jeu de données entièrement réconcilié.
 
+## Hypothèses de calendrier publiées
+
+- **Référence comptable : 2025** (totaux APU), ventilations pédagogiques et non certifiées.
+- **Exercice simulé : budget 2027**, **effets comptabilisés dès 2027**, prolongés annuellement à montant constant jusqu'en **2032**, horizon conventionnel de fin du prochain quinquennat.
+- **Année 2026 : aucun effet des mesures simulées** ; seule la référence mécanique évolue.
+- **Hypothèse de référence :** chaque année, déficit de 2025 × [1 + 0,025 × (année − 2025)] ; ceci n'est **pas** une croissance composée ni une prévision officielle.
+- **Hypothèse politique :** 2027 est une année de transition présidentielle et le budget 2027 est élaboré en 2026. La simulation est un exercice citoyen contrefactuel, non un calendrier de mise en œuvre légalement ou politiquement garanti.
+- **Millésimes sources ≠ année d'application :** les montants de contre-budgets RN/LFI 2026 sont repris à titre **illustratif** pour 2027. Aucune montée en charge, aucun effet indirect, aucune distinction de dates par mesure dans cette version.
+- Les labels de tendance portent sur les variations annuelles **à partir de 2027**, en excluant le saut d'activation entre 2026 et 2027.
+
 ## Référence de comparaison
-Les contre-budgets 2026 répondent au **projet initial PLF/PLFSS 2026**, pas aux comptes publics effectivement exécutés en 2025. La référence de l'interface V1 reste un jeu **fictif 2025** : appliquer un montant revendiqué pour 2026 à cet exemple ne garantit pas qu'il soit transposable. Avant de présenter un déficit comparatif réel, charger et réconcilier les agrégats officiels et harmoniser le millésime.
+Les contre-budgets 2026 répondent au **projet initial PLF/PLFSS 2026**, pas aux comptes publics effectivement exécutés en 2025. La référence V1 conserve les **totaux APU 2025 publiés avec une ventilation fictive par postes** : appliquer un montant revendiqué pour 2026 à cet exemple ne garantit pas qu'il soit transposable. Avant de présenter un déficit comparatif réel, charger et réconcilier les agrégats officiels et harmoniser le millésime.
 
 ## Contrat technique
 `src/projection.ts` expose :
