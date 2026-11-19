@@ -3,7 +3,7 @@ import './BudgetSummary.css';
 
 type BudgetSummaryProps = {
   title: string;
-  side: 'a' | 'b';
+  side?: 'a' | 'b';
   revenues: number;
   expenses: number;
   deficit: number;
@@ -23,9 +23,9 @@ export default function BudgetSummary({title,side,revenues,expenses,deficit,refe
     : improvement > 0
       ? 'Déficit réduit de '+currency(Math.abs(improvement))+' vs référence'
       : 'Déficit augmenté de '+currency(Math.abs(improvement))+' vs référence';
-  return <article className={'budget-summary budget-summary--'+side} aria-label={'Synthèse du budget '+title}>
+  return <article className={'budget-summary budget-summary--'+(side||'personal')} aria-label={'Synthèse du budget '+title}>
     <div className="budget-summary__heading">
-      <h3><span className="budget-summary__side">{side.toUpperCase()}</span>{title}</h3>
+      <h3>{side&&<span className="budget-summary__side">{side.toUpperCase()}</span>}{title}</h3>
       <span className="budget-summary__period">2025 · Md€</span>
     </div>
     <div className="budget-summary__figures">
