@@ -14,8 +14,11 @@ export default async function handler(req: any, res: any) {
   const origin=req.headers.origin;const host=req.headers.host;
   if(origin&&new URL(origin).host!==host)return reply(res,403,{error:'Origine non autorisée'});
   const b=jsonBody(req);
-  const refs=await sql`SELECT id,side,amount::float8 AS amount FROM reference_categories WHERE reference_year=2025`;
-  const categories=new Map(refs.map((x:any)=>[(x.side==='revenues'?'revenue:':'expense:')+x.id,x.amount]));
+  const [refs,offBudget]=await Promise.all([
+   sql`SELECT id,side,amount::float8 AS amount FROM reference_categories WHERE reference_year=2025`,
+   sql`SELECT id,amount::float8 AS amount FROM reference_off_budget`
+  ]);
+  const categories=new Map([...refs.map((x:any)=>[(x.side==='revenues'?'revenue:':'expense:')+x.id,x.amount]),...offBudget.map((x:any)=>['revenue:'+x.id,x.amount])]);
   if(typeof b.title!=='string'||b.title.trim().length<3||b.title.length>100||
     typeof b.description!=='string'||b.description.length>500||
     b.referenceYear!==2025||typeof b.scenario?.author!=='string'||b.scenario.author.trim().length<2||b.scenario.author.length>60||!Array.isArray(b.measures)||b.measures.length>100||
@@ -31,8 +34,8 @@ export default async function handler(req: any, res: any) {
     return reply(res,400,{error:'Mesures invalides'});
   const expected=categories;
   if(!b.scenario.budget.revenues||!b.scenario.budget.expenses||
-    !['revenues','expenses'].every(kind=>Object.entries(b.scenario.budget[kind]).every(([id,value])=>{
-      const base=expected.get((kind==='revenues'?'revenue:':'expense:')+id);
+    !['revenues','expenses','offBudget'].every(kind=>Object.entries(b.scenario.budget[kind]??{}).every(([id,value])=>{
+      const base=expected.get((kind==='expenses'?'expense:':'revenue:')+id);
       return base!==undefined&&typeof value==='number'&&Number.isFinite(value)&&value>=0&&value<=base*2;
     })))return reply(res,400,{error:'Montants invalides'});
   const canonical=JSON.stringify(b.scenario);

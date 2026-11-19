@@ -18,6 +18,14 @@ describe('budget gauges are derived from the accounting result',()=>{
   expect(after.revenues.vat).toBeCloseTo(255);
   expect(after.deficit).toBeCloseTo(before.deficit-5.96);
  });
+ it('edits off-budget advantages through the same gauge engine',()=>{
+  const before=calculateScenario([],empty);
+  const target=gaugeOverride('offBudget','business-tax-relief',39.7,49.7,empty,before);
+  const result=calculateScenario([],{...empty,offBudget:{'business-tax-relief':target}});
+  expect(target).toBeCloseTo(39.7);
+  expect(gaugeAmount(result,'offBudget','business-tax-relief')).toBeCloseTo(39.7);
+  expect(result.deficit).toBeCloseTo(142.5);
+ });
  it('preserves citizen absolute overrides and accounting when no measure is selected',()=>{
   const before=calculateScenario([],{revenues:{},expenses:{defense:31}});
   const defense=expenses.find(r=>r.id==='defense')!;

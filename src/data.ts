@@ -1,4 +1,5 @@
-export type Category={id:string;label:string;amount:number;canonical:string;description:string};
+export type Category={id:string;label:string;amount:number;canonical:string;description:string;revenueImpactCategory?:string};
+import {ENTERPRISE_AIDS,OFF_BUDGET_ACCOUNTING_NOTE} from './enterprise-aids';
 export type Measure={id:string;party:'RN'|'LFI'|'Horizons';theme:string;title:string;revenueDelta:number;expenseDelta:number;source:string;year:number;status:'publié'|'illustration';description:string};
 // Totaux officiels APU 2025 INSEE : dépenses 1 714,1 Md€, recettes 1 561,6 Md€, déficit 152,5 Md€.
 // La répartition par catégorie est indicative ; les lignes d'ajustement rendent les totaux exacts.
@@ -12,7 +13,7 @@ export const expenses:Category[]=[
 {id:'health',label:'Santé',amount:280,canonical:'COFOG 07 — Santé',description:'Hôpitaux, soins et politique de santé.'},
 {id:'education',label:'Éducation',amount:180,canonical:'COFOG 09 — Enseignement',description:'Écoles, universités et formation.'},
 {id:'economy',label:'Économie et transports',amount:125,canonical:'COFOG 04 — Affaires économiques (ventilation indicative)',description:'Transports, infrastructures et autres affaires économiques, hors soutien aux entreprises isolé ci-dessous.'},
-{id:'enterprise-support',label:'Soutien public aux entreprises',amount:30,canonical:'Sous-ensemble indicatif de COFOG 04 — Affaires économiques',description:'Aides directes et soutien à l’innovation ou à la R&D des entreprises. Enveloppe pédagogique de 30 Md€ reclassée depuis Économie et transports : non certifiée, hors avantages fiscaux et allègements de cotisations.'},
+{id:'enterprise-support',label:'Soutien public aux entreprises',amount:30,canonical:'Sous-ensemble indicatif de COFOG 04 — Affaires économiques',description:'Dépenses directes de soutien aux entreprises : enveloppe pédagogique de 30 Md€ reclassée depuis Économie et transports pour conserver les comptes APU 2025. Le recensement officiel élargi 2024 atteint 166,1 Md€ : 43,3 Md€ d’aides budgétaires, 49,7 Md€ d’avantages fiscaux, 69,1 Md€ d’allègements de cotisations et 4,0 Md€ d’aides financières. Ces chiffres de millésimes et de périmètres différents ne sont pas additionnables.'},
 {id:'general',label:'Services publics généraux',amount:150,canonical:'COFOG 01 — Services publics généraux',description:'Administration générale, dette et autres services.'},
 {id:'defense',label:'Défense',amount:65,canonical:'COFOG 02 — Défense',description:'Armées et défense nationale.'},
 {id:'safety',label:'Sécurité et justice',amount:55,canonical:'COFOG 03 — Ordre et sécurité publics',description:'Police, justice et sécurité.'},
@@ -21,6 +22,17 @@ export const expenses:Category[]=[
 {id:'environment',label:'Environnement',amount:50,canonical:'COFOG 05 — Protection de l’environnement',description:'Actions de protection de l’environnement.'},
 {id:'other-expenses',label:'Autres dépenses et ajustement',amount:64.1,canonical:'Ventilation indicative — solde de rapprochement INSEE 2025',description:'Complément de ventilation pour retrouver exactement les dépenses publiques 2025 ; répartition fonctionnelle à consolider.'}
 ];
+// Hors budget : recensement des avantages, sans ajout aux dépenses/recettes 2025.
+export const offBudget:Category[]=[
+ {id:'business-tax-relief',label:'Avantages fiscaux aux entreprises',amount:ENTERPRISE_AIDS.fiscal,
+  canonical:'Jaune budgétaire PLF 2027 — aides fiscales 2024 · hors budget',revenueImpactCategory:'business',
+  description:'49,7 Md€ d’avantages fiscaux recensés en 2024 : crédits d’impôt, exonérations et taux réduits. '+OFF_BUDGET_ACCOUNTING_NOTE},
+ {id:'business-social-relief',label:'Allègements de cotisations des entreprises',amount:ENTERPRISE_AIDS.social,
+  canonical:'Jaune budgétaire PLF 2027 — aides sociales 2024 · hors budget',revenueImpactCategory:'contributions',
+  description:'69,1 Md€ d’allègements et exonérations de cotisations recensés en 2024. '+OFF_BUDGET_ACCOUNTING_NOTE},
+];
+// 4,0 Md€ d’aides financières en équivalent-avantage : documentés dans la
+// description du soutien aux entreprises, mais pas convertis en recettes fictives.
 export const revenues:Category[]=[
 {id:'vat',label:'TVA et consommation',amount:260,canonical:'SEC 2010 — Impôts sur produits',description:'Fiscalité sur les achats et la consommation.'},
 {id:'income',label:'Impôt sur le revenu',amount:115,canonical:'SEC 2010 — Impôts courants sur revenu',description:'Prélèvements sur les revenus des ménages.'},
