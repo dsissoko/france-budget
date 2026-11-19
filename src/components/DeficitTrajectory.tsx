@@ -1,6 +1,6 @@
 import {Line,LineChart,XAxis,Tooltip,ResponsiveContainer} from 'recharts';
 import {QUALIFICATIONS,type QualificationTone} from '../engine/qualification';
-import type {ProjectionResult} from '../engine/simulation';
+import {PROJECTION_CALENDAR,type ProjectionResult} from '../engine/simulation';
 import './DeficitTrajectory.css';
 
 type Props={primary:ProjectionResult; secondary?:ProjectionResult; referenceOnly?:boolean};
@@ -25,7 +25,7 @@ export default function DeficitTrajectory({primary,secondary,referenceOnly=false
    <div className="deficit-trajectory__plot">
      <ResponsiveContainer width="100%" height={112}>
        <LineChart data={rows} margin={{top:9,right:7,bottom:0,left:5}}>
-         <XAxis dataKey="year" axisLine={false} tickLine={false} interval={0} tick={{fontSize:10,fill:'#85857f'}} tickMargin={7}/>
+         <XAxis dataKey="year" axisLine={false} tickLine={false} ticks={['2025','2027','2030','2032']} interval={0} tick={{fontSize:10,fill:'#85857f'}} tickMargin={7}/>
          <Tooltip formatter={(v,name)=>[label(Number(v)),name==='reference'?'Sans changement':name==='b'?'Budget B':secondary?'Budget A':'Avec ce budget']} labelFormatter={v=>'Année '+v} />
          <Line type="linear" dataKey="reference" name="reference" stroke="#b9b9b4" strokeWidth={2.2} dot={false} activeDot={{r:3}} isAnimationActive={false} />
          {!referenceOnly&&<Line type="linear" dataKey="scenario" name="scenario" stroke={tones[a.tone]} strokeWidth={3} dot={false} activeDot={{r:3}} isAnimationActive={false}/>}
@@ -39,12 +39,12 @@ export default function DeficitTrajectory({primary,secondary,referenceOnly=false
        {!referenceOnly&&<span><i style={{background:tones[a.tone]}}/>{secondary?'Budget A':'Avec ce budget'}</span>}
        {secondary&&b&&<span><i className="dashed" style={{borderColor:tones[b.tone]}}/>Budget B</span>}
      </div>
-     <span className="deficit-trajectory__disclaimer">Simulation indicative</span>
+     <span className="deficit-trajectory__disclaimer">Effets 2027 · Horizon 2032</span>
    </div>
    {secondary&&b&&<div className="deficit-trajectory__assessments">
      <span>Budget A : <strong className={'deficit-trajectory__assessment--'+a.tone}>{a.label}</strong></span>
      <span>Budget B : <strong className={'deficit-trajectory__assessment--'+b.tone}>{b.label}</strong></span>
    </div>}
-   <details className="deficit-trajectory__details"><summary>Comprendre cette projection</summary><p>La simulation reprend les hypothèses mécaniques actuelles : la référence augmente de 2,5 % de son niveau initial par année, et les effets budgétaires sont constants à partir de 2026. Les effets économiques indirects ne sont pas calculés. Ce n’est pas une prévision.</p></details>
+   <details className="deficit-trajectory__details"><summary>Comprendre cette projection</summary><p>Référence comptable 2025 ; budget simulé applicable en 2027, effets constants jusqu’à l’horizon 2032. Le déficit de référence augmente mécaniquement de 2,5 % de sa valeur de 2025 par année. Les effets économiques indirects et les calendriers de mise en œuvre propres aux mesures ne sont pas modélisés. Les chiffrages de contre-budgets 2026 sont ici transposés à titre illustratif. Ce n’est pas une prévision.</p></details>
  </div>;
 }
