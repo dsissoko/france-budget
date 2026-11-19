@@ -1,0 +1,73 @@
+name: "Programme politique — soumettre ou corriger une proposition"
+description: "Présenter une mesure chiffrée, sa ventilation et ses hypothèses, sans écrire de code."
+title: "[politique] "
+body:
+  - type: markdown
+    attributes:
+      value: "Cette issue n'implique aucune validation officielle. Même procédure pour tous les partis. Merci de ne publier aucune donnée personnelle sensible."
+  - type: input
+    id: programme
+    attributes:
+      label: "Formation, programme et année"
+      placeholder: "Nom du programme, année, date de la proposition"
+    validations:
+      required: true
+  - type: input
+    id: source
+    attributes:
+      label: "Source primaire publique"
+      placeholder: "https://... (programme, communiqué ou document de chiffrage)"
+    validations:
+      required: true
+  - type: dropdown
+    id: relation
+    attributes:
+      label: "Qualité déclarée du contributeur"
+      options:
+        - "Particulier / chercheur / observateur"
+        - "Équipe d'un parti (habilitations non vérifiées)"
+        - "Autre"
+    validations:
+      required: true
+  - type: textarea
+    id: mesure
+    attributes:
+      label: "Mesure et objectif"
+      description: "Intitulé, description, calendrier, périmètre et population concernée."
+    validations:
+      required: true
+  - type: textarea
+    id: chiffrage
+    attributes:
+      label: "Montants revendiqués"
+      description: "Recettes / dépenses ; Md€, année, ponctuel/récurrent, source de chaque montant. Préciser si aucun montant officiel n'existe."
+    validations:
+      required: true
+  - type: textarea
+    id: ventilation
+    attributes:
+      label: "Ventilation proposée dans les catégories du simulateur"
+      description: "Pour chaque effet : recettes/dépenses, catégorie existante, montant, signe, justification et somme de contrôle ; ne pas inventer de catégories."
+    validations:
+      required: true
+  - type: textarea
+    id: hypotheses
+    attributes:
+      label: "Hypothèses, effets indirects et incertitudes"
+      description: "Décrire les hypothèses non vérifiées et distinguer impact direct et projections économiques."
+    validations:
+      required: true
+  - type: textarea
+    id: interactions
+    attributes:
+      label: "Interactions ou risques de double compte"
+      description: "Préciser les mesures dépendantes ou écrire 'non évalué'."
+  - type: checkboxes
+    id: verifications
+    attributes:
+      label: "Vérifications"
+      options:
+        - label: "Je distingue les montants revendiqués des résultats calculés par le site."
+          required: true
+        - label: "Je comprends que la représentation officielle et le chiffrage doivent être vérifiés indépendamment."
+          required: true
