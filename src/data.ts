@@ -1,4 +1,4 @@
-export type Category={id:string;label:string;amount:number;canonical:string;description:string};
+export type Category={id:string;label:string;amount:number;canonical:string;description:string;revenueImpactCategory?:string};
 import {ENTERPRISE_AIDS,OFF_BUDGET_ACCOUNTING_NOTE} from './enterprise-aids';
 export type Measure={id:string;party:'RN'|'LFI'|'Horizons';theme:string;title:string;revenueDelta:number;expenseDelta:number;source:string;year:number;status:'publié'|'illustration';description:string};
 // Totaux officiels APU 2025 INSEE : dépenses 1 714,1 Md€, recettes 1 561,6 Md€, déficit 152,5 Md€.
@@ -25,10 +25,10 @@ export const expenses:Category[]=[
 // Hors budget : recensement des avantages, sans ajout aux dépenses/recettes 2025.
 export const offBudget:Category[]=[
  {id:'business-tax-relief',label:'Avantages fiscaux aux entreprises',amount:ENTERPRISE_AIDS.fiscal,
-  canonical:'Jaune budgétaire PLF 2027 — aides fiscales 2024 · hors budget',
+  canonical:'Jaune budgétaire PLF 2027 — aides fiscales 2024 · hors budget',revenueImpactCategory:'business',
   description:'49,7 Md€ d’avantages fiscaux recensés en 2024 : crédits d’impôt, exonérations et taux réduits. '+OFF_BUDGET_ACCOUNTING_NOTE},
  {id:'business-social-relief',label:'Allègements de cotisations des entreprises',amount:ENTERPRISE_AIDS.social,
-  canonical:'Jaune budgétaire PLF 2027 — aides sociales 2024 · hors budget',
+  canonical:'Jaune budgétaire PLF 2027 — aides sociales 2024 · hors budget',revenueImpactCategory:'contributions',
   description:'69,1 Md€ d’allègements et exonérations de cotisations recensés en 2024. '+OFF_BUDGET_ACCOUNTING_NOTE},
 ];
 // 4,0 Md€ d’aides financières en équivalent-avantage : documentés dans la
