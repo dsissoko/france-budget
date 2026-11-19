@@ -2,7 +2,7 @@ export const publishedBudgetUrl = (id: string, origin: string) =>
   origin.replace(/\/$/, '') + '/b/' + encodeURIComponent(id);
 
 type ComparableScenario = {
-  budget: { revenues: Record<string, number>; expenses: Record<string, number> };
+  budget: { revenues: Record<string, number>; expenses: Record<string, number>; offBudget?:Record<string,number> };
   picked: string[];
   citizenMeasures?: Array<{ id: string; title: string; description: string; kind: string; categoryId: string; delta: number }>;
 };
@@ -13,11 +13,13 @@ export function samePublishedScenario(
   published: ComparableScenario,
   revenueDefaults: Array<{ id: string; amount: number }>,
   expenseDefaults: Array<{ id: string; amount: number }>,
+  offBudgetDefaults: Array<{ id: string; amount: number }> = [],
 ): boolean {
   if (current.picked.length !== published.picked.length ||
       [...current.picked].sort().join('|') !== [...published.picked].sort().join('|')) return false;
   if (!revenueDefaults.every(c => (current.budget.revenues[c.id] ?? c.amount) === (published.budget.revenues[c.id] ?? c.amount)) ||
-      !expenseDefaults.every(c => (current.budget.expenses[c.id] ?? c.amount) === (published.budget.expenses[c.id] ?? c.amount))) return false;
+      !expenseDefaults.every(c => (current.budget.expenses[c.id] ?? c.amount) === (published.budget.expenses[c.id] ?? c.amount)) ||
+      !offBudgetDefaults.every(c => (current.budget.offBudget?.[c.id] ?? c.amount) === (published.budget.offBudget?.[c.id] ?? c.amount))) return false;
   const normalized = (items: ComparableScenario['citizenMeasures']) =>
     (items || []).map(m => [m.id, m.title, m.description, m.kind, m.categoryId, m.delta].join('\u001f')).sort();
   return JSON.stringify(normalized(current.citizenMeasures)) === JSON.stringify(normalized(published.citizenMeasures));
