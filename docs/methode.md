@@ -1,4 +1,4 @@
-# Notre méthode — France Budget
+# Notre méthode — Mon Budget Citoyen
 
 ## 1. D'où viennent les chiffres ?
 La référence 2025 couvre **l'ensemble des administrations publiques (APU)**, pas uniquement l'État. Les agrégats INSEE retenus sont **1 561,6 Md€ de recettes, 1 714,1 Md€ de dépenses et 152,5 Md€ de déficit**. Source : https://www.insee.fr/fr/statistiques/8956575
@@ -9,7 +9,7 @@ Les grandes catégories présentées dans la V1 sont **indicatives** : elles ne 
 Dans les deux onglets « Comprendre » et « Mon budget », un poste « Soutien public aux entreprises » de **30 Md€** est isolé **à titre pédagogique**, par reclassement de la catégorie « Économie et transports » (155 → 125 Md€). **Ce montant de 30 Md€ n’est pas un chiffrage officiel des aides** : il illustre le fonctionnement de l’axe en attendant une ventilation sourcée. Les agrégats de dépenses restent inchangés. Il ne couvre ni les dépenses fiscales ni les allègements de cotisations, qui doivent être distingués des dépenses budgétaires pour éviter les doubles comptes. Les modifications de cet axe dans « Mon budget » correspondent à une variation de dépense directe, **sans effet macroéconomique automatique**. Le futur chiffrage doit documenter les dispositifs, leur périmètre et leurs écritures comptables.
 
 ## 2. Pourquoi une règle de projection ?
-Les thèmes de campagne (« pouvoir d'achat », « immigration », « écologie ») ne sont pas des postes comptables. Une mesure peut modifier plusieurs recettes et dépenses ; un même poste peut recevoir plusieurs mesures. France Budget traduit les mesures en écritures budgétaires au moyen de règles **génériques** (delta, ventilation) ou **spécifiques** (calcul particulier). Ces ventilations sont des **interprétations documentées**, non opposables.
+Les thèmes de campagne (« pouvoir d'achat », « immigration », « écologie ») ne sont pas des postes comptables. Une mesure peut modifier plusieurs recettes et dépenses ; un même poste peut recevoir plusieurs mesures. Mon Budget Citoyen traduit les mesures en écritures budgétaires au moyen de règles **génériques** (delta, ventilation) ou **spécifiques** (calcul particulier). Ces ventilations sont des **interprétations documentées**, non opposables.
 
 Exemple : une baisse de TVA sur l'énergie de 10 Md€ (exemple pédagogique) se projette sur les recettes fiscales et dégrade mécaniquement le solde de 10 Md€, à effets indirects constants.
 
