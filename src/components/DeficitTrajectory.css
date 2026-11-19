@@ -1,0 +1,25 @@
+.deficit-trajectory{min-width:0}
+.deficit-trajectory__header{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.deficit-trajectory__header h3{margin:0;font-size:16px;line-height:1.35;letter-spacing:-.3px;font-weight:680}
+.deficit-trajectory__header p{font-size:12px;color:#85857f;line-height:1.5;margin:4px 0 0}
+.deficit-trajectory__badge{font-size:10px;font-weight:650;border-radius:30px;padding:5px 9px;white-space:nowrap;flex:none}
+.deficit-trajectory__badge--positive{background:#edf7f3;color:#287b68}
+.deficit-trajectory__badge--neutral{background:#f1f1ef;color:#6d716e}
+.deficit-trajectory__badge--warning{background:#fbf2e8;color:#98642d}
+.deficit-trajectory__badge--negative{background:#fbeae6;color:#ac564d}
+.deficit-trajectory__plot{height:112px;margin-top:8px;width:100%}
+.deficit-trajectory__footer{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-top:8px}
+.deficit-trajectory__legend{display:flex;gap:13px;align-items:center;flex-wrap:wrap;color:#757771;font-size:11px}
+.deficit-trajectory__legend span{display:inline-flex;align-items:center;gap:6px}
+.deficit-trajectory__legend i{display:inline-block;width:7px;height:7px;border-radius:50%;flex:none}
+.deficit-trajectory__legend i.dashed{background:transparent!important;border-top:2px dashed;border-radius:0;width:12px;height:1px}
+.deficit-trajectory__disclaimer{font-size:10px;color:#91938e}
+.deficit-trajectory__assessments{display:flex;gap:12px;flex-wrap:wrap;margin-top:10px;font-size:11px;color:#777}
+.deficit-trajectory__assessment--positive{color:#287b68}
+.deficit-trajectory__assessment--neutral{color:#666}
+.deficit-trajectory__assessment--warning{color:#98642d}
+.deficit-trajectory__assessment--negative{color:#ac564d}
+.deficit-trajectory__details{font-size:11px;color:#747771;margin-top:9px}
+.deficit-trajectory__details summary{cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+.deficit-trajectory__details p{margin:7px 0 0;line-height:1.5}
+@media(max-width:370px){.deficit-trajectory__header{flex-wrap:wrap}.deficit-trajectory__header h3{font-size:15px}}
