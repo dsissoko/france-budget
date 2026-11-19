@@ -1,4 +1,4 @@
-import { expenses, revenues, measures, type Category, type Measure } from './data';
+import { expenses, revenues, offBudget, measures, type Category, type Measure } from './data';
 
 /**
  * Les règles traduisent des mesures politiques en lignes budgétaires.
@@ -6,7 +6,7 @@ import { expenses, revenues, measures, type Category, type Measure } from './dat
  * Toutes les unités financières sont en Md€.
  */
 export type Side = 'revenues' | 'expenses';
-export type Override = { revenues: Record<string, number>; expenses: Record<string, number> };
+export type Override = { revenues: Record<string, number>; expenses: Record<string, number>; offBudget?: Record<string,number> };
 export type Entry = { measureId: string; side: Side; categoryId: string; amount: number; rationale: string };
 export type Rule = {
   kind: 'allocate' | 'specific';
@@ -18,6 +18,7 @@ export type Result = {
   entries: Entry[];
   revenues: Record<string, number>;
   expenses: Record<string, number>;
+  offBudget: Record<string,number>;
   revenueTotal: number;
   expenseTotal: number;
   deficit: number;
@@ -74,7 +75,7 @@ export function projectMeasure(measure: Measure): Entry[] {
   });
 }
 export function calculateScenario(selectedIds: string[], citizen: Override = { revenues: {}, expenses: {} }): Result {
-  const revenueValues = baseline(revenues), expenseValues = baseline(expenses);
+  const revenueValues = baseline(revenues), expenseValues = baseline(expenses), offBudgetValues=baseline(offBudget);
   const entries: Entry[] = [];
   const warnings: string[] = [];
   for (const id of new Set(selectedIds)) {
@@ -103,14 +104,24 @@ export function calculateScenario(selectedIds: string[], citizen: Override = { r
       values[id] += value - original.amount;
     }
   }
-  const revenueTotal = round(sum(revenueValues)), expenseTotal = round(sum(expenseValues));
+  // Off-budget = baseline already implicit in net receipts; count ONLY the delta.
+  // The public-finance baseline remains exactly 2025 INSEE.
+  for(const [id,value] of Object.entries(citizen.offBudget??{})){
+   const category=offBudget.find(c=>c.id===id);
+   if(!category||!Number.isFinite(value)||value<0||value>2*category.amount){
+    warnings.push('Ajustement hors budget invalide : '+id);continue;
+   }
+   offBudgetValues[id]=value;
+   revenueValues[id==='business-tax-relief'?'business':'contributions']+=category.amount-value;
+  }
+    const revenueTotal = round(sum(revenueValues)), expenseTotal = round(sum(expenseValues));
   const originalBalance = sum(baseline(revenues)) - sum(baseline(expenses));
   if (Object.values(revenueValues).some(v => v < 0) || Object.values(expenseValues).some(v => v < 0))
     warnings.push('Au moins un poste négatif : projection non réaliste sur cette référence.');
   const years = new Set(selectedIds.map(id => measures.find(m => m.id === id)?.year).filter(Boolean));
   if (years.size > 1) warnings.push('Mesures de millésimes différents : addition illustrative, pas un budget annuel homogène.');
   if (selectedIds.length > 1) warnings.push('Les interactions et risques de double compte ne sont pas évalués.');
-  return { entries, revenues: revenueValues, expenses: expenseValues, revenueTotal, expenseTotal,
+  return { entries, revenues: revenueValues, expenses: expenseValues, offBudget:offBudgetValues, revenueTotal, expenseTotal,
     deficit: round(expenseTotal - revenueTotal),
     balanceDelta: round((revenueTotal - expenseTotal) - originalBalance), warnings };
 }
