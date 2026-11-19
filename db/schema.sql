@@ -110,3 +110,8 @@ ON CONFLICT (id) DO UPDATE SET
  label=EXCLUDED.label,amount=EXCLUDED.amount,source_year=EXCLUDED.source_year,
  canonical=EXCLUDED.canonical,description=EXCLUDED.description,
  revenue_impact_category=EXCLUDED.revenue_impact_category,sort_order=EXCLUDED.sort_order;
+
+-- Update the 2025 pedagogical expense line's tooltip, without changing its 30 Md€.
+UPDATE reference_categories
+ SET description='Dépense directe pédagogique de 30 Md€ reclassée depuis Économie et transports pour conserver le total APU 2025. Le recensement officiel élargi 2024 atteint 166,1 Md€ : 43,3 Md€ d’aides budgétaires, 49,7 Md€ d’avantages fiscaux, 69,1 Md€ d’allègements de cotisations et 4,0 Md€ d’aides financières. Avantages fiscaux et sociaux : postes hors budget activables séparément, déjà reflétés dans les recettes nettes. Ces périmètres et millésimes différents ne sont pas additionnables. Source : https://www.budget.gouv.fr/documentation/file-download/34471'
+ WHERE id='enterprise-support' AND side='expenses' AND reference_year=2025;
