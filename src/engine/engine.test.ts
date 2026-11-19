@@ -3,6 +3,7 @@ import {assessmentService,type QualificationCode} from './assessment';
 import {QUALIFICATIONS} from './qualification';
 import {simulationService,createSimulationService} from './simulation';
 import {accountingService} from './accounting';
+import type {Override} from '../projection';
 import {expenses,revenues,sum,years} from '../data';
 
 const samples=(values:number[])=>values.map((deficit,i)=>({year:2025+i,deficit}));
@@ -62,7 +63,7 @@ describe('AccountingService and SimulationService: V1 parity',()=>{
   {name:'Citizen defense',ids:['lfi-wealth','lfi-school','lfi-green'],override:{revenues:{},expenses:{defense:31}},deficit:114.7,expected2030:133.8},
   {name:'Citizen complementary',ids:['lfi-wealth','lfi-school','lfi-green'],override:{revenues:{},expenses:{social:394}},deficit:142.7,expected2030:161.8},
  ])('reconciles production scenario fixture $name and preserves old rounding',({ids,override,deficit,expected2030})=>{
-  const result=accountingService.calculate(ids,override);
+  const result=accountingService.calculate(ids,override as Override);
   expect(result.deficit).toBeCloseTo(deficit,2);
   const projected=simulationService.simulate(base,result.balanceDelta,years);
   expect(projected.rows[5].scenario).toBe(expected2030);
