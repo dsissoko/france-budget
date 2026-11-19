@@ -55,6 +55,23 @@ describe('AccountingService and SimulationService: V1 parity',()=>{
   expect(result.rows).toEqual(expected(impact));
   expect(result.modelId).toBe('mechanical-v1');
  });
+ it.each([
+  {name:'RN',ids:['rn-vat','rn-social','rn-agencies'],override:{revenues:{},expenses:{}},deficit:149.66,expected2030:168.7},
+  {name:'LFI',ids:['lfi-wealth','lfi-school','lfi-green'],override:{revenues:{},expenses:{}},deficit:148.7,expected2030:167.8},
+  {name:'Horizons',ids:['hor-admin','hor-tax'],override:{revenues:{},expenses:{}},deficit:151.5,expected2030:170.6},
+  {name:'Citizen defense',ids:['lfi-wealth','lfi-school','lfi-green'],override:{revenues:{},expenses:{defense:31}},deficit:114.7,expected2030:133.8},
+  {name:'Citizen complementary',ids:['lfi-wealth','lfi-school','lfi-green'],override:{revenues:{},expenses:{social:394}},deficit:142.7,expected2030:161.8},
+ ])('reconciles production scenario fixture $name and preserves old rounding',({ids,override,deficit,expected2030})=>{
+  const result=accountingService.calculate(ids,override);
+  expect(result.deficit).toBeCloseTo(deficit,2);
+  const projected=simulationService.simulate(base,result.balanceDelta,years);
+  expect(projected.rows[5].scenario).toBe(expected2030);
+  expect(projected.assessment.code).toBe('INCREASE_STEADY');
+  for(const [i,row] of projected.rows.entries()){
+   expect(row.reference).toBe(Math.round(base*(1+.025*i)*10)/10);
+   expect(row.scenario).toBe(Math.round((base*(1+.025*i)-(i?result.balanceDelta:0))*10)/10);
+  }
+ });
  it('supports an optional future impact adapter without changing UI contracts',()=>{
   const model=createSimulationService({apply:()=>3});
   const enhanced=model.simulate(base,0,years);
