@@ -1,7 +1,7 @@
 import {describe,expect,it} from 'vitest';
 import {assessmentService,type QualificationCode} from './assessment';
 import {QUALIFICATIONS} from './qualification';
-import {simulationService,createSimulationService} from './simulation';
+import {simulationService,createSimulationService,PROJECTION_CALENDAR,projectionYears} from './simulation';
 import {accountingService} from './accounting';
 import type {Override} from '../projection';
 import {expenses,revenues,sum,years} from '../data';
@@ -51,12 +51,32 @@ describe('AccountingService and SimulationService: V1 parity',()=>{
  const base=sum(expenses)-sum(revenues);
  const expected=(impact:number)=>years.map((year,i)=>({
   year,reference:Math.round(base*(1+.025*i)*10)/10,
-  scenario:Math.round((base*(1+.025*i)-(i===0?0:impact))*10)/10,
+  scenario:Math.round((base*(1+.025*i)-(year<PROJECTION_CALENDAR.applicationYear?0:impact))*10)/10,
  }));
+ it('defines calendar once for all projections and the next presidential term end',()=>{
+  expect(PROJECTION_CALENDAR).toMatchObject({referenceYear:2025,budgetYear:2027,applicationYear:2027,horizonYear:2032});
+  expect(years).toEqual(projectionYears);
+  expect(years).toEqual([2025,2026,2027,2028,2029,2030,2031,2032]);
+ });
+ it('does not apply any political changes to 2025 or 2026, then applies them in 2027',()=>{
+  const result=simulationService.simulate(base,37.8,years);
+  expect(result.rows.slice(0,2).every(r=>r.scenario===r.reference)).toBe(true);
+  expect(result.rows.find(r=>r.year===2027)?.scenario).toBe(Math.round((base*(1+.025*2)-37.8)*10)/10);
+  expect(result.rows[result.rows.length-1].year).toBe(2032);
+  expect(result.assessment.code).toBe('INCREASE_STEADY');
+ });
+ it('anchors calculations to calendar years, not displayed array positions',()=>{
+  const subset=simulationService.simulate(base,1,[2027,2030,2032]);
+  expect(subset.rows).toEqual([2027,2030,2032].map(year=>({
+   year,
+   reference:Math.round(base*(1+.025*(year-2025))*10)/10,
+   scenario:Math.round((base*(1+.025*(year-2025))-1)*10)/10,
+  })));
+ });
  it('delegates the existing accounting calculations without changing them',()=>{
   expect(accountingService.calculate([]).deficit).toBeCloseTo(152.5,8);
  });
- it.each([-80,-20,0,20,100,200])('preserves every old trajectory point for balance delta %i',impact=>{
+ it.each([-80,-20,0,20,100,200])('preserves V1 accounting and 2027 application for balance delta %i',impact=>{
   const result=simulationService.simulate(base,impact,years);
   expect(result.rows).toEqual(expected(impact));
   expect(result.modelId).toBe('mechanical-v1');
@@ -75,7 +95,7 @@ describe('AccountingService and SimulationService: V1 parity',()=>{
   expect(projected.assessment.code).toBe('INCREASE_STEADY');
   for(const [i,row] of projected.rows.entries()){
    expect(row.reference).toBe(Math.round(base*(1+.025*i)*10)/10);
-   expect(row.scenario).toBe(Math.round((base*(1+.025*i)-(i?result.balanceDelta:0))*10)/10);
+   expect(row.scenario).toBe(Math.round((base*(1+.025*i)-(row.year<2027?0:result.balanceDelta))*10)/10);
   }
  });
  it('supports an optional future impact adapter without changing UI contracts',()=>{
