@@ -4,7 +4,7 @@ export default async function handler(req: any, res: any) {
  try {
   const sql=db();
   if(req.method==='GET'){
-   const rows=await sql`SELECT b.id,b.title,b.description,b.origin,b.party_code,b.maturity_status,b.confirmation_organization,b.confirmation_evidence_url,b.confirmed_at,b.featured,b.featured_order,b.reference_year,b.published_at,b.scenario,
+   const rows=await sql`SELECT b.id,b.title,b.description,b.origin,b.party_code,b.maturity_status,b.confirmation_organization,b.confirmation_evidence_url,b.confirmed_at,b.featured,b.featured_order,b.reference_year,b.published_at,b.scenario,b.budget_mode::text AS "budgetMode",
      CASE WHEN b.origin='party' THEN
        (SELECT COALESCE(jsonb_agg(jsonb_build_object(
           'id',p.group_id,'title',p.title,'year',p.source_year,
