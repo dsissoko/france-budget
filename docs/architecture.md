@@ -1,6 +1,6 @@
 # Architecture technique et modèle de données — Mon Budget Citoyen
 
-## Vue d'ensemble (état v1.0.0)
+## Vue d'ensemble (code main et modèle Neon, 20/11/2026)
 
 ```text
 React 19 + TypeScript + Vite + Recharts (navigateur)
@@ -18,18 +18,22 @@ React 19 + TypeScript + Vite + Recharts (navigateur)
 - **Données privées locales** : `localStorage['france-budget-v1']` (ajustements de jauges) et `localStorage['france-budget-scenarios']` (scénarios nommés). Pas de synchronisation inter-appareils.
 - **Données publiques** : budgets publiés, mesures et votes conservés dans Neon ; une publication est une copie distincte du scénario local.
 
-## Modèle relationnel (voir db/schema.sql)
+## Modèle relationnel (voir [schema.md](schema.md), référence vérifiée en base)
 
-| Objet | Fonction | Relations / contraintes |
+Le [schéma détaillé](schema.md) est la **référence technique** (colonnes, FK, index, tables de préparation et état de validation). Le fichier [`db/schema.sql`](../db/schema.sql) est un bootstrap historique, **pas un miroir à jour de la base de production**.
+
+| Table | Responsabilité | Identité / contraintes majeures |
 |---|---|---|
-| `reference_categories` | Référence budgétaire : `id`, `side`, `amount`, `label`, `canonical`, `description`, `reference_year`, `sort_order` | Clé `id` ; catégories recettes/dépenses |
-| `budgets` | Budget publié politique ou citoyen | UUID ; `origin` (`party`, `citizen`, `educational`), `visibility`, `reference_year`, `scenario JSONB`, `featured`, `featured_order`, `published_at` |
-| `measures` | Propositions liées à un budget | FK `budget_id` → `budgets.id`, `category_code`, `kind`, `delta_amount`, `reference_amount`, métadonnées politiques et `legacy_id` |
-| `votes` | Soutien public | FK `budget_id`, `voter_hash`, contrainte UNIQUE (`budget_id`, `voter_hash`) |
-| `publication_limits` | Limitation des publications | Empreinte et horodatage |
-| `reference_measures` | Ancienne table de migration | Conservée pour vérification / retour arrière ; plus lue par `GET /api/reference` |
+| `political_parties` | Répertoire des formations | `code` PK stable, `name` libellé |
+| `budgets` | Budgets citoyens et politiques | `id UUID` PK, `party_code` FK validée (requise pour `origin='party'`), `scenario JSONB`, visibilité |
+| `measures` | Mesures associées aux budgets | `id UUID` PK, FK budget, `legacy_id` historique |
+| `measure_accounting_entries` | **Écritures APU normalisées** | PK `(measure_id,line_number)`, FK catégorie `(category_id,side)`, montant signé |
+| `reference_categories` | 25 postes APU, y compris les deux « Autres et ajustement » | `id` PK, `(id,side)` unique |
+| `reference_off_budget` | Deux avantages hors budget | Écarts imputés aux recettes, non additionnés aux dépenses |
+| `votes` | Votes sur les budgets | FK budget et unique `(budget_id,voter_hash)` |
+| `party_*_draft` | Sources, lignes et groupes politiques **non encore publiés** | Identités composites, validation documentaire restante |
 
-Le schéma `db/schema.sql` documente la structure de création ; **ne pas le confondre avec un outil de migration automatique de la base existante**. Les évolutions de schéma et les données migrées doivent être suivies séparément.
+Les libellés `title` et `name` ne doivent **jamais** identifier un parti ou déterminer une écriture comptable. Les groupes documentaires ne sont pas comptés en plus de leurs composantes.
 
 ### Modèle logique de scénario
 
@@ -53,21 +57,21 @@ Le schéma `db/schema.sql` documente la structure de création ; **ne pas le con
 1. `GET /api/reference` lit `reference_categories` et les mesures politiques de `measures` jointes à `budgets` ; la version actuelle cible **2025**.
 2. Le frontend attend ce référentiel avant d'afficher les montants ; il alimente les collections utilisées par les composants et le moteur de projection.
 3. `GET /api/budgets` sert les budgets publiés et leur sélection éditoriale (`featured`, `featured_order`). Comparer limite la sélection mise en avant à dix budgets ; Voter liste les budgets publics.
-4. `POST /api/budgets` valide les catégories contre Neon, puis utilise la fonction SQL `publish_citizen_budget` pour une publication atomique et la limite globale de **50 budgets citoyens**.
+4. `POST /api/budgets` valide les catégories contre Neon, puis utilise la fonction SQL `publish_citizen_budget` pour une publication atomique et la limite globale actuellement codée de **100 budgets citoyens**.
 5. `POST /api/votes` enregistre un soutien. Unicité technique par budget et empreinte du cookie, **pas par personne**.
 6. Les budgets personnels non publiés ne passent pas par ces endpoints : ils restent dans le navigateur.
 
 ## Calcul budgétaire
 
-- Agrégats APU 2025 utilisés : recettes **1 561,6 Md€**, dépenses **1 714,1 Md€**, déficit **152,5 Md€**.
+- Agrégats APU 2025 actifs dans Neon : recettes **1 561,7 Md€**, dépenses **1 714,2 Md€**, déficit **152,5 Md€**.
 - **Important** : les catégories ventilées et les reclassements pédagogiques ne sont pas des montants INSEE certifiés poste par poste.
 - `src/projection.ts` contient `calculateScenario`, `projectMeasure` et les audits de rapprochement des revendications. Le solde résulte des recettes moins les dépenses, après application des ajustements et écritures de mesures.
-- Les règles `rules` (notamment la répartition d'une mesure entre plusieurs catégories et certaines exceptions) sont **encore codées en dur** ; elles utilisent les identifiants historiques `legacy_id`.
+- Les mesures politiques actives sont maintenant ventilées dans `measure_accounting_entries` ; `GET /api/reference` produit `apuEntries` et contrôle la réconciliation avec les deltas. `projectMeasure` privilégie ces écritures et rejette toute incohérence. Les règles `rules` codées en dur subsistent **en repli historique**, pas comme mode cible.
 - Une égalité comptable entre montant revendiqué et montant ventilé n'atteste ni faisabilité économique ni absence de double compte. Les trajectoires v1.0.0 sont indicatives et non prédictives.
 
 ## Dette technique : issue #22 (v1.0.0, ouverte)
 
-- Concevoir et migrer `measure_impacts` ou une représentation versionnée équivalente : mesures → catégories, parts, sens, justification et hypothèses.
+- **Réalisé partiellement** : table `measure_accounting_entries` avec FK et code parti stable. Reste à enrichir le modèle des propositions documentaires validées et à éliminer les copies/règles transitoires.
 - Fournir ces paramètres par API, tout en conservant le moteur d'exécution TypeScript réactif côté navigateur.
 - Supprimer les dépendances de production à la copie historique `src/data.ts` ; garder des fixtures dédiées pour les tests.
 - Tester la conservation des totaux INSEE, les mesures RN/LFI/Horizons, les propositions citoyennes, les répartitions multiples et les avertissements.
@@ -86,4 +90,4 @@ Le schéma `db/schema.sql` documente la structure de création ; **ne pas le con
 - **v1.0.0** : quatre parcours, base Neon unifiée, comparaison A/B en deux clics, campagne de recette et migration de paramètres à terminer.
 - **v1.1.0** : modèle pluriannuel avec dette/PIB, intérêts, sensibilité, indicateurs de désendettement validés ; **non implémenté dans la v1.0.0**.
 
-Voir aussi [vision.md](vision.md), [neon-integration.md](neon-integration.md) et [../db/schema.sql](../db/schema.sql).
+Voir aussi **[schema.md](schema.md)** (schéma réel et statut des migrations), [vision.md](vision.md), [neon-integration.md](neon-integration.md) et [../db/schema.sql](../db/schema.sql) (bootstrap historique).
