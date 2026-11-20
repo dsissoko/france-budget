@@ -11,7 +11,7 @@ export default async function handler(req: any, res: any) {
           'sourceCount',p.source_measure_count,'reviewStatus',p.review_status,
           'sourceLines',(SELECT COALESCE(jsonb_agg(jsonb_build_object(
              'id',l.source_row,'title',l.title,'direction',l.direction,
-             'claimedAmountBn',l.claimed_amount_bn,'sourceUrl',l.source_url,
+             'claimedAmountBn',l.claimed_amount_bn,'impactDescription',l.impact_description,'sourceUrl',l.source_url,
              'validationStatus',l.validation_status,'apuDecision',l.apu_decision,
              'accountingMeasureId',(SELECT sal.measure_id::text FROM source_accounting_links sal
                WHERE (sal.party_code,sal.source_year,sal.source_row)=(l.party_code,l.source_year,l.source_row)
