@@ -8,6 +8,10 @@ export type PublishedAggregate = {
   balanceDeltaBn?:number;
   sourceUrl:string;
   description?:string;
+  scope?:string;
+  sourceSection?:string;
+  reportedOverallBalanceDeltaBn?:number;
+  overallExplanation?:string;
 };
 export type PartyBudgetInput = {
   origin:'party'|'citizen';
@@ -39,8 +43,7 @@ export function calculatePublishedBudget(b:PartyBudgetInput,reference:ReferenceM
       ![revenuesBn,expensesBn].every(Number.isFinite)||
       !sourceUrl.startsWith('https://'))
     throw Error('Agrégats politiques invalides : métadonnées, année ou source');
-  if((basis==='total'&&(revenuesBn<0||expensesBn<0))||
-      (basis==='delta'&&(revenuesBn<0||expensesBn<0)))
+  if(basis==='total'&&(revenuesBn<0||expensesBn<0))
     throw Error('Agrégats politiques invalides : montants négatifs');
   const baseRevenue=sum(reference.revenues),baseExpense=sum(reference.expenses);
   const deltaRevenue=basis==='delta'?revenuesBn:revenuesBn-baseRevenue;

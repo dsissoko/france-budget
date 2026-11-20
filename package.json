@@ -8,7 +8,8 @@
     "build": "vite build",
     "preview": "vite preview --host 0.0.0.0",
     "check": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:programmes": "node scripts/import-programmes.mjs"
   },
   "dependencies": {
     "@vitejs/plugin-react": "^4.7.0",

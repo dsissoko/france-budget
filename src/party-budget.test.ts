@@ -34,6 +34,17 @@ describe('Moteur à deux modes : agrégats sourcés ou référence + deltas',()=
   expect(aggregateMode(p)).toBe(false);
   expect(calculatePublishedBudget(p,reference).balanceDelta).toBe(-5);
  });
+ it('accepte les baisses nettes de recettes et dépenses revendiquées par RN 2026',()=>{
+  const rn={...claim,revenuesBn:-14,expensesBn:-50,balanceDeltaBn:36};
+  const result=calculatePublishedBudget({...party,scenario:{...party.scenario,claimedTotals:rn}},reference);
+  expect(result.balanceDelta).toBe(36);
+  expect(result.revenueTotal).toBe(86);
+  expect(result.expenseTotal).toBe(80);
+ });
+ it('distingue le solde calculé des deux masses d’un solde politique avec effets indirects',()=>{
+  const eqx={...claim,revenuesBn:59,expensesBn:-14.4,balanceDeltaBn:73.4};
+  expect(calculatePublishedBudget({...party,scenario:{...party.scenario,claimedTotals:eqx}},reference).balanceDelta).toBeCloseTo(73.4);
+ });
  it('emploie la référence INSEE et les mesures actives sans agrégats globaux',()=>{
   const result=calculatePublishedBudget({...party,scenario:{picked:['item'],budget:{revenues:{},expenses:{}}}},reference);
   expect(result.balanceDelta).toBe(-5);

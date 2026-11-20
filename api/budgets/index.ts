@@ -4,7 +4,7 @@ export default async function handler(req: any, res: any) {
  try {
   const sql=db();
   if(req.method==='GET'){
-   const rows=await sql`SELECT b.id,b.title,b.description,b.origin,b.party_code,b.maturity_status,b.confirmation_organization,b.confirmation_evidence_url,b.confirmed_at,b.featured,b.featured_order,b.reference_year,b.published_at,b.scenario,
+   const rows=await sql`SELECT b.id,b.title,b.description,b.origin,b.party_code,b.maturity_status,b.confirmation_organization,b.confirmation_evidence_url,b.confirmed_at,b.featured,b.featured_order,b.reference_year,b.published_at,b.scenario,b.budget_mode::text AS "budgetMode",b.budget_mode::text AS "budgetMode",
      CASE WHEN b.origin='party' THEN
        (SELECT COALESCE(jsonb_agg(jsonb_build_object(
           'id',p.group_id,'title',p.title,'year',p.source_year,
@@ -18,10 +18,11 @@ export default async function handler(req: any, res: any) {
                LIMIT 1)
            ) ORDER BY l.source_row),'[]'::jsonb)
            FROM party_source_lines l WHERE (l.party_code,l.source_year,l.group_id)=(p.party_code,p.source_year,p.group_id)),
-          'sourceUrl',(SELECT MIN(l.source_url) FROM party_source_lines l
-                       WHERE (l.party_code,l.source_year,l.group_id)=(p.party_code,p.source_year,p.group_id))
+          'sourceUrl',COALESCE(p.source_url,(SELECT MIN(l.source_url) FROM party_source_lines l
+                       WHERE (l.party_code,l.source_year,l.group_id)=(p.party_code,p.source_year,p.group_id)))
         ) ORDER BY p.source_year DESC,p.group_id),'[]'::jsonb)
-        FROM party_proposals p WHERE p.party_code=b.party_code)
+        FROM party_proposals p WHERE p.party_code=b.party_code
+         AND p.source_year=COALESCE((b.scenario->'claimedTotals'->>'year')::int,(SELECT MAX(q.source_year) FROM party_proposals q WHERE q.party_code=b.party_code)))
      ELSE '[]'::jsonb END AS "documentaryProposals",
      count(v.id)::int AS votes FROM budgets b LEFT JOIN votes v ON v.budget_id=b.id
      WHERE b.origin IN ('citizen','party') AND b.visibility='public'
