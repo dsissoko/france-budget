@@ -58,7 +58,20 @@ Pour chaque ligne source, choisir **un statut documenté** :
 - Compatibilité avec les scénarios citoyens et votes, et stratégie de retour arrière :
 - Documentation mise à jour : `docs/schema.md`, `docs/architecture.md` et/ou `docs/projections.md` :
 
-## 6. Vérifications avant fusion
+## 6. Maturité du budget complet et confirmation officielle
+
+- **Budget concerné** (`budgets.id`, UUID stable) :
+- **Statut actuel** : `en_preparation` / `complet` / `a_confirmer` / `confirme`
+- **Statut proposé** :
+- **Périmètre couvert** (programme complet ou extrait explicitement nommé) :
+- **Justification du changement de maturité** :
+- **Confirmation demandée au parti** (date, canal, interlocuteur déclaré, sans publier de coordonnées privées) :
+- **Si « Confirmé »** : organisation, date et URL HTTPS d'une preuve explicite de confirmation de la fidélité documentaire :
+- **Limites connues** : mesures non chiffrables, postes incomplets, hypothèses et divergences :
+
+> « À confirmer » signifie **prêt à soumettre**, et non « demande envoyée ». « Confirmé » signifie que la **fidélité documentaire** du budget a reçu une confirmation traçable de la formation concernée. Aucun de ces statuts ne certifie la viabilité économique. Le statut est générique en base mais son affichage est limité aux budgets politiques dans cette première version.
+
+## 7. Vérifications avant fusion
 
 - [ ] Codes/UUID/identifiants stables ; aucun titre utilisé comme clé
 - [ ] Source primaire datée et pages vérifiées, couverture déclarée (complète ou partielle)
@@ -72,7 +85,7 @@ Pour chaque ligne source, choisir **un statut documenté** :
 - [ ] CI GitHub réussie : `npm run check`, `npm test`, `npm run build`
 - [ ] Aucun secret, empreinte de vote ou donnée privée joint à la PR
 
-## 7. Validation et publication
+## 8. Validation et publication
 
 - **Revue documentaire** (fidélité à la source) :
 - **Revue comptable APU** (ventilations et doubles comptes) :
