@@ -35,3 +35,19 @@ CREATE TABLE IF NOT EXISTS public.party_proposal_draft (
 -- Ne JAMAIS sommer une ligne de sous-total et ses composantes.
 -- Ne JAMAIS calculer à la fois un groupe et les mesures qui le composent.
 -- Ces tables de préparation ne sont pas exposées par GET /api/reference.
+
+-- Registre des formations candidates, sans exposition publique ni sélection éditoriale.
+CREATE TABLE IF NOT EXISTS public.party_source_registry_draft (
+    party_code text PRIMARY KEY,
+    formation_name text NOT NULL,
+    document_year integer NOT NULL,
+    source_type text NOT NULL,
+    source_url text NOT NULL,
+    verification_status text NOT NULL,
+    notes text NOT NULL,
+    updated_at timestamptz NOT NULL DEFAULT now()
+);
+
+-- Cette table n'est pas un tableau de popularité ni une preuve d'exhaustivité.
+-- L'inclusion dans Voter exige vérification primaire, couverture déclarée,
+-- correspondance APU et capacité réelle du moteur à calculer le scénario.
