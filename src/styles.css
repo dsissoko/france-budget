@@ -169,3 +169,8 @@
 .budget-maturity-detail{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:8px 0 14px;font-size:12px;color:#585a59}
 .budget-maturity-detail a{font-weight:650;text-decoration:underline}
 @media(max-width:650px){.vote-card-top .budget-maturity{max-width:110px}.budget-maturity-detail{align-items:flex-start;gap:8px}}
+
+/* Plusieurs critères indépendants dans Voter : trajectoire 2032 et maturité des données. */
+.vote-card-badges{display:flex;flex-wrap:wrap;align-items:center;gap:7px;margin:-9px 0 14px;min-height:24px}
+.vote-card-badges .deficit-trajectory__badge,.vote-card-badges .budget-maturity{max-width:100%;white-space:normal;overflow-wrap:anywhere}
+@media(max-width:650px){.vote-card-badges{gap:6px}.vote-card-badges .budget-maturity{max-width:none}}
