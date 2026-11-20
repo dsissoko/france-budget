@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { measures, type Measure } from '../data';
+import { measures, revenues, expenses, offBudget, type Measure } from '../data';
 import { calculateScenario, projectMeasure } from '../projection';
 
 const documented: Measure = {
@@ -109,6 +109,32 @@ describe('Contrat des écritures APU normalisées', () => {
     expect(reference.revenues[0].amount).toBe(100);
     expect(reference.expenses[0].amount).toBe(120);
     expect(calculateScenario([], { revenues: {}, expenses: {} }, [], reference).deficit).toBe(20);
+  });
+
+  it('préserve le déficit de référence et les soldes RN/LFI après migration Neon', () => {
+    const neonReference = {
+      revenues: revenues.map(c => ({...c, amount: c.id === 'other' ? c.amount + 0.1 : c.amount})),
+      expenses: expenses.map(c => ({...c, amount: c.id === 'other-expenses' ? c.amount + 0.1 : c.amount})),
+      offBudget: [...offBudget],
+      measures: measures.filter(m => ['rn-vat','rn-social','rn-agencies','lfi-school','lfi-green'].includes(m.id)).map(m => ({
+        ...m, referenceOrigin: 'neon' as const,
+        apuEntries: m.id === 'rn-vat' ? [{side:'revenues' as const,categoryId:'vat',amount:-14.46}]
+          : m.id === 'rn-social' ? [{side:'expenses' as const,categoryId:'social',amount:-6.1}]
+          : m.id === 'rn-agencies' ? [{side:'expenses' as const,categoryId:'general',amount:-8.213}]
+          : m.id === 'lfi-school' ? [{side:'expenses' as const,categoryId:'education',amount:3.6}]
+          : [{side:'expenses' as const,categoryId:'environment',amount:4.24},{side:'expenses' as const,categoryId:'economy',amount:6.36}],
+      })),
+    };
+    const original = calculateScenario([]);
+    const migrated = calculateScenario([], undefined, [], neonReference);
+    expect(migrated.deficit).toBe(original.deficit);
+    expect(migrated.deficit).toBe(152.5);
+    for(const measure of neonReference.measures){
+      const before = calculateScenario([measure.id]);
+      const after = calculateScenario([measure.id],undefined,[],neonReference);
+      expect(after.balanceDelta).toBeCloseTo(before.balanceDelta,2);
+      expect(after.deficit).toBeCloseTo(before.deficit,2);
+    }
   });
 
   it('reproduit les six écritures APU Neon des cinq mesures RN/LFI historiques', () => {
