@@ -13,7 +13,21 @@ export default async function handler(req:any,res:any){
         JOIN source_accounting_links sal ON sal.measure_id=pam.measure_id
         JOIN party_source_lines sl ON (sl.party_code,sl.source_year,sl.source_row)=(sal.party_code,sal.source_year,sal.source_row)
         WHERE pam.measure_id=m.id AND pp.review_status='validated'
-          AND sl.validation_status='validated'
+          AND sl.validation_status='validated' AND sl.apu_decision='calculate'
+          AND NOT EXISTS (
+            SELECT 1 FROM party_source_lines pending
+            WHERE (pending.party_code,pending.source_year,pending.group_id)=(pam.party_code,pam.source_year,pam.group_id)
+              AND (pending.validation_status<>'validated' OR pending.apu_decision IS NULL)
+          )
+          AND NOT EXISTS (
+            SELECT 1 FROM party_source_lines calc
+            WHERE (calc.party_code,calc.source_year,calc.group_id)=(pam.party_code,pam.source_year,pam.group_id)
+              AND calc.apu_decision='calculate'
+              AND NOT EXISTS (
+                SELECT 1 FROM source_accounting_links linked
+                WHERE (linked.party_code,linked.source_year,linked.source_row)=(calc.party_code,calc.source_year,calc.source_row)
+              )
+          )
       ) END AS "sourceValidated"
    FROM measures m JOIN budgets b ON b.id=m.budget_id WHERE b.origin='party' AND b.visibility='public' AND b.party_code IS NOT NULL AND m.status='publié' ORDER BY b.featured_order NULLS LAST,b.party_code,m.created_at,m.legacy_id`,
    sql`SELECT id,label,amount::float8 AS amount,canonical,description,revenue_impact_category AS "revenueImpactCategory" FROM reference_off_budget ORDER BY sort_order`,
