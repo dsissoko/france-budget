@@ -121,3 +121,11 @@ Metricool ne doit pas être présenté comme capable de parcourir l'ensemble des
 - Documenter les décisions et liens de suivi dans GitHub pour assurer la continuité.
 - Préserver les données Neon et la neutralité du produit ; ne pas attribuer au parti des chiffres non vérifiés et ne pas rendre public un programme documentaire comme scénario chiffré.
 - Ne jamais déclarer une modification « en production » sans vérifier le déploiement effectivement actif.
+
+## Versionnement et Conventional Commits
+
+- Respecter la spécification [Conventional Commits 1.0.0](https://www.conventionalcommits.org/fr/v1.0.0/) pour les nouveaux commits et les titres de PR destinées à être fusionnées par *squash* (`feat:`, `fix:`, `docs:`, etc.). Contrôler automatiquement les titres de PR lorsque la CI correspondante est installée.
+- Appliquer [Semantic Versioning](https://semver.org/lang/fr/) au format `MAJOR.MINOR.PATCH`. Les jalons correspondent aux versions mineures : **M1 → v1.1.0**, **M2 → v1.2.0**, …, **M8 → v1.8.0**. Entre deux jalons, des versions correctives `PATCH` sont possibles (ex. `v1.1.1`). Une version majeure ultérieure nécessite une décision explicite.
+- Utiliser **Release Please** dans un workflow GitHub Actions dédié pour préparer les PR de release, le changelog et les tags. **Les jalons GitHub ne pilotent pas nativement Release Please** : encadrer explicitement les changements de version mineure afin de ne publier la version cible qu'à la validation du jalon correspondant.
+- La PR de release reste soumise à revue et fusion manuelles ; **fusionner une PR de release ne vaut pas autorisation de déployer en production**. Vérifier séparément les déclencheurs réels de CI/CD et de Vercel.
+- Conserver l'historique Git antérieur sans réécriture. Initialiser la première release `v1.1.0` à la validation de M1 ; ne pas créer cette version tant que le jalon n'est pas validé.
