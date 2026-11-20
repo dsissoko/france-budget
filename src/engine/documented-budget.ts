@@ -16,12 +16,14 @@ export function calculateDocumentedBudget(
  const lines=new Set<string>();
  const groupIds=new Set<string>();
  const entries:Entry[]=[];
+ const documentationWarnings:string[]=[];
  for(const group of groups){
    if(!group.id||groupIds.has(group.id))throw Error('Groupe en double ou absent : '+group.id);
    groupIds.add(group.id);
    const projection=consolidatePartyProposal(group.id,group.lines,{
      revenues:revenues.map(x=>x.id), expenses:expenses.map(x=>x.id)
    });
+   documentationWarnings.push(...projection.warnings);
    for(const line of group.lines){
      // Une même mesure source ne peut appartenir à deux propositions.
      if(lines.has(line.id))throw Error('Mesure source comptée deux fois : '+line.id);
@@ -37,5 +39,6 @@ export function calculateDocumentedBudget(
      });
    }
  }
- return accountingService.calculate([...legacySelectedIds],overrides,entries);
+ const result=accountingService.calculate([...legacySelectedIds],overrides,entries);
+ return {...result,warnings:[...result.warnings,...documentationWarnings]};
 }
