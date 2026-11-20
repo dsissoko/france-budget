@@ -57,7 +57,7 @@
 
 ### Migration des propositions
 
-- Les huit mesures politiques ont été copiées de `reference_measures` vers `measures`, chacune rattachée au budget politique correspondant.
+- Historique : huit mesures politiques avaient été copiées de `reference_measures` vers `measures`. À présent, seules cinq mesures publiées (RN 3 et LFI 2) restent publiques ; Horizons est masqué et les chiffrages fictifs LFI ont été retirés des données publiques.
 - La colonne `legacy_id` préserve les identifiants utilisés par les scénarios et le moteur de projection.
 - L'ancienne table reste disponible pour vérification avant suppression future ; **elle n'est plus source de lecture**.
 - Les écritures multiples par mesure sont **implémentées** dans `measure_accounting_entries` ; leur liaison éditoriale avec les regroupements politiques en cours de vérification reste à terminer.
