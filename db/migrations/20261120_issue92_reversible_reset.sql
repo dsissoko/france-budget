@@ -83,8 +83,13 @@ DELETE FROM public.measures WHERE budget_id IN
 UPDATE public.party_proposals SET source_measure_count=0 WHERE party_code IN
  (SELECT code FROM public.political_parties);
 -- @statement
-UPDATE public.budgets SET scenario=(scenario || '{"picked":[]}'::jsonb)
- WHERE origin='party' AND scenario->'picked' IS NOT NULL;
+UPDATE public.budgets SET scenario=(
+  scenario || '{"picked":[]}'::jsonb ||
+  CASE WHEN jsonb_typeof(scenario->'claimedTotals'->'revenuesBn')='number'
+        AND jsonb_typeof(scenario->'claimedTotals'->'expensesBn')='number'
+       THEN '{"documentaryOnly":false}'::jsonb
+       ELSE '{"documentaryOnly":true}'::jsonb END
+ ) WHERE origin='party';
 -- @statement
 DO $$
 BEGIN
