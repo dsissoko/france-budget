@@ -90,6 +90,17 @@ describe('projection de contre-budgets',()=>{
   expect(projectMeasure(m)).toEqual([expect.objectContaining({side:'expenses',categoryId:'social',amount:-6.1})]);
   expect(calculateScenario(['rn-social']).warnings.join(' ')).toContain('Hypothèse spécifique');
  });
+ it('reproduit les deux propositions RN regroupées activées à partir de quatre mesures officielles',()=>{
+   const fiscal=measures.find(m=>m.id==='rn-vat')!;
+   const administration=measures.find(m=>m.id==='rn-agencies')!;
+   expect(fiscal.revenueDelta).toBeCloseTo(-10.96-3.5,8);
+   expect(administration.expenseDelta).toBeCloseTo(-7.7-0.513,8);
+   const base=calculateScenario([]);
+   const scenario=calculateScenario(['rn-vat','rn-agencies']);
+   expect(scenario.entries).toHaveLength(2);
+   expect(scenario.balanceDelta).toBeCloseTo(-14.46+8.213,8);
+   expect(scenario.deficit).toBeCloseTo(base.deficit+6.247,8);
+ });
  it('conserve le solde de la référence quand aucune mesure n’est activée',()=>{
   const base=calculateScenario([]);
   expect(base.balanceDelta).toBe(0);
@@ -98,8 +109,8 @@ describe('projection de contre-budgets',()=>{
  it('additionne une variation manuelle une seule fois, en plus des projections',()=>{
   const base=calculateScenario([]);
   const change=calculateScenario(['rn-vat'],{revenues:{vat:270},expenses:{health:290}});
-  expect(change.balanceDelta).toBeCloseTo(-10.96,8); // +10 de TVA, +10 santé => annulation
-  expect(change.deficit-base.deficit).toBeCloseTo(10.96,8);
+  expect(change.balanceDelta).toBeCloseTo(-14.46,8); // +10 de TVA et +10 de santé s'annulent, reste baisse de TVA du RN
+  expect(change.deficit-base.deficit).toBeCloseTo(14.46,8);
  });
  it('signale le mélange de millésimes et les interactions non chiffrées',()=>{
   const result=calculateScenario(['rn-social','hor-tax']);
