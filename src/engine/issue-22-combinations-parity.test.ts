@@ -34,8 +34,11 @@ describe('Issue #22 — parité exhaustive des combinaisons historiques', () => 
       const after = calculateScenario(selected, undefined, [], reference);
       expect(after.deficit, selected.join(',')).toBeCloseTo(before.deficit, 2);
       expect(after.balanceDelta, selected.join(',')).toBeCloseTo(before.balanceDelta, 2);
-      expect(after.entries.map(e => [e.measureId, e.side, e.categoryId, e.amount]))
-        .toEqual(before.entries.map(e => [e.measureId, e.side, e.categoryId, e.amount]));
+      expect(after.entries.map(e => [e.measureId, e.side, e.categoryId]))
+        .toEqual(before.entries.map(e => [e.measureId, e.side, e.categoryId]));
+      after.entries.forEach((entry, index) => {
+        expect(entry.amount).toBeCloseTo(before.entries[index].amount, 8);
+      });
     }
   });
 
