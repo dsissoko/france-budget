@@ -27,7 +27,7 @@ export default async function handler(req: any, res: any) {
    sql`SELECT id,side,amount::float8 AS amount FROM reference_categories WHERE reference_year=2025`,
    sql`SELECT id,amount::float8 AS amount FROM reference_off_budget`
   ]);
-  const categories=new Map([...refs.map((x:any)=>[(x.side==='revenues'?'revenue:':'expense:')+x.id,x.amount]),...offBudget.map((x:any)=>['revenue:'+x.id,x.amount])]);
+  const categories=new Map<string,number>([...refs.map((x:any):[string,number]=>[(x.side==='revenues'?'revenue:':'expense:')+x.id,Number(x.amount)]),...offBudget.map((x:any):[string,number]=>['revenue:'+x.id,Number(x.amount)])]);
   if(typeof b.title!=='string'||b.title.trim().length<3||b.title.length>100||
     typeof b.description!=='string'||b.description.length>500||
     b.referenceYear!==2025||typeof b.scenario?.author!=='string'||b.scenario.author.trim().length<2||b.scenario.author.length>60||!Array.isArray(b.measures)||b.measures.length>100||
