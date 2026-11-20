@@ -62,40 +62,57 @@ Une **demande explicite de publication** est nécessaire pour lancer ou promouvo
 - Ne jamais fermer prématurément une Issue traitée par plusieurs PR.
 - La PR est une unité de livraison technique ; l'Issue reste une unité de besoin.
 
-## Second processus émergent : notoriété et campagne de promotion
+## Catalogue commun des outils optionnels
 
-Ce processus est **distinct du développement / déploiement**. Il concerne une campagne **non commerciale**, visant la **notoriété de Mon Budget Citoyen**, les conversations utiles, l'essai du simulateur et la participation citoyenne. Aucun objectif de vente ou d'acquisition payante n'est présumé.
+Le catalogue décrit les capacités mobilisables, **pas une garantie d'accès permanent**. Avant d'agir, vérifier les connecteurs réellement accessibles, leurs permissions et l'environnement cible. Les connecteurs/MCP donnent accès à des services ; les *skills* indiquent des méthodes ; les commandes/CLI supposent un environnement d'exécution disponible.
 
-**Référentiel persistant :** [`docs/promotion/README.md`](docs/promotion/README.md), [`docs/promotion/campagne-promotionnelle.md`](docs/promotion/campagne-promotionnelle.md), ainsi que les journaux `contacts.csv`, `publications.csv`, `indicateurs.csv` et les brouillons `messages.md`.
-
-**Cycle émergent, révisable selon les premiers retours :**
-
-1. **Définir / affiner la campagne** : cible, angle éditorial, canaux, messages, calendrier, garde-fous et indicateurs. La campagne actuelle est « Parlons chiffres ».
-2. **Préparer les actions** : sélectionner les prises de parole, rédiger les messages, identifier les comptes et communautés et vérifier les règles des plateformes. Une préparation n'est pas une publication.
-3. **Exécuter sur validation** : obtenir un accord explicite pour envoyer, publier, programmer ou contacter. Ne pas poster automatiquement ni multiplier les relances.
-4. **Suivre par tâches récurrentes** : revue des réponses, performances observables, participation, éventuels points de blocage et propositions de prochaines actions. Les automatisations ne sont créées ou modifiées que sur demande ou accord explicite.
-5. **Capitaliser / ajuster** : journaliser les résultats vérifiés, mettre à jour le plan, interrompre les actions inefficaces et requalifier les opportunités.
-
-**Mesure et éthique :** distinguer audience (portée, impressions), conversations (réponses utiles), usage (visites, budgets publiés, votes) et qualité des retours. Une valeur non disponible est `ND`, jamais un zéro inventé. Privilégier une diffusion transparente, pluraliste, non partisane et non intrusive. Respecter les règles de chaque plateforme, l'absence d'envoi sans validation et la confidentialité des données.
-
-## Catalogue des outils optionnels — connecteurs, MCP, skills et commandes
-
-Un **catalogue de capacités**, pas une garantie d'accès permanent. Avant chaque action, identifier les outils réellement connectés dans la session, leurs permissions, leurs limites et l'environnement cible. Les connecteurs/MCP sont des accès à des services ; les skills définissent des méthodes ; les commandes/outils locaux ne sont utilisables que si un environnement d'exécution approprié est réellement disponible.
-
-| Outil / catégorie | Utilité dans nos processus | Statut / précaution |
+| Outil | Rôle dans le cycle produit | Précautions |
 | --- | --- | --- |
-| **GitHub (connecteur / MCP)** | Issues, branches, PR, fichiers, historique, revue, CI, documentation et suivi de campagne versionné | **Outil central** ; éviter les commits directs sur `main` |
-| **Vercel (connecteur / MCP)** | Builds, déploiements, environnements, domaines, diagnostics d'exécution | **Outil central** ; surveiller les quotas, éviter de déployer chaque commit |
-| **Neon (connecteur / MCP)** | Postgres, requêtes, migrations, vérification des budgets, votes et données de référence | **Outil central** ; vérifier le projet et la cible avant toute écriture |
-| **Automations / tâches récurrentes** | Suivi régulier de campagne, résultats, réactions, contrôle périodique et alertes | Pertinent pour **marketing et exploitation** ; aucune tâche à créer sans demande/accord |
-| **Metricool (connecteur / MCP)** | Réseaux sociaux : accès aux comptes liés, programmation, métriques, horaires de publication | **Connecté (LinkedIn détecté), valeur à démontrer** ; tester les possibilités réelles avant de l'intégrer au flux |
-| **Gmail (connecteur, si disponible)** | Préparer les prises de contact médias/relayeurs, rechercher des réponses et assurer le suivi | L'envoi nécessite une validation explicite |
-| **Skills** (GitHub, Vercel, marketing, analyse, etc., selon installation) | Instructions spécialisées pour guider les opérations et éviter les erreurs répétées | Découvrir et lire le skill pertinent avant de l'utiliser ; ne pas supposer qu'il est installé |
-| **Commandes / CLI** (`git`, `gh`, `npm`, `vercel`, `psql`, etc.) | Développement, tests, diagnostics, migrations et opérations de secours | Utiliser seulement si exécution et accès sont disponibles ; ne pas contourner quotas, permissions ou validations |
+| **GitHub (connecteur / MCP)** | Référentiel du projet : Issues, branches, PR, code, CI et documentation | **Outil central** ; éviter tout commit direct sur `main` |
+| **Vercel (connecteur / MCP)** | Builds, déploiements, domaines et diagnostic de production | **Outil central** ; limiter les déploiements, vérifier les quotas |
+| **Neon (connecteur / MCP)** | PostgreSQL, migrations et contrôle des données budgétaires | **Outil central** ; vérifier la cible avant toute écriture |
+| **Skills** (si installés) | Procédures spécialisées, consignes et bonnes pratiques | Découvrir et lire le skill pertinent ; ne pas supposer sa présence |
+| **Commandes / CLI** (`git`, `gh`, `npm`, `vercel`, `psql`) | Tests, diagnostics, maintenance et opérations de secours | Exécution uniquement si l'outil et les accès existent ; ne pas contourner les permissions |
 
-**Trio technique privilégié : GitHub + Vercel + Neon.** Il couvre le pilotage du développement, l'hébergement et la base de données. Les tâches récurrentes ajoutent une continuité opérationnelle pour le suivi de notoriété. Metricool est **candidat** pour enrichir cette chaîne avec des fonctions sociales mesurables, sans présumer qu'il peut consulter l'intégralité du réseau LinkedIn ni garantir un accès à ses conversations privées.
+**Trio technique privilégié : GitHub + Vercel + Neon.** Choisir l'outil minimal adapté, consigner le résultat vérifiable, et ne pas simuler les actions indisponibles.
 
-**Règle d'outillage :** choisir le minimum nécessaire à la demande, enregistrer les résultats durables dans le dépôt quand c'est pertinent, et mentionner les limitations constatées plutôt que de simuler une action.
+## Processus autonome : campagne de notoriété (non commerciale)
+
+**Périmètre isolé du développement :** faire connaître Mon Budget Citoyen, susciter des discussions, des essais du simulateur, des budgets alternatifs et des votes. Aucun objectif commercial ou achat de trafic n'est présumé.
+
+### Référentiel unique et organisation documentaire
+
+**Tous les éléments opérationnels de campagne vivent sous [`docs/promotion/`](docs/promotion/README.md).** `AGENTS.md` ne définit que le fonctionnement transversal ; il ne duplique ni le calendrier, ni les contacts, ni les messages, ni les KPI.
+
+- [`campagne-promotionnelle.md`](docs/promotion/campagne-promotionnelle.md) : objectifs, canaux, positionnement, planning et indicateurs.
+- `messages.md` : brouillons de prises de parole.
+- `contacts.csv` : cibles et état réel des prises de contact.
+- `publications.csv` : publications et réponses effectivement réalisées, avec preuves/URL.
+- `indicateurs.csv` : mesures observées ; valeur absente = `ND`, jamais zéro inventé.
+
+La campagne actuelle est **« Parlons chiffres »**. Toute nouvelle campagne dispose de son propre cadrage dans ce même espace, sans éparpiller son suivi entre le code, des Issues techniques ou des tâches non référencées.
+
+### Cycle de campagne
+
+1. **Cadrer** : cible, angle éditorial, canaux, messages, calendrier, règles de publication et indicateurs.
+2. **Préparer** : sélectionner les actions, rédiger et vérifier les contenus, identifier communautés et contacts. Préparer ne signifie pas envoyer.
+3. **Diffuser sur accord** : publication, programmation, envoi ou prise de contact uniquement avec validation explicite. Ne pas automatiser du démarchage non sollicité.
+4. **Suivre de manière récurrente** : analyser les retours, l'engagement, les résultats observables et proposer les prochaines actions. Les tâches récurrentes sont créées/modifiées uniquement sur demande ou accord ; consigner dans `docs/promotion/` leur objectif, cadence et identifiant.
+5. **Faire le bilan et ajuster** : mesurer notoriété, échanges utiles, visites, budgets créés/publiés, votes et enseignements ; actualiser le référentiel de campagne.
+
+**Garde-fous :** transparence sur le rôle du créateur, neutralité partisane, respect des règles de chaque plateforme, aucune statistique inventée, aucune adresse privée ou secret dans le dépôt public, aucune relance intrusive.
+
+### Outillage spécifique à la campagne
+
+| Outil optionnel | Apport envisagé | État / limites |
+| --- | --- | --- |
+| **GitHub** | Versionner le dossier `docs/promotion/` et historiser les décisions | Déjà dans le trio technique ; ne pas créer un second référentiel |
+| **Automations / tâches récurrentes** | Bilans périodiques, contrôles des réponses, suivi de campagne et rappels | Capacité disponible ; ne créer, modifier ou déclencher de tâche qu'avec autorisation adaptée |
+| **Metricool (connecteur / MCP)** | Comptes sociaux liés, programmation, indicateurs et horaires de diffusion | **Connecté à LinkedIn**, mais intérêt opérationnel **à démontrer** ; vérifier ses fonctions effectives |
+| **Gmail (connecteur, si accessible)** | Préparer et suivre des prises de contact ciblées | Aucune expédition sans validation explicite |
+| **Skills / commandes spécialisés** | Recherche, analyse, préparation des messages et tableaux de bord | Facultatifs ; découvrir ceux effectivement installés |
+
+Metricool ne doit pas être présenté comme capable de parcourir l'ensemble des relations LinkedIn ou d'accéder à des échanges privés. Sa pertinence sera jugée sur des résultats réellement vérifiés.
 
 ## Règles générales de communication et de sécurité
 
