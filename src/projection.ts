@@ -44,7 +44,9 @@ export const rules: Record<string, Rule> = {
 const round = (n: number) => Math.round(n * 100) / 100;
 const sum = (values: Record<string, number>) => Object.values(values).reduce((a, b) => a + b, 0);
 const baseline = (items: Category[]) => Object.fromEntries(items.map(c => [c.id, c.amount]));
-const categoryExists = (side: Side, id: string) => (side === 'revenues' ? revenues : side==='expenses'?expenses:offBudget).some(c => c.id === id);
+export type ReferenceModel = { revenues: ReadonlyArray<Category>; expenses: ReadonlyArray<Category>; offBudget: ReadonlyArray<Category>; measures: ReadonlyArray<Measure> }; 
+const legacyReference = (): ReferenceModel => ({ revenues, expenses, offBudget, measures });
+const categoryExists = (side: Side, id: string, reference: ReferenceModel) => (side === 'revenues' ? reference.revenues : side==='expenses'?reference.expenses:reference.offBudget).some(c => c.id === id);
 
 /** 
  * Point d'extension des règles spécifiques : ici une approximation directe seulement.
@@ -59,14 +61,14 @@ function specific(measure: Measure): Entry[] {
       throw new Error('Règle spécifique non implémentée : ' + measure.id);
   }
 }
-export function projectMeasure(measure: Measure): Entry[] {
+export function projectMeasure(measure: Measure, reference: ReferenceModel = legacyReference()): Entry[] {
   // En production, l'affectation APU est une donnée explicite et stable.
   // Les anciennes règles V1 ne servent que de repli pour les scénarios historiques.
   if(measure.apuEntries !== undefined){
     if(!Array.isArray(measure.apuEntries)||measure.apuEntries.length===0)
       throw new Error('Affectation APU absente : '+measure.id);
     const entries=measure.apuEntries.map(entry=>{
-      if(!['revenues','expenses'].includes(entry.side)||!categoryExists(entry.side,entry.categoryId)||!Number.isFinite(entry.amount))
+      if(!['revenues','expenses'].includes(entry.side)||!categoryExists(entry.side,entry.categoryId,reference)||!Number.isFinite(entry.amount))
         throw new Error('Écriture APU invalide : '+measure.id);
       return {measureId:measure.id,side:entry.side,categoryId:entry.categoryId,amount:entry.amount,
         rationale:'Écriture APU explicite issue du référentiel Neon, source : '+measure.source};
@@ -87,7 +89,7 @@ export function projectMeasure(measure: Measure): Entry[] {
   const shares = targets.reduce((a, t) => a + t.share, 0);
   if (Math.abs(shares - 1) > 0.000001) throw new Error('Parts non équilibrées : ' + measure.id);
   return targets.map(t => {
-    if (!categoryExists(t.side, t.categoryId)) throw new Error('Catégorie inconnue : ' + t.categoryId);
+    if (!categoryExists(t.side, t.categoryId,reference)) throw new Error('Catégorie inconnue : ' + t.categoryId);
     // An off-budget advantage is the inverse of an explicitly claimed tax/social revenue change.
     const amount = (t.side === 'offBudget' ? -measure.revenueDelta : t.side === 'revenues' ? measure.revenueDelta : measure.expenseDelta) * t.share;
     return { measureId: measure.id, side: t.side, categoryId: t.categoryId, amount,
@@ -103,15 +105,17 @@ export function calculateScenario(
  selectedIds: string[],
  citizen: Override = { revenues: {}, expenses: {} },
  sourcedEntries: ReadonlyArray<SourcedEntry> = [],
+ reference: ReferenceModel = legacyReference(),
 ): Result {
-  const revenueValues = baseline(revenues), expenseValues = baseline(expenses), offBudgetValues=baseline(offBudget);
+  const {revenues,expenses,offBudget,measures}=reference;
+  const revenueValues = baseline([...revenues]), expenseValues = baseline([...expenses]), offBudgetValues=baseline([...offBudget]);
   const entries: Entry[] = [];
   const warnings: string[] = [];
   for (const id of new Set(selectedIds)) {
     const measure = measures.find(m => m.id === id);
     if (!measure) { warnings.push('Mesure inconnue ignorée : ' + id); continue; }
     try {
-      const projected = projectMeasure(measure);
+      const projected = projectMeasure(measure,reference);
       entries.push(...projected);
       if (measure.status === 'illustration') warnings.push('Chiffrage fictif : ' + measure.title);
       if (!measure.apuEntries && rules[measure.id]?.kind === 'specific') warnings.push('Hypothèse spécifique : ' + rules[measure.id].explanation);
@@ -128,7 +132,7 @@ export function calculateScenario(
   const validSourced=sourcedEntries.every(entry=>
     Boolean(entry.measureId) && !existingMeasureIds.has(entry.measureId) &&
     Boolean(entry.rationale?.trim()) &&
-    Number.isFinite(entry.amount) && categoryExists(entry.side,entry.categoryId)
+    Number.isFinite(entry.amount) && categoryExists(entry.side,entry.categoryId,reference)
   );
   if(!validSourced){
     if(sourcedEntries.length)warnings.push('Écritures documentaires invalides ou déjà sélectionnées : extension ignorée.');
@@ -175,7 +179,7 @@ export function calculateScenario(
   }
   if(offBudget.some(c=>offBudgetValues[c.id]<0||offBudgetValues[c.id]>2*c.amount)) warnings.push('Au moins un avantage hors budget dépasse les bornes 0–200 % de sa référence.');
   const revenueTotal = round(sum(revenueValues)), expenseTotal = round(sum(expenseValues));
-  const originalBalance = sum(baseline(revenues)) - sum(baseline(expenses));
+  const originalBalance = sum(baseline([...revenues])) - sum(baseline([...expenses]));
   if (Object.values(revenueValues).some(v => v < 0) || Object.values(expenseValues).some(v => v < 0))
     warnings.push('Au moins un poste négatif : projection non réaliste sur cette référence.');
   const years = new Set(selectedIds.map(id => measures.find(m => m.id === id)?.year).filter(Boolean));
@@ -200,11 +204,11 @@ export type Audit = {
   explanation: string;
   entries: Entry[];
 };
-export function auditMeasure(measure: Measure): Audit {
+export function auditMeasure(measure: Measure, reference: ReferenceModel = legacyReference()): Audit {
   const claimBalanceDelta = round(measure.revenueDelta - measure.expenseDelta);
   let entries: Entry[] = [];
   try {
-    entries = projectMeasure(measure);
+    entries = projectMeasure(measure,reference);
     const projectedBalanceDelta = round(entries.reduce((s, e) =>
       s + (e.side === 'revenues' ? e.amount : -e.amount), 0));
     const discrepancy = round(projectedBalanceDelta - claimBalanceDelta);
@@ -223,9 +227,10 @@ export function auditMeasure(measure: Measure): Audit {
       explanation: 'Projection indisponible : ' + String(error) };
   }
 }
-export function auditSelected(ids: string[]): Audit[] {
+export function auditSelected(ids: string[], reference: ReferenceModel = legacyReference()): Audit[] {
+  const {measures}=reference;
   return [...new Set(ids)].flatMap(id => {
     const measure = measures.find(m => m.id === id);
-    return measure ? [auditMeasure(measure)] : [];
+    return measure ? [auditMeasure(measure,reference)] : [];
   });
 }
