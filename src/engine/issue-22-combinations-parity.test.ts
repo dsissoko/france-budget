@@ -59,6 +59,24 @@ describe('Issue #22 — parité exhaustive des combinaisons historiques', () => 
     }
   });
 
+  it('refuse une mesure Neon sans écritures, même si une règle historique existe', () => {
+    const missing = reference.measures.map(m =>
+      m.id === 'rn-vat' ? { ...m, apuEntries: undefined } : m
+    );
+    expect(() => calculateScenario(['rn-vat'], undefined, [], { ...reference, measures: missing }))
+      .toThrow('Affectation APU Neon absente');
+  });
+
+  it('refuse une ventilation Neon dont le montant ne correspond pas au montant publié', () => {
+    const invalid = reference.measures.map(m =>
+      m.id === 'lfi-green'
+        ? { ...m, apuEntries: [{ side: 'expenses' as const, categoryId: 'environment', amount: 4.24 }] }
+        : m
+    );
+    expect(() => calculateScenario(['lfi-green'], undefined, [], { ...reference, measures: invalid }))
+      .toThrow('Écritures APU et montant revendiqué incohérents');
+  });
+
   it('ne modifie pas le référentiel injecté pendant les projections', () => {
     const snapshot = JSON.stringify(reference);
     for (const selected of cases) calculateScenario(selected, undefined, [], reference);
