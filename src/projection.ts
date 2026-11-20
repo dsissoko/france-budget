@@ -60,6 +60,23 @@ function specific(measure: Measure): Entry[] {
   }
 }
 export function projectMeasure(measure: Measure): Entry[] {
+  // En production, l'affectation APU est une donnée explicite et stable.
+  // Les anciennes règles V1 ne servent que de repli pour les scénarios historiques.
+  if(measure.apuEntries !== undefined){
+    if(!Array.isArray(measure.apuEntries)||measure.apuEntries.length===0)
+      throw new Error('Affectation APU absente : '+measure.id);
+    const entries=measure.apuEntries.map(entry=>{
+      if(!['revenues','expenses'].includes(entry.side)||!categoryExists(entry.side,entry.categoryId)||!Number.isFinite(entry.amount))
+        throw new Error('Écriture APU invalide : '+measure.id);
+      return {measureId:measure.id,side:entry.side,categoryId:entry.categoryId,amount:entry.amount,
+        rationale:'Écriture APU explicite issue du référentiel Neon, source : '+measure.source};
+    });
+    const revenuesDelta=entries.filter(e=>e.side==='revenues').reduce((sum,e)=>sum+e.amount,0);
+    const expensesDelta=entries.filter(e=>e.side==='expenses').reduce((sum,e)=>sum+e.amount,0);
+    if(Math.abs(revenuesDelta-measure.revenueDelta)>0.001||Math.abs(expensesDelta-measure.expenseDelta)>0.001)
+      throw new Error('Écritures APU et montant revendiqué incohérents : '+measure.id);
+    return entries;
+  }
   const rule = rules[measure.id];
   if (!rule) throw new Error('Règle absente pour ' + measure.id);
   if (rule.kind === 'specific') return specific(measure);
@@ -95,7 +112,7 @@ export function calculateScenario(
       const projected = projectMeasure(measure);
       entries.push(...projected);
       if (measure.status === 'illustration') warnings.push('Chiffrage fictif : ' + measure.title);
-      if (rules[measure.id].kind === 'specific') warnings.push('Hypothèse spécifique : ' + rules[measure.id].explanation);
+      if (!measure.apuEntries && rules[measure.id]?.kind === 'specific') warnings.push('Hypothèse spécifique : ' + rules[measure.id].explanation);
     } catch (err) { warnings.push(String(err)); }
   }
   // Fail closed : une affectation sourcée invalide annule entièrement
