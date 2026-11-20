@@ -1,5 +1,5 @@
 name: "Programme politique — soumettre ou corriger une proposition"
-description: "Présenter une mesure chiffrée, sa ventilation et ses hypothèses, sans écrire de code."
+description: "Soumettre ou corriger une proposition de budget politique avec source, identifiant stable et décision APU."
 title: "[politique] "
 body:
   - type: markdown
@@ -8,14 +8,14 @@ body:
   - type: input
     id: programme
     attributes:
-      label: "Formation, programme et année"
-      placeholder: "Nom du programme, année, date de la proposition"
+      label: "Formation (nom et code stable), programme et année"
+      placeholder: "Par exemple : RN, contre-budget 2026 ; document du JJ/MM/AAAA"
     validations:
       required: true
   - type: input
     id: source
     attributes:
-      label: "Source primaire publique"
+      label: "Source primaire publique (URL + page / section)"
       placeholder: "https://... (programme, communiqué ou document de chiffrage)"
     validations:
       required: true
@@ -46,10 +46,20 @@ body:
   - type: textarea
     id: ventilation
     attributes:
-      label: "Ventilation proposée dans les catégories du simulateur"
-      description: "Pour chaque effet : recettes/dépenses, catégorie existante, montant, signe, justification et somme de contrôle ; ne pas inventer de catégories."
+      label: "Décision manuelle APU et ventilation proposée"
+      description: "Préciser calculate, non_chiffrable_apu (avec justification) ou review_pending. Pour les mesures calculables : recettes/dépenses, catégorie existante, montant signé, somme de contrôle ; ne pas inventer de catégories."
     validations:
       required: true
+  - type: textarea
+    id: identity
+    attributes:
+      label: "Identifiants existants ou proposés (non obligatoires pour une première soumission)"
+      description: "Code de formation, source_year, group_id, source_row ou identifiant stable de mesure ; jamais le titre comme clé."
+  - type: textarea
+    id: coverage
+    attributes:
+      label: "Couverture du document et regroupement"
+      description: "Programme entier ou extrait ? Liste des lignes sources regroupées, année et horizon des montants."
   - type: textarea
     id: hypotheses
     attributes:
@@ -61,7 +71,7 @@ body:
     id: interactions
     attributes:
       label: "Interactions ou risques de double compte"
-      description: "Préciser les mesures dépendantes ou écrire 'non évalué'."
+      description: "Préciser les sous-totaux, les mesures liées et les risques de double compte. Un groupe est une vue : ne jamais l’ajouter au total de ses composantes."
   - type: checkboxes
     id: verifications
     attributes:
@@ -70,4 +80,6 @@ body:
         - label: "Je distingue les montants revendiqués des résultats calculés par le site."
           required: true
         - label: "Je comprends que la représentation officielle et le chiffrage doivent être vérifiés indépendamment."
+          required: true
+        - label: "Je comprends qu’aucun groupe ou montant non validé ne sera automatiquement activé dans le moteur."
           required: true
