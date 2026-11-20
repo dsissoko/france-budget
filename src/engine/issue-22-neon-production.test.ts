@@ -16,7 +16,7 @@ describe('Issue #22 — référentiel de production Neon uniquement', () => {
 
   it('ne recalcule jamais sur le référentiel statique pendant le chargement', () => {
     expect(app).toContain('const activeReference=reference??pendingReference');
-    expect(app).toContain('calculateWithReference(ids,overrides,[],activeReference)');
+    expect(app).toContain('calculateWithReference(ids,overrides??{revenues:{},expenses:{}},[],activeReference)');
     expect(app).not.toMatch(/:\s*calculateWithReference\(ids,overrides\)/);
     expect(app).not.toMatch(/:\s*auditSelectedWithReference\(ids\)/);
     expect(app).not.toMatch(/:\s*auditMeasureWithReference\(measure\)/);
