@@ -31,7 +31,3 @@
 .budget-summary__share:focus-visible{outline:2px solid #239a84;outline-offset:2px}
 .budget-summary__share-feedback{margin:6px 0 0;font-size:11px;color:#396f60}
 @media(max-width:370px){.budget-summary__heading-actions{width:100%;justify-content:space-between}}
-
-/* Maturité documentaire au sein de la synthèse, sans badge supplémentaire pour les citoyens. */
-.budget-summary__maturity{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin:-4px 0 14px}
-.budget-summary__maturity-note{font-size:11px;color:#85857f}
