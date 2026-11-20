@@ -112,3 +112,12 @@ Chaîne : `PoliticalMeasure -> (DirectBudgetEntries, MacroEffects) -> MacroConte
 **Conditions de mise en œuvre :** relations sourcées, plages d'incertitude, tests de sensibilité, calcul pluriannuel, traitement explicite des interactions et absence de double comptage. Introduire les relations une par une, sans modèle macro généraliste ni changement d'interface V1.
 
 Voir aussi [les règles de projection](./projections.md).
+
+
+## Réintégration de tous les programmes — issue #92
+
+La collecte durable et réutilisable est disponible dans `data/programmes/registre-programmes.csv` et dans chaque dossier `data/programmes/<code>/<millesime>/` contenant `sources.csv`, `themes.csv`, `mesures.csv` et `agregats.csv`. Les mesures documentaires sont conservées dans les CSV même lorsqu'elles ne sont pas importées en base. **La transcription peut être partielle** : le registre indique ce qui est exploitable ou bloqué.
+
+Le mode `AGGREGATE` charge **uniquement les deux masses financières revendiquées et les thèmes sourcés dans Neon** ; aucune mesure individuelle n'est intégrée. Le mode `PARTIAL` charge les thèmes et uniquement les mesures comptables chiffrées, sourcées et qualifiées ; en l'absence d'une telle mesure, la page reste documentaire. Les anciennes mesures ont d'abord été archivées en CSV et dans les tables de sauvegarde Neon `issue92_archive_*`.
+
+`npm run test:programmes` valide et affiche la couverture sans se connecter à Neon. Après la migration sauvegardée `db/migrations/20261120_issue92_reversible_reset.sql`, l'importation peut être rejouée avec `DATABASE_URL=... node scripts/import-programmes.mjs --apply`. Le script est **en lecture seule par défaut** et ne réextrait pas les PDF. La version des sources est suivie par Git.
