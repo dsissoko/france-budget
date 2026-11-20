@@ -4,7 +4,7 @@ export default async function handler(req: any, res: any) {
  try {
   const sql=db();
   if(req.method==='GET'){
-   const rows=await sql`SELECT b.id,b.title,b.description,b.origin,b.featured,b.featured_order,b.reference_year,b.published_at,b.scenario,
+   const rows=await sql`SELECT b.id,b.title,b.description,b.origin,b.party_code,b.featured,b.featured_order,b.reference_year,b.published_at,b.scenario,
      count(v.id)::int AS votes FROM budgets b LEFT JOIN votes v ON v.budget_id=b.id
      WHERE b.origin IN ('citizen','party') AND b.visibility='public'
      GROUP BY b.id ORDER BY CASE WHEN b.origin='party' THEN 0 ELSE 1 END, votes DESC,b.published_at DESC LIMIT 103`;
