@@ -84,3 +84,15 @@ L'API `GET /api/reference` sélectionne les mesures publiques via `budgets.party
 Ce travail ne signifie **pas** que les groupes `party_proposal_draft` ont été activés : ils sont encore non validés et hors moteur public. Le formulaire citoyen conserve le même schéma `budgets`/`measures`, sans `party_code`. Les 25 catégories, incluant les deux « Autres et ajustement », restent visibles et modifiables. Référence APU 2025 : **1 561,7 Md€ de recettes**, **1 714,2 Md€ de dépenses**, **152,5 Md€ de déficit**.
 
 Voir [schema.md](schema.md) pour le modèle relationnel exact, les FK, index et migrations. Les fonctionnalités non encore déployées sur Vercel ne doivent pas être assimilées à une mise en production publique.
+
+## Publication des budgets documentaires — 20/11/2026
+
+La lecture de `GET /api/budgets` comprend désormais `documentaryProposals` pour les budgets politiques : titre de groupe, année, nombre de lignes sources, statut de revue et URL officielle. Le champ `scenario.documentaryOnly=true` identifie un budget **présentable mais non calculable**.
+
+- **RN (9 groupes, 3 mesures calculées)** et **LFI (8 groupes, 2 mesures calculées)** restent publics avec leurs simulations **explicitement partielles**.
+- **Équinoxe (8 groupes, 0 mesure calculée)** est public avec le statut **En préparation**, mais l'interface ne présente **aucun déficit simulé**. Les sources sont consultables dans la fiche Voter.
+- **Horizons** demeure masqué : les anciens montants fictifs ne peuvent pas être publiés comme mesures officielles. Les autres formations sans propositions extraites ne sont pas promues en budgets vides.
+- Les citoyens conservent leurs budgets, votes et interactions précédents. Les budgets documentaires sont exclus des comparaisons financières et des copies de scénario à partir de Mon budget.
+
+Cette distinction **publication documentaire ≠ activation comptable** est détaillée dans [schema.md](schema.md). Les groupes `review_pending` restent hors calcul APU même lorsqu'ils sont visibles à titre documentaire.
+
