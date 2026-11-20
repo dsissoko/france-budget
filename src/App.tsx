@@ -2,7 +2,7 @@ import {resetCompareToReference} from './compare-reset';
 import {differentBudgetLines} from './compare-differences';
 import {useEffect,useMemo,useState} from 'react';
 import {Landmark,ChevronDown,Info,RefreshCcw,SlidersHorizontal,ArrowRight,ArrowLeft,ExternalLink,BookOpen,Scale,Wallet,ChartNoAxesCombined,Check,Download,X,Heart,UserRound,CalendarDays,ListChecks} from 'lucide-react';
-import {years,sum,currency,type Category,type Party,type Measure} from './data';
+import {sum,currency,type Category,type Party,type Measure} from './data';
 import {auditMeasure as auditMeasureWithReference,auditSelected as auditSelectedWithReference,calculateScenario as calculateWithReference,type ReferenceModel} from './projection';
 import {accountingService} from './engine/accounting';
 import {simulationService,yearsFor,type SimulationParameters} from './engine/simulation';
