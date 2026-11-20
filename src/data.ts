@@ -1,6 +1,6 @@
 export type Category={id:string;label:string;amount:number;canonical:string;description:string;revenueImpactCategory?:string};
 import {ENTERPRISE_AIDS,OFF_BUDGET_ACCOUNTING_NOTE} from './enterprise-aids';
-export type Measure={id:string;party:string;theme:string;title:string;revenueDelta:number;expenseDelta:number;source:string;year:number;status:'publié'|'illustration';description:string;apuEntries?:Array<{side:'revenues'|'expenses';categoryId:string;amount:number}>};
+export type Measure={id:string;party:string;theme:string;title:string;revenueDelta:number;expenseDelta:number;source:string;year:number;status:'publié'|'illustration';description:string;referenceOrigin?:'neon';apuEntries?:Array<{side:'revenues'|'expenses';categoryId:string;amount:number}>};
 // Totaux officiels APU 2025 INSEE : dépenses 1 714,1 Md€, recettes 1 561,6 Md€, déficit 152,5 Md€.
 // La répartition par catégorie est indicative ; les lignes d'ajustement rendent les totaux exacts.
 // Soutien aux entreprises : reclassement PÉDAGOGIQUE de 30 Md€ depuis « économie » ; ce montant n'est PAS une statistique officielle des aides.
