@@ -34,7 +34,33 @@ Les sous-thèmes « Retraites et pensions », « Famille et enfance », « Chôm
 
 La ligne de **30 Md€** initialement isolée est une **enveloppe pédagogique, et non le montant officiel de l'ensemble des aides aux entreprises**. Les avantages fiscaux (49,7 Md€) et sociaux (69,1 Md€) présentés à titre complémentaire proviennent du « jaune » budgétaire PLF 2027, avec données **2024**. La modification d'un manque à gagner provoque un effet **strictement comptable** dans le simulateur, pas une prévision de rendement fiscal réel. Source : [Jaune budgétaire Aides publiques aux entreprises](https://www.budget.gouv.fr/documentation/file-download/34471).
 
-## 3. Des mesures politiques aux écritures budgétaires
+## 3. Deux façons de présenter un budget politique : agrégats ou mesures partielles
+
+L'objectif de Mon Budget Citoyen est de **restituer fidèlement et de façon attribuable les engagements chiffrés d'un parti**, et non de certifier leur faisabilité économique. Le mode d'intégration dépend des **données que le parti publie**, jamais de son identité.
+
+### Cas A — Budget globalement chiffré : agrégats sourcés prioritaires
+
+Si un programme publie, pour **une même année et un même périmètre**, les **masses de recettes et de dépenses** et leur solde cohérent, la restitution du budget utilise directement **ces agrégats revendiqués**. La source, le millésime, l'unité, le caractère **total ou variation** et le solde doivent être explicites. **Ce jeu d'agrégats suffit** : les mesures détaillées peuvent être listées et vérifiées, mais n'ont pas à être qualifiées une à une pour restituer le résultat annoncé, et ne sont surtout **pas ajoutées une seconde fois**.
+
+- Si la source annonce des **variations** de recettes et dépenses : recettes présentées = recettes de référence INSEE + variation annoncée ; dépenses présentées = dépenses de référence INSEE + variation annoncée ; amélioration du solde = variation de recettes − variation de dépenses.
+- Si la source annonce des **totaux APU absolus**, de périmètre compatible : les totaux publiés sont présentés directement et leur différence donne le solde. Ne pas prendre une variation pour un total.
+- Le résultat affiché doit être nommé **« solde revendiqué par la formation »** et accompagné de la source. Il n'est **pas** une certification ni une expertise indépendante de la politique annoncée.
+
+**Exemple LFI 2027** : le [contre-budget officiel, bilan p. 14](https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf) revendique **106,4 Md€ de recettes nouvelles** et **81,7 Md€ de dépenses nouvelles**. Soit **24,7 Md€ d'amélioration annoncée du solde**, appliqués à la référence INSEE dans notre présentation mécanique. Ces montants sont des **variations**, pas les masses totales de recettes et dépenses des administrations publiques. Les 28 mesures chiffrées détaillent l'annonce ; elles ne sont pas additionnées aux 106,4 / 81,7 Md€.
+
+**Un budget chiffré globalement est donc plus simple à intégrer qu'un budget partiel** : trois montants réconciliés, un périmètre, une année et une source suffisent à restituer l'annonce.
+
+### Cas B — Budget partiellement chiffré : INSEE + variations des mesures
+
+Si le couple d'agrégats recettes/dépenses n'est **pas** publié de manière suffisamment précise et comparable, le simulateur conserve la **référence INSEE** pour les postes sans mesure et n'applique que les **variations chiffrées, sourcées et imputables** des mesures disponibles. Le résultat s'intitule **« simulation partielle à partir des mesures disponibles »**, pas bilan officiel intégral du parti. Le calcul ne doit pas être présenté comme un jugement sur l'ensemble du programme.
+
+**Exemple** : une mesure de dépenses de santé +3 Md€ documentée, sans autres agrégats globaux, conserve toutes les autres recettes et dépenses à leur niveau INSEE et augmente mécaniquement les dépenses de 3 Md€. Aucune ligne fictive ne complète le programme : les éventuelles lignes techniques d'ajustement appartiennent à la **ventilation de référence**, pas aux mesures manquantes.
+
+### Règle commune de prudence
+
+Aucun de ces deux modes ne prouve la faisabilité, l'effet macroéconomique réel ou la cohérence économique des annonces. On distingue **l'attribution du chiffrage au parti**, **la restitution arithmétique de son solde** et **la validité économique de ses hypothèses**. La trajectoire jusqu'en 2032 reste mécanique et illustrative, même quand le montant de départ reproduit fidèlement un agrégat sourcé.
+
+## 4. Des mesures politiques aux écritures budgétaires
 
 « Pouvoir d'achat », « immigration » et « écologie » sont des thèmes politiques, pas des postes comptables. Une mesure peut affecter plusieurs agrégats. Le moteur comptable `src/projection.ts` traduit les mesures en variations de recettes et dépenses et contrôle le rapprochement arithmétique. Les services `src/engine/accounting.ts`, `simulation.ts` et `impact.ts` organisent le calcul et la trajectoire.
 
@@ -42,13 +68,13 @@ Un montant **revendiqué par un parti** ne devient pas une expertise indépendan
 
 **Exemple :** une baisse de TVA de 10 Md€ baisse les recettes de 10 Md€ et augmente le déficit de 10 Md€ **à effets indirects constants**. L'écart de ventilation nul prouve seulement l'égalité comptable.
 
-## 4. Projections et limites
+## 5. Projections et limites
 
 La trajectoire V1 prolonge de manière **mécanique** le déficit de référence 2025 en ajoutant **2,5 % de sa valeur initiale par année**, sans intérêts composés. À partir de 2027, elle applique un effet budgétaire annuel constant du scénario jusqu'en 2032. **Ce n'est ni une prévision économique ni un programme gouvernemental validé.** Les conséquences indirectes sur croissance, emploi, salaires, inflation, fiscalité ou dette ne sont pas actuellement calculées par un modèle causal.
 
 Les budgets citoyens sont des scénarios personnels, pas des lois de finances. La publication et le vote ne valent ni certification économique ni scrutin représentatif. Une révision du référentiel doit préserver le contexte des anciens budgets publiés, notamment les montants de référence utilisés à leur création.
 
-## 5. Comment vérifier les chiffres
+## 6. Comment vérifier les chiffres
 
 L'inventaire et les contrôles sont publics :
 - [Audit des agrégats citoyens et sources](audit-fiabilisation-agregats-2026-11.md)
