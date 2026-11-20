@@ -12,7 +12,10 @@ export default async function handler(req: any, res: any) {
           'sourceLines',(SELECT COALESCE(jsonb_agg(jsonb_build_object(
              'id',l.source_row,'title',l.title,'direction',l.direction,
              'claimedAmountBn',l.claimed_amount_bn,'sourceUrl',l.source_url,
-             'validationStatus',l.validation_status,'apuDecision',l.apu_decision
+             'validationStatus',l.validation_status,'apuDecision',l.apu_decision,
+             'accountingMeasureId',(SELECT sal.measure_id::text FROM source_accounting_links sal
+               WHERE (sal.party_code,sal.source_year,sal.source_row)=(l.party_code,l.source_year,l.source_row)
+               LIMIT 1)
            ) ORDER BY l.source_row),'[]'::jsonb)
            FROM party_source_lines l WHERE (l.party_code,l.source_year,l.group_id)=(p.party_code,p.source_year,p.group_id)),
           'sourceUrl',(SELECT MIN(l.source_url) FROM party_source_lines l
