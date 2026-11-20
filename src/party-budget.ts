@@ -8,6 +8,10 @@ export type PublishedAggregate = {
   balanceDeltaBn?:number;
   sourceUrl:string;
   description?:string;
+  scope?:string;
+  sourceSection?:string;
+  reportedOverallBalanceDeltaBn?:number;
+  overallExplanation?:string;
 };
 export type PartyBudgetInput = {
   origin:'party'|'citizen';
