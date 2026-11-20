@@ -1,4 +1,14 @@
 -- Mon Budget Citoyen — schema for Neon PostgreSQL. Apply on a new empty database.
+-- IMPORTANT (20/11/2026): ce fichier est un BOOTSTRAP HISTORIQUE.
+-- Il ne décrit PAS l'état relationnel complet de Neon production.
+-- Le schéma réel, les FK validées, les index et l'état des tables _draft :
+--   docs/schema.md
+-- Voir aussi db/migrations/20261120_party_documentary_groups.sql,
+-- db/migrations/20261120_party_ids_apu_entries.sql et
+-- db/migrations/20261120_api_indexes.sql.
+-- Ne pas réexécuter ce bootstrap sur une base de production existante :
+-- il contient des DDL et une initialisation de données de référence historiques.
+
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 CREATE TABLE IF NOT EXISTS budgets (
  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
