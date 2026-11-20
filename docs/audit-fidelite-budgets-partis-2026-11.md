@@ -1,5 +1,12 @@
 # Fidélité des budgets politiques — revue prioritaire au 20 novembre 2026
 
+> **Mise à jour opérationnelle du 20/11/2026** : les tableaux ci-dessous constituent **l'état de l'audit initial**, avant les migrations. Ils ne décrivent plus la production actuelle. La [documentation du schéma réel](schema.md) et le [suivi #59](https://github.com/dsissoko/france-budget/issues/59) font foi pour l'état actif.
+>
+> - Les budgets politiques **visibles** sont RN (trois propositions, dont deux regroupées) et LFI (deux propositions officielles). Le scénario Horizons basé sur des chiffrages fictifs est **masqué** ; la ligne LFI fictive de +18 Md€ a été retirée des mesures publiques.
+> - Les sources documentaires RN 2026 (75 lignes / 9 regroupements), LFI 2026 (143 lignes / 8 regroupements, préliminaires), Équinoxe 2027 (14 grandes lignes / 8 regroupements, préliminaires) sont en tables `party_*_draft` ; **non activées** et non certifiées sur APU.
+> - La base de données possède `political_parties.code`, `budgets.party_code` avec FK, et `measure_accounting_entries` avec FK aux catégories ; le moteur privilégie ces écritures plutôt que des règles codées en dur. Les libellés ne sont jamais des identifiants.
+> - Référence APU 2025 actuellement utilisée : **1 561,7 Md€** recettes, **1 714,2 Md€** dépenses, **152,5 Md€** déficit. Les 25 catégories et les deux catégories « Autres et ajustement » sont conservées.
+
 ## Doctrine
 
 L'objectif premier n'est **pas** d'afficher un budget plausible ou représentatif d'une famille politique : c'est de reproduire **le plus fidèlement possible les mesures effectivement publiées par chaque parti**, avec la date et le document source. Aucun montant inventé ne doit être attribué au parti. Un extrait partiel de contre-budget doit être étiqueté **extrait**, et ne doit pas être présenté comme son budget complet ou sa trajectoire de déficit.
