@@ -31,35 +31,12 @@ export type Result = {
  * Une nouvelle proposition simple se configure ici sans nouvelle fonction.
  * Une proposition complexe peut être branchée sur un calcul spécifique.
  */
-export const rules: Record<string, Rule> = {
-  'rn-vat': { kind: 'allocate', target: [{ side: 'revenues', categoryId: 'vat', share: 1 }], explanation: 'Baisse de recettes affectée à la TVA et consommation.' },
-  'rn-social': { kind: 'specific', explanation: 'Projection interprétative : effet direct sur la protection sociale ; effets sur le marché du travail non quantifiés en V1.', assumption: 'Aucun effet automatique sur chômage, PIB, cotisations ou TVA.' },
-  'rn-agencies': { kind: 'allocate', target: [{ side: 'expenses', categoryId: 'general', share: 1 }], explanation: 'Économie affectée par approximation aux services publics généraux.' },
-  'lfi-wealth': { kind: 'allocate', target: [{ side: 'revenues', categoryId: 'property', share: 1 }], explanation: 'Recettes nouvelles affectées aux prélèvements sur le patrimoine.' },
-  'lfi-school': { kind: 'allocate', target: [{ side: 'expenses', categoryId: 'education', share: 1 }], explanation: 'Dépense affectée à la fonction enseignement.' },
-  'lfi-green': { kind: 'allocate', target: [{ side: 'expenses', categoryId: 'environment', share: 0.4 }, { side: 'expenses', categoryId: 'economy', share: 0.6 }], explanation: 'Répartition conventionnelle 40 % environnement, 60 % économie/transports ; aucun fondement comptable officiel.' },
-  'hor-admin': { kind: 'allocate', target: [{ side: 'expenses', categoryId: 'general', share: 1 }], explanation: 'Économie indicative sur les services publics généraux.' },
-  'hor-tax': { kind: 'allocate', target: [{ side: 'revenues', categoryId: 'otherTax', share: 1 }], explanation: 'Baisse de recettes affectée aux autres impôts, faute de ventilation précise.' },
-};
 const round = (n: number) => Math.round(n * 100) / 100;
 const sum = (values: Record<string, number>) => Object.values(values).reduce((a, b) => a + b, 0);
 const baseline = (items: Category[]) => Object.fromEntries(items.map(c => [c.id, c.amount]));
 export type ReferenceModel = { revenues: ReadonlyArray<Category>; expenses: ReadonlyArray<Category>; offBudget: ReadonlyArray<Category>; measures: ReadonlyArray<Measure> }; 
 const categoryExists = (side: Side, id: string, reference: ReferenceModel) => (side === 'revenues' ? reference.revenues : side==='expenses'?reference.expenses:reference.offBudget).some(c => c.id === id);
 
-/** 
- * Point d'extension des règles spécifiques : ici une approximation directe seulement.
- * Un futur modèle macro peut calculer plusieurs écritures et expliciter ses hypothèses.
- */
-function specific(measure: Measure): Entry[] {
-  switch (measure.id) {
-    case 'rn-social':
-      return [{ measureId: measure.id, side: 'expenses', categoryId: 'social', amount: measure.expenseDelta,
-        rationale: 'Économie imputée à la protection sociale ; effets indirects sur emploi et recettes exclus.' }];
-    default:
-      throw new Error('Règle spécifique non implémentée : ' + measure.id);
-  }
-}
 export function projectMeasure(measure: Measure, reference: ReferenceModel): Entry[] {
   // En production, l'affectation APU est une donnée explicite et stable.
   // Les anciennes règles V1 ne servent que de repli pour les scénarios historiques.
@@ -78,22 +55,7 @@ export function projectMeasure(measure: Measure, reference: ReferenceModel): Ent
       throw new Error('Écritures APU et montant revendiqué incohérents : '+measure.id);
     return entries;
   }
-  // Une mesure chargée depuis Neon ne peut jamais revenir aux règles historiques locales.
-  if (measure.referenceOrigin === 'neon') throw new Error('Affectation APU Neon absente : ' + measure.id);
-  const rule = rules[measure.id];
-  if (!rule) throw new Error('Règle absente pour ' + measure.id);
-  if (rule.kind === 'specific') return specific(measure);
-  const targets = rule.target || [];
-  if (!targets.length) throw new Error('Ventilation vide : ' + measure.id);
-  const shares = targets.reduce((a, t) => a + t.share, 0);
-  if (Math.abs(shares - 1) > 0.000001) throw new Error('Parts non équilibrées : ' + measure.id);
-  return targets.map(t => {
-    if (!categoryExists(t.side, t.categoryId,reference)) throw new Error('Catégorie inconnue : ' + t.categoryId);
-    // An off-budget advantage is the inverse of an explicitly claimed tax/social revenue change.
-    const amount = (t.side === 'offBudget' ? -measure.revenueDelta : t.side === 'revenues' ? measure.revenueDelta : measure.expenseDelta) * t.share;
-    return { measureId: measure.id, side: t.side, categoryId: t.categoryId, amount,
-      rationale: rule.explanation };
-  });
+  throw new Error('Affectation APU Neon absente : '+measure.id);
 }
 /**
  * Écritures sourcées, déjà validées par le regroupement documentaire.
@@ -117,11 +79,10 @@ export function calculateScenario(
       const projected = projectMeasure(measure,reference);
       entries.push(...projected);
       if (measure.status === 'illustration') warnings.push('Chiffrage fictif : ' + measure.title);
-      if (!measure.apuEntries && rules[measure.id]?.kind === 'specific') warnings.push('Hypothèse spécifique : ' + rules[measure.id].explanation);
     } catch (err) {
       // Un budget documenté doit être cohérent en entier : jamais de solde
       // partiel si une écriture APU a été corrompue ou mal renseignée.
-      if (measure.apuEntries !== undefined || measure.referenceOrigin === 'neon') throw err;
+      throw err;
       warnings.push(String(err));
     }
   }
