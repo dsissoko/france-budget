@@ -5,7 +5,7 @@ Le moteur réalise des **interprétations pédagogiques**, non opposables. Il ne
 
 ## Chaîne de validation
 1. Recueillir la **présentation défendue par le parti** (document officiel, millésime, page, intitulé, assiette, objectif, hypothèses, montant revendiqué).
-2. Définir une **règle interprétative de projection** : allocation générique vers des postes canoniques, ou traitement spécifique codé.
+2. Définir une **ventilation APU explicite et contrôlée** : une ou plusieurs écritures par mesure, liées à une catégorie et un côté recettes/dépenses. Les règles codées subsistent uniquement comme repli historique.
 3. Comparer **solde annoncé** et **somme des écritures projetées** : écart, règles et hypothèses.
 4. Afficher le résultat avec les réserves et limites : « montant reproduit » n'implique pas « effet établi ».
 5. Pour contrôler la validité des **hypothèses économiques**, il faut des données et un modèle distincts ; la V1 ne fait que le rapprochement comptable.
@@ -26,19 +26,19 @@ Le moteur réalise des **interprétations pédagogiques**, non opposables. Il ne
 - Les labels de tendance portent sur les variations annuelles **à partir de 2027**, en excluant le saut d'activation entre 2026 et 2027.
 
 ## Référence de comparaison
-Les contre-budgets 2026 répondent au **projet initial PLF/PLFSS 2026**, pas aux comptes publics effectivement exécutés en 2025. La référence V1 conserve les **totaux APU 2025 publiés avec une ventilation fictive par postes** : appliquer un montant revendiqué pour 2026 à cet exemple ne garantit pas qu'il soit transposable. Avant de présenter un déficit comparatif réel, charger et réconcilier les agrégats officiels et harmoniser le millésime.
+Les contre-budgets 2026 répondent au **projet initial PLF/PLFSS 2026**, pas aux comptes publics effectivement exécutés en 2025. La référence V1 conserve les **totaux APU 2025 publiés avec une ventilation indicative par postes** : appliquer un montant revendiqué pour 2026 à cet exemple ne garantit pas qu'il soit transposable. Avant de présenter un déficit comparatif réel, charger et réconcilier les agrégats officiels et harmoniser le millésime.
 
 ## Contrat technique
 `src/projection.ts` expose :
-- `rules` : table des règles par mesure, type `allocate` ou `specific`.
-- `projectMeasure` : calcule les écritures canoniques attribuées.
+- `rules` : table de **repli historique** par identifiant de mesure (non cible de production).
+- `projectMeasure` : valide prioritairement les écritures APU reçues via l'API ; refuse les ventilations incohérentes.
 - `auditMeasure` : rapproche impact annoncé, impact ventilé et écart.
-- `calculateScenario` : additionne les impacts et les ajustements manuels, retourne recettes/dépenses/solde/alertes.
+- `calculateScenario` : additionne les impacts et les ajustements manuels, retourne recettes/dépenses/solde/alertes ; troisième paramètre `sourcedEntries` facultatif. Pour les groupes documentaires, voir `src/engine/documented-budget.ts` (non encore exposé au public).
 
-Chaque mesure conserve son origine, sa présentation et son montant déclaré dans `src/data.ts`. Les règles ne changent jamais le sens du montant déclaré sans le signaler.
+Chaque mesure publiée est lue depuis Neon (`measures`) et ses écritures depuis `measure_accounting_entries`, restituées en `apuEntries`. `src/data.ts` ne constitue plus la source de vérité des mesures publiées. Les règles historiques restent disponibles pour les fixtures et anciens scénarios.
 
 ## Exemples de projection
-- TVA énergie RN : −10,96 Md€ sur la recette `vat` ; solde : −10,96.
+- Proposition RN regroupée TVA énergie et produits essentiels : −14,46 Md€ de recettes sur `vat` (−10,96 et −3,5 revendiqués), soit −14,46 Md€ de solde avant effets indirects.
 - Prestation sociale RN : −6,1 Md€ en dépense `social` ; solde : +6,1. Les impacts sur chômage/emploi/recettes sont explicitement **non modélisés**.
 - Énergies renouvelables LFI : +10,6 Md€ de dépenses, ventilées conventionnellement 40 % `environment` et 60 % `economy`. Répartition interprétative, non revendiquée par le parti.
 - Gratuité scolaire LFI : +3,6 Md€ sur `education`.
@@ -47,7 +47,7 @@ Les tests automatisés vérifient la conservation des montants et l'arithmétiqu
 
 ## Manques à gagner hors budget de référence (2024)
 
-Les allègements fiscaux et sociaux recensés dans le jaune **Aides publiques aux entreprises**, annexé au PLF 2027, sont des **postes de référence complémentaires**, et non des dépenses additionnelles. Le référentiel des comptes APU de 2025 reste inchangé : 1 714,1 Md€ de dépenses, 1 561,6 Md€ de recettes et 152,5 Md€ de déficit.
+Les allègements fiscaux et sociaux recensés dans le jaune **Aides publiques aux entreprises**, annexé au PLF 2027, sont des **postes de référence complémentaires**, et non des dépenses additionnelles. La référence APU 2025 active vaut 1 714,2 Md€ de dépenses, 1 561,7 Md€ de recettes et 152,5 Md€ de déficit.
 
 - **Avantages fiscaux aux entreprises : 49,7 Md€ (2024)**, rattachés à la recette « Fiscalité des entreprises ».
 - **Allègements de cotisations des entreprises : 69,1 Md€ (2024)**, rattachés à la recette « Cotisations sociales ».
@@ -65,3 +65,13 @@ Source : [Jaune budgétaire PLF 2027, aides publiques aux entreprises (exécutio
 - Les programmes sont incomplets et leurs totaux publiés ne doivent pas être additionnés à leurs mesures détaillées.
 - La V1 signale les interactions potentielles et les millésimes différents sans les résoudre.
 - Les budgets canoniques doivent ultimement être définis par périmètre (APU / État / sécurité sociale), classification fonctionnelle et nature économique.
+
+## État des données et contrôle des écritures — novembre 2026
+
+- Codes de partis : `political_parties.code` et `budgets.party_code`, sans parser les titres.
+- Écritures : `measure_accounting_entries(measure_id,line_number,side,category_id,amount)` liées aux catégories APU par FK ; leurs sommes doivent reproduire `measures.revenue_delta` et `expense_delta` pour les mesures calculées. Le contrôle d'égalité est effectué à la lecture dans l'API et dans le moteur, **pas encore par une contrainte SQL agrégative**.
+- Les groupes documentaires RN/LFI/Équinoxe dans `party_proposal_draft` sont **non validés et non actifs** ; aucune somme brute ne doit être présentée comme déficit APU.
+- Les mesures `non_chiffrable_apu` demandent une décision manuelle motivée. Les contributions non calculables restent documentées, pas intégrées dans le solde.
+- La copie `measures.apu_entries` est **transitoire** : l'API lit la table normalisée, pas cette colonne.
+
+Voir le [schéma technique réel](schema.md) et [l'architecture comptable](projection-architecture.md).
