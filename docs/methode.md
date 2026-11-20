@@ -64,7 +64,7 @@ Aucun de ces deux modes ne prouve la faisabilité, l'effet macroéconomique rée
 
 « Pouvoir d'achat », « immigration » et « écologie » sont des thèmes politiques, pas des postes comptables. Une mesure peut affecter plusieurs agrégats. Le moteur comptable `src/projection.ts` traduit les mesures en variations de recettes et dépenses et contrôle le rapprochement arithmétique. Les services `src/engine/accounting.ts`, `simulation.ts` et `impact.ts` organisent le calcul et la trajectoire.
 
-Un montant **revendiqué par un parti** ne devient pas une expertise indépendante du seul fait qu'il est intégré au simulateur. Certaines mesures sont des **illustrations fictives** ; les contre-budgets 2026 répondent à un autre projet de loi que les comptes APU exécutés de 2025. Les montants comparés ne constituent pas des programmes exhaustifs.
+Un montant **revendiqué par un parti** ne devient pas une expertise indépendante du seul fait qu'il est intégré au simulateur. Certaines mesures sont des **illustrations fictives** ; les contre-budgets 2026 répondent à un autre projet de loi que les comptes APU exécutés de 2025. **En mode AGGREGATE**, les montants sont les engagements globaux publiés pour le périmètre annoncé ; **en mode PARTIAL**, seuls les impacts des mesures disponibles sont simulés. Leur affichage doit permettre de distinguer ces deux situations sans ambiguïté.
 
 **Exemple :** une baisse de TVA de 10 Md€ baisse les recettes de 10 Md€ et augmente le déficit de 10 Md€ **à effets indirects constants**. L'écart de ventilation nul prouve seulement l'égalité comptable.
 
