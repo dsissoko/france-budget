@@ -91,6 +91,31 @@ erDiagram
 
 Les relations en pointillés représentent des **rattachements logiques non encore matérialisés par des clés étrangères** dans les tables de préparation. Le diagramme ne doit pas laisser croire que les 25 groupes sont intégrés à `measures` ou au calcul public.
 
+## Nouvelles tables relationnelles permanentes (créées en base le 20/11/2026)
+
+La transition documentaire a franchi une étape **sans activation de nouveaux budgets** :
+
+- `party_proposals` : PK composite `(party_code,source_year,group_id)`, FK `party_code` → `political_parties.code`. Titre d'affichage, `source_measure_count`, `review_status` limité à `review_pending`, `validated` ou `rejected`.
+- `party_source_lines` : PK composite `(party_code,source_year,source_row)`, FK composite **validée** `(party_code,source_year,group_id)` → `party_proposals`. Sens de flux contrôlé, montant revendiqué positif ou nul, source HTTPS, statut documentaire et éventuel tag APU manuel.
+- Index `idx_party_source_lines_group(party_code,source_year,group_id,source_row)` pour les lectures d'un groupe.
+- Initialisation RN → `RN`, LFI → `LFI`, Équinoxe → `EQX` : correspondances **explicites de codes**, aucun libellé parsé comme clé. Vérifié : 25 groupes, 232 lignes, **zéro orpheline**, décomptes par groupe cohérents, **zéro groupe validé**.
+- Les tables `party_proposal_draft` et `party_source_measure_draft` sont conservées provisoirement comme données d'origine, **pas comme second moteur comptable**. La promotion vers les nouvelles tables n'implique pas leur publication.
+
+Le modèle cible est désormais :
+
+```text
+political_parties.code
+  ├── budgets.party_code → measures.id → measure_accounting_entries
+  └── party_proposals (party_code, source_year, group_id)
+        └── party_source_lines (party_code, source_year, source_row)
+```
+
+**Raccordement encore manquant :** rattacher les mesures comptables validées aux lignes sources et aux groupes par des clés stables et des contraintes d'unicité. Ne pas supposer que ce lien existe déjà dans le schéma ; aucun groupe préparatoire ne doit être compté automatiquement.
+
+Migration reproductible : [`db/migrations/20261120_party_proposals_relational.sql`](../db/migrations/20261120_party_proposals_relational.sql).
+
+Modèle de contribution synchronisé : [PR programme politique](../.github/PULL_REQUEST_TEMPLATE/political-programme.md) et [issue de soumission](../.github/ISSUE_TEMPLATE/political-programme.yml). Ils exigent désormais identifiants stables, validation APU, contrôle des doublons et mise à jour du schéma.
+
 ## Tables opérationnelles
 
 | Table | Identité et contenu | Intégrité / comportement |
@@ -169,7 +194,7 @@ Mesures ponctuelles `EXPLAIN (ANALYZE,BUFFERS)` : lectures de budgets/mesures pu
 
 ## Points restant à traiter dans le modèle
 
-- Unifier les niveaux `party -> budget -> proposal -> source measure -> accounting entry` avec des FK pour les propositions et mesures **après validation** du corpus ; les tables `_draft` représentent actuellement le chaînon éditorial sans FK entre elles et les budgets actifs.
+- **Partiellement réalisé** : \`party_proposals\` et \`party_source_lines\` ont maintenant des FK réelles. Il reste à lier explicitement les écritures comptables actives aux lignes sources des propositions validées.
 - Éliminer la double représentation transitoire `measures.apu_entries` et `measure_accounting_entries` après recette, en conservant **uniquement la table normalisée**.
 - Refuser explicitement les mesures politiques actives sans écritures validées, et vérifier qu'une source documentaire ne contribue qu'à un seul calcul.
 - Remplacer les reliquats de règles V1 et fixtures codées en dur ; garder les mêmes modèles, calculs et 25 catégories pour les citoyens et les partis.
