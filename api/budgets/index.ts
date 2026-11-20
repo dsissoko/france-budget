@@ -5,6 +5,15 @@ export default async function handler(req: any, res: any) {
   const sql=db();
   if(req.method==='GET'){
    const rows=await sql`SELECT b.id,b.title,b.description,b.origin,b.party_code,b.maturity_status,b.confirmation_organization,b.confirmation_evidence_url,b.confirmed_at,b.featured,b.featured_order,b.reference_year,b.published_at,b.scenario,
+     CASE WHEN b.origin='party' THEN
+       (SELECT COALESCE(jsonb_agg(jsonb_build_object(
+          'id',p.group_id,'title',p.title,'year',p.source_year,
+          'sourceCount',p.source_measure_count,'reviewStatus',p.review_status,
+          'sourceUrl',(SELECT MIN(l.source_url) FROM party_source_lines l
+                       WHERE (l.party_code,l.source_year,l.group_id)=(p.party_code,p.source_year,p.group_id))
+        ) ORDER BY p.source_year DESC,p.group_id),'[]'::jsonb)
+        FROM party_proposals p WHERE p.party_code=b.party_code)
+     ELSE '[]'::jsonb END AS "documentaryProposals",
      count(v.id)::int AS votes FROM budgets b LEFT JOIN votes v ON v.budget_id=b.id
      WHERE b.origin IN ('citizen','party') AND b.visibility='public'
      GROUP BY b.id ORDER BY CASE WHEN b.origin='party' THEN 0 ELSE 1 END, votes DESC,b.published_at DESC LIMIT 103`;
