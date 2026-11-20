@@ -5,7 +5,7 @@ export type PublishedAggregate = {
   basis:'delta'|'total';
   revenuesBn:number;
   expensesBn:number;
-  balanceDeltaBn:number;
+  balanceDeltaBn?:number;
   sourceUrl:string;
   description?:string;
 };
@@ -34,7 +34,7 @@ export function calculatePublishedBudget(b:PartyBudgetInput,reference:ReferenceM
   const {year,basis,revenuesBn,expensesBn,balanceDeltaBn,sourceUrl}=claim;
   if(!Number.isInteger(year)||year<2000||year>2100||
       !['delta','total'].includes(basis)||
-      ![revenuesBn,expensesBn,balanceDeltaBn].every(Number.isFinite)||
+      ![revenuesBn,expensesBn].every(Number.isFinite)||
       !sourceUrl.startsWith('https://'))
     throw Error('Agrégats politiques invalides : métadonnées, année ou source');
   if((basis==='total'&&(revenuesBn<0||expensesBn<0))||
@@ -43,7 +43,7 @@ export function calculatePublishedBudget(b:PartyBudgetInput,reference:ReferenceM
   const baseRevenue=sum(reference.revenues),baseExpense=sum(reference.expenses);
   const deltaRevenue=basis==='delta'?revenuesBn:revenuesBn-baseRevenue;
   const deltaExpense=basis==='delta'?expensesBn:expensesBn-baseExpense;
-  if(!close(deltaRevenue-deltaExpense,balanceDeltaBn))
+  if(balanceDeltaBn!==undefined && (!Number.isFinite(balanceDeltaBn)||!close(deltaRevenue-deltaExpense,balanceDeltaBn)))
     throw Error('Agrégats politiques non réconciliés : recettes - dépenses != solde');
   const entries:SourcedEntry[]=[
     {measureId:'aggregate:'+year+':revenues',side:'revenues',categoryId:adjustment('revenues',reference),
@@ -51,6 +51,7 @@ export function calculatePublishedBudget(b:PartyBudgetInput,reference:ReferenceM
     {measureId:'aggregate:'+year+':expenses',side:'expenses',categoryId:adjustment('expenses',reference),
       amount:deltaExpense,rationale:'Agrégat revendiqué par la formation, non ventilé : '+sourceUrl},
   ];
+  // The third number is optional: the resulting balance is inferred from the two sourced masses.
   // Never sum individual selections on top of the complete announced totals.
   const result=calculateScenario([],{revenues:{},expenses:{}},entries,reference);
   return {...result,warnings:[...result.warnings,
