@@ -37,8 +37,9 @@ describe('Intégration générique d’un programme politique — LFI 2027', () 
   it('qualifie toutes les lignes et n’en active aucune sans validation explicite', () => {
     expect(qualification).toHaveLength(28);
     expect(new Set(qualification.map(x => x.source_row_id)).size).toBe(28);
-    expect(qualification.every(x => ['candidate', 'needs_split', 'year_uncertain'].includes(x.qualification))).toBe(true);
-    expect(qualification.filter(x => x.qualification === 'candidate')).toHaveLength(19);
+    expect(qualification.every(x => ['candidate', 'validated_direct', 'needs_split', 'year_uncertain'].includes(x.qualification))).toBe(true);
+    expect(qualification.filter(x => x.qualification === 'candidate')).toHaveLength(13);
+    expect(qualification.filter(x => x.qualification === 'validated_direct')).toHaveLength(6);
     expect(qualification.filter(x => x.qualification === 'needs_split')).toHaveLength(8);
     expect(qualification.filter(x => x.qualification === 'year_uncertain')).toHaveLength(1);
     const keys = new Set([...revenues.map(x => 'revenues:' + x.id), ...expenses.map(x => 'expenses:' + x.id)]);
