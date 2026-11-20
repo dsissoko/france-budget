@@ -79,7 +79,7 @@ describe('Contrat des écritures APU normalisées', () => {
     })).toThrow('Écriture APU invalide');
   });
   it('interdit le retour silencieux aux règles locales pour une mesure Neon', () => {
-    const fromNeon = { ...documented, id: 'rn-vat', referenceOrigin: 'neon' as const };
+    const fromNeon = { ...documented, id: 'rn-vat', referenceOrigin: 'neon' as const, apuEntries: undefined };
     expect(() => projectMeasure(fromNeon)).toThrow('Affectation APU Neon absente');
     expect(() => projectMeasure({ ...fromNeon, apuEntries: [] })).toThrow('Affectation APU absente');
   });
