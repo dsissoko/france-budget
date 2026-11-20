@@ -80,7 +80,7 @@ Les libellés `title` et `name` ne doivent **jamais** identifier un parti ou dé
 ## Sécurité et exploitation
 
 - L'API doit valider les montants et catégories indépendamment des validations du navigateur.
-- Limites anti-abus documentées : 50 publications citoyennes publiques, 2 publications par 24 h et par empreinte, cookie de vote HttpOnly/Secure/SameSite.
+- Limites anti-abus documentées : 100 publications citoyennes publiques, 100 publications par 24 h et par empreinte, cookie de vote HttpOnly/Secure/SameSite.
 - Les limites par cookie/empreinte ne garantissent pas une identité unique ; aucun scrutin représentatif n'est revendiqué.
 - Ne jamais lancer de réinitialisation de `votes` ou de `budgets` lors d'un déploiement ou d'une migration.
 - Éviter de présenter les contenus saisis par les visiteurs comme du HTML de confiance.
