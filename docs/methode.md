@@ -64,6 +64,7 @@ Les sources et les inventaires de travail sont consultables directement dans Git
 - [RN 2026 — inventaire des 75 lignes](../data/programmes/rn-contre-budget-2026-inventaire.csv) et [regroupement en neuf propositions](../data/programmes/rn-2026-regroupement-9-propositions.csv).
 - [LFI 2026 — inventaire préliminaire](../data/programmes/lfi-contre-budget-2026-inventaire-preliminaire.csv) et [regroupement préliminaire en huit propositions](../data/programmes/lfi-2026-regroupement-8-propositions-preliminaire.csv).
 - [Équinoxe 2027 — regroupement préliminaire en huit propositions](../data/programmes/equinoxe-2027-regroupement-8-propositions-preliminaire.csv).
+- [Les Républicains — fiches chiffrées 2032, inventaire préliminaire](../data/programmes/lr-2032-fiches-inventaire-preliminaire.csv) : montants de fin de trajectoire, chevauchements à neutraliser avant tout calcul.
 - [Suivi de la fidélité des budgets politiques](https://github.com/dsissoko/france-budget/issues/59).
 
 Leur publication garantit la **traçabilité et la possibilité de vérification**, pas la certification des montants ou des effets économiques. Les programmes partiels sont inclus suivant les mêmes critères documentaires, sans classement politique.
