@@ -30,7 +30,9 @@ const adjustment=(side:'revenues'|'expenses',reference:ReferenceModel)=>{
  */
 export function calculatePublishedBudget(b:PartyBudgetInput,reference:ReferenceModel):Result {
   const claim=b.origin==='party'?b.scenario.claimedTotals:undefined;
-  if(!claim) return calculateScenario(b.scenario.picked||[],b.scenario.budget||{revenues:{},expenses:{}},[],reference);
+  // Only a pair of numeric masses selects AGGREGATE; a lone announced figure remains PARTIAL.
+  if(!claim || !Number.isFinite(claim.revenuesBn) || !Number.isFinite(claim.expensesBn))
+    return calculateScenario(b.scenario.picked||[],b.scenario.budget||{revenues:{},expenses:{}},[],reference);
   const {year,basis,revenuesBn,expensesBn,balanceDeltaBn,sourceUrl}=claim;
   if(!Number.isInteger(year)||year<2000||year>2100||
       !['delta','total'].includes(basis)||
@@ -60,4 +62,4 @@ export function calculatePublishedBudget(b:PartyBudgetInput,reference:ReferenceM
     'Ventilation des agrégats dans les catégories techniques de rapprochement : ce ne sont pas des postes de dépense ou recette supplémentaires.']};
 }
 
-export const aggregateMode=(b:PartyBudgetInput)=>b.origin==='party'&&Boolean(b.scenario.claimedTotals);
+export const aggregateMode=(b:PartyBudgetInput)=>b.origin==='party'&&Number.isFinite(b.scenario.claimedTotals?.revenuesBn)&&Number.isFinite(b.scenario.claimedTotals?.expensesBn);
