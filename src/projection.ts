@@ -75,7 +75,16 @@ export function projectMeasure(measure: Measure): Entry[] {
       rationale: rule.explanation };
   });
 }
-export function calculateScenario(selectedIds: string[], citizen: Override = { revenues: {}, expenses: {} }): Result {
+/**
+ * Écritures sourcées, déjà validées par le regroupement documentaire.
+ * Facultatives : tous les anciens appels calculent exactement comme auparavant.
+ */
+export type SourcedEntry = Entry;
+export function calculateScenario(
+ selectedIds: string[],
+ citizen: Override = { revenues: {}, expenses: {} },
+ sourcedEntries: ReadonlyArray<SourcedEntry> = [],
+): Result {
   const revenueValues = baseline(revenues), expenseValues = baseline(expenses), offBudgetValues=baseline(offBudget);
   const entries: Entry[] = [];
   const warnings: string[] = [];
@@ -88,6 +97,19 @@ export function calculateScenario(selectedIds: string[], citizen: Override = { r
       if (measure.status === 'illustration') warnings.push('Chiffrage fictif : ' + measure.title);
       if (rules[measure.id].kind === 'specific') warnings.push('Hypothèse spécifique : ' + rules[measure.id].explanation);
     } catch (err) { warnings.push(String(err)); }
+  }
+  // Fail closed : une affectation sourcée invalide annule entièrement
+  // l'extension documentaire ; ne jamais comptabiliser un sous-ensemble silencieux.
+  const existingMeasureIds=new Set(selectedIds);
+  const validSourced=sourcedEntries.every(entry=>
+    Boolean(entry.measureId) && !existingMeasureIds.has(entry.measureId) &&
+    Boolean(entry.rationale?.trim()) &&
+    Number.isFinite(entry.amount) && categoryExists(entry.side,entry.categoryId)
+  );
+  if(!validSourced){
+    if(sourcedEntries.length)warnings.push('Écritures documentaires invalides ou déjà sélectionnées : extension ignorée.');
+  }else{
+    entries.push(...sourcedEntries);
   }
   for (const entry of entries) {
     if(entry.side==='offBudget'){
