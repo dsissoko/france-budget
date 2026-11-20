@@ -56,6 +56,18 @@ L'inventaire et les contrôles sont publics :
 - [Table de correspondance des 25 agrégats](../data/audit-agregats-citoyens-2026-11.csv)
 - [Suivi des corrections](https://github.com/dsissoko/france-budget/issues/58)
 
+### Registres publics des propositions politiques
+
+Les sources et les inventaires de travail sont consultables directement dans GitHub. **Une mesure inscrite dans un inventaire n'est pas nécessairement intégrée au simulateur ni validée sur le périmètre consolidé APU.** Les regroupements servent à limiter le nombre de propositions affichées, sans perdre le détail documentaire.
+
+- [Registre ouvert des formations et de leurs sources](../data/programmes/registre-partis-sources-2026-11.csv) : permet de suivre les publications disponibles, y compris les programmes incomplets.
+- [RN 2026 — inventaire des 75 lignes](../data/programmes/rn-contre-budget-2026-inventaire.csv) et [regroupement en neuf propositions](../data/programmes/rn-2026-regroupement-9-propositions.csv).
+- [LFI 2026 — inventaire préliminaire](../data/programmes/lfi-contre-budget-2026-inventaire-preliminaire.csv) et [regroupement préliminaire en huit propositions](../data/programmes/lfi-2026-regroupement-8-propositions-preliminaire.csv).
+- [Équinoxe 2027 — regroupement préliminaire en huit propositions](../data/programmes/equinoxe-2027-regroupement-8-propositions-preliminaire.csv).
+- [Suivi de la fidélité des budgets politiques](https://github.com/dsissoko/france-budget/issues/59).
+
+Leur publication garantit la **traçabilité et la possibilité de vérification**, pas la certification des montants ou des effets économiques. Les programmes partiels sont inclus suivant les mêmes critères documentaires, sans classement politique.
+
 La base opérationnelle est **Neon PostgreSQL**, servie par `GET /api/reference`. Le fichier historique `src/data.ts` n'est pas le référentiel à auditer en production ; il demeure une dépendance technique du moteur à supprimer lors de l'externalisation complète.
 
 
