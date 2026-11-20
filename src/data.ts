@@ -1,6 +1,6 @@
 export type Category={id:string;label:string;amount:number;canonical:string;description:string;revenueImpactCategory?:string};
 import {ENTERPRISE_AIDS,OFF_BUDGET_ACCOUNTING_NOTE} from './enterprise-aids';
-export type Measure={id:string;party:'RN'|'LFI'|'Horizons';theme:string;title:string;revenueDelta:number;expenseDelta:number;source:string;year:number;status:'publié'|'illustration';description:string};
+export type Measure={id:string;party:string;theme:string;title:string;revenueDelta:number;expenseDelta:number;source:string;year:number;status:'publié'|'illustration';description:string;apuEntries?:Array<{side:'revenues'|'expenses';categoryId:string;amount:number}>};
 // Totaux officiels APU 2025 INSEE : dépenses 1 714,1 Md€, recettes 1 561,6 Md€, déficit 152,5 Md€.
 // La répartition par catégorie est indicative ; les lignes d'ajustement rendent les totaux exacts.
 // Soutien aux entreprises : reclassement PÉDAGOGIQUE de 30 Md€ depuis « économie » ; ce montant n'est PAS une statistique officielle des aides.
@@ -58,7 +58,7 @@ export const measures:Measure[]=[
 {id:'hor-tax',party:'Horizons',theme:'Fiscalité',title:'Limiter certaines hausses de prélèvements',revenueDelta:-4,expenseDelta:0,source:'https://parti-horizons.fr/',year:2027,status:'illustration',description:'Exemple de perte de recettes calculée fictivement.'}
 ];
 export const partyNames=['Référence 2025','RN','LFI','Horizons'] as const;
-export type Party=typeof partyNames[number];
+export type Party=string;
 // Shared business calendar, not a separate UI-defined range.
 export {projectionYears as years} from './engine/simulation';
 export const sum=(items:Category[])=>items.reduce((a,i)=>a+i.amount,0);
