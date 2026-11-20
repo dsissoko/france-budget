@@ -141,6 +141,27 @@ political_parties (code)
 
 Migrations : [`20261120_party_source_accounting_links.sql`](../db/migrations/20261120_party_source_accounting_links.sql) et [`20261120_party_source_apu_decisions.sql`](../db/migrations/20261120_party_source_apu_decisions.sql).
 
+## Maturité éditoriale du budget (20/11/2026)
+
+Le champ `budgets.maturity_status` est **générique** et commun aux budgets citoyens et politiques. Son affichage est actuellement limité aux budgets `origin='party'`. Il est indépendant des champs `visibility`, `featured` et de la performance du déficit.
+
+| Code stable | Badge visible pour les partis | Signification documentaire |
+| --- | --- | --- |
+| `en_preparation` | **En préparation** (gris) | Collecte, regroupement ou contrôle documentaire incomplet |
+| `complet` | **Complet** (neutre) | Couverture achevée sur le périmètre annoncé ; vérifications éditoriales encore à finaliser |
+| `a_confirmer` | **À confirmer** (vert) | Restitution consolidée, prête pour sollicitation officielle du parti |
+| `confirme` | **Confirmé** (vert soutenu) | La formation a explicitement confirmé la fidélité de sa transcription, **pas** sa faisabilité économique |
+
+**Contrôle en base :** contrainte `budgets_maturity_status_check` sur les quatre codes. Le statut `confirme` requiert `confirmation_organization`, `confirmation_evidence_url` (HTTPS) et `confirmed_at` non nuls. Aucun budget n'a été marqué « Complet », « À confirmer » ou « Confirmé » automatiquement : **les cinq budgets présents commencent à `en_preparation`**.
+
+**Historisation :** `budget_maturity_history` conserve le budget, l'ancien/nouveau statut, l'horodatage, le rôle SQL déclencheur (`changed_by`) et, si applicable, la preuve de confirmation. Un trigger enregistre les changements de statut. `changed_by` correspond au rôle PostgreSQL, **pas automatiquement à l'identité d'un représentant du parti** : la preuve documentaire doit contenir ou permettre de vérifier cette identité. Une confirmation officielle nécessite une revue humaine avant toute mutation.
+
+**Affichage :** `GET /api/budgets` fournit les champs de maturité et de preuve. Dans **Comparer**, le badge figure sur les choix de budgets politiques. Dans **Voter**, il remplace le badge de qualification budgétaire sur les cartes politiques pour éviter de cumuler les badges ; les citoyens conservent leur badge de qualification. La fiche détaillée affiche le sens du statut et un lien vers la preuve pour `confirme`. La visibilité du budget **n'est jamais modifiée par le statut**.
+
+Migration versionnée : [`db/migrations/20261120_budget_maturity.sql`](../db/migrations/20261120_budget_maturity.sql). Tests de présentation : [`src/budget-maturity.test.ts`](../src/budget-maturity.test.ts).
+
+**Publication des nouveaux budgets politiques :** reste un chantier distinct, qui doit distinguer catalogue documentaire et impacts effectivement calculables. Ne pas promouvoir silencieusement les groupes encore `review_pending` dans les calculs ni fabriquer de confirmations pour accélérer la publication.
+
 ## Tables opérationnelles
 
 | Table | Identité et contenu | Intégrité / comportement |
