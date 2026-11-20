@@ -22,5 +22,8 @@ INSERT INTO model_parameters (reference_version_id,model_id,parameter_key,numeri
 ('insee-apu-2025-v1','mechanical-v1','baselineRatePerIndex',0.025,'ratio'),
 ('insee-apu-2025-v1','mechanical-v1','budgetYear',2027,'year'),
 ('insee-apu-2025-v1','mechanical-v1','applicationYear',2027,'year'),
-('insee-apu-2025-v1','mechanical-v1','horizonYear',2032,'year')
+('insee-apu-2025-v1','mechanical-v1','horizonYear',2032,'year'),
+('insee-apu-2025-v1','mechanical-v1','balanceThreshold',0.05,'MdEUR'),
+('insee-apu-2025-v1','mechanical-v1','changeThreshold',0.10,'MdEUR'),
+('insee-apu-2025-v1','mechanical-v1','momentumThreshold',0.50,'MdEUR')
 ON CONFLICT (reference_version_id,model_id,parameter_key) DO NOTHING;
