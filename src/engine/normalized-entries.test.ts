@@ -98,7 +98,7 @@ describe('Contrat des écritures APU normalisées', () => {
       const measure: Measure = {
         ...documented, id: fixture.id, revenueDelta: fixture.revenueDelta,
         expenseDelta: fixture.expenseDelta, referenceOrigin: 'neon',
-        apuEntries: fixture.entries.map(([side, categoryId, amount]) => ({ side, categoryId, amount })),
+        apuEntries: fixture.entries.map(([side, categoryId, amount]) => ({ side: side as 'revenues' | 'expenses', categoryId, amount })),
       };
       const entries = projectMeasure(measure);
       expect(entries.map(e => [e.side, e.categoryId, e.amount])).toEqual(fixture.entries.map(e => [...e]));
