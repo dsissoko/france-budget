@@ -106,6 +106,9 @@ describe('Contrat des écritures APU normalisées', () => {
     expect(result.expenseTotal).toBe(122);
     expect(result.deficit).toBe(19);
     expect(result.balanceDelta).toBe(1);
+    expect(reference.revenues[0].amount).toBe(100);
+    expect(reference.expenses[0].amount).toBe(120);
+    expect(calculateScenario([], { revenues: {}, expenses: {} }, [], reference).deficit).toBe(20);
   });
 
   it('reproduit les six écritures APU Neon des cinq mesures RN/LFI historiques', () => {
