@@ -1,4 +1,3 @@
-import { createHash } from 'node:crypto';
 import { db, reply, method } from './_db.js';
 export default async function handler(req:any,res:any){
  if(!method(req,'GET',res))return;
@@ -48,8 +47,7 @@ export default async function handler(req:any,res:any){
        Math.abs(expenseDelta-m.expenseDelta)>0.001)
      throw new Error('Incohérence APU mesure '+m.id);
   }
-  const referenceFingerprint=createHash('sha256').update(JSON.stringify({year:2025,categories:categories.map((c:any)=>[c.side,c.id,c.amount,c.canonical]),offBudget:offBudget.map((c:any)=>[c.id,c.amount,c.revenueImpactCategory]),measures:measures.map((m:any)=>[m.id,m.revenueDelta,m.expenseDelta,m.apuEntries])})).digest('hex');
   res.setHeader('Cache-Control','public, max-age=60, stale-while-revalidate=300');
-  return reply(res,200,{referenceYear:2025,referenceFingerprint,revenues:categories.filter((x:any)=>x.side==='revenues').map(({side,...x}:any)=>x),expenses:categories.filter((x:any)=>x.side==='expenses').map(({side,...x}:any)=>x),offBudget,measures:measures.map(({sourceValidated,...m}:any)=>({...m,referenceOrigin:'neon'})),parties});
+  return reply(res,200,{referenceYear:2025,revenues:categories.filter((x:any)=>x.side==='revenues').map(({side,...x}:any)=>x),expenses:categories.filter((x:any)=>x.side==='expenses').map(({side,...x}:any)=>x),offBudget,measures:measures.map(({sourceValidated,...m}:any)=>({...m,referenceOrigin:'neon'})),parties});
  }catch(error){console.error('GET /api/reference failed',error);return reply(res,503,{error:'Référentiel temporairement indisponible'})}
 }
