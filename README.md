@@ -1,86 +1,114 @@
 # Mon Budget Citoyen
 
-[![Site Vercel](https://img.shields.io/website?url=https%3A%2F%2Fmon-budget-citoyen.vercel.app&label=Vercel&logo=vercel&logoColor=white)](https://mon-budget-citoyen.vercel.app)
+**Comprendre où va l'argent public. Comparer les choix politiques. Imaginer les nôtres.**
 
-**Application : [mon-budget-citoyen.vercel.app](https://mon-budget-citoyen.vercel.app)**
+[![Accéder à l'application](https://img.shields.io/badge/D%C3%A9couvrir-Mon%20Budget%20Citoyen-16806A?style=for-the-badge)](https://mon-budget-citoyen.vercel.app)
 
-Simulateur citoyen open source et non partisan pour **comprendre** les finances publiques, **comparer** deux budgets, **construire** son propre scénario et **voter** pour des budgets publiés.
+**[Accéder à Mon Budget Citoyen](https://mon-budget-citoyen.vercel.app)**
 
-> **Statut : V1 en recette.** Les agrégats de recettes (1 561,6 Md€), de dépenses (1 714,1 Md€) et le déficit (152,5 Md€) correspondent à la référence INSEE 2025 utilisée par le projet. La ventilation des catégories est **indicative et pédagogique**, non une extraction comptable certifiée. Les mesures politiques ont des sources et statuts distincts ; les simulations sont mécaniques, non des prévisions économiques.
+## Pourquoi ce projet ?
 
-## Parcours
+La France vit depuis des décennies avec des déficits publics répétés et une dette élevée. Sa trajectoire budgétaire pose une vraie question de soutenabilité : **comment continuer à financer nos priorités, préserver nos services publics et préparer l'avenir sans repousser indéfiniment les choix difficiles ?**
 
-- **Comprendre** : agrégats INSEE 2025, catégories de recettes et de dépenses, explications et trajectoire indicative.
-- **Comparer** : choisir un budget A puis un budget B **en deux clics** parmi les budgets mis en avant (10 maximum) ; comparaison à la référence INSEE ; **Réinitialiser** pour recommencer.
-- **Mon budget** : partir de la référence ou d'un budget existant, modifier les postes, ajouter des propositions, enregistrer des scénarios dans le navigateur ou publier.
-- **Voter** : explorer les budgets politiques et citoyens publiés, filtrer, consulter le détail et soutenir un budget. Le vote n'est pas une élection représentative.
+Ce sujet devrait être au cœur du débat démocratique. Pourtant, il est souvent difficile d'en discuter sereinement.
 
-## Architecture actuelle
+Les finances publiques sont complexes. Les chiffres sont dispersés, les périmètres se mélangent et les annonces se résument parfois à quelques milliards d'économies ou de dépenses supplémentaires, sans vision d'ensemble. Les partis politiques défendent naturellement leurs priorités, mais peinent à rendre leurs propositions pédagogiques, complètes et comparables. Et parler franchement des arbitrages — augmenter certaines recettes, réduire certaines dépenses, renoncer à des avantages ou accepter un déficit plus élevé — expose à la critique. La tentation est grande de laisser les sujets les plus sensibles dans l'ombre.
 
-```text
-Navigateur (React 19 / Vite / TypeScript / CSS / Recharts)
-    ├── localStorage : brouillons et scénarios personnels non publiés
-    ├── GET /api/reference : catégories et mesures politiques
-    ├── GET /api/budgets : budgets publics, sélection éditoriale et votes
-    ├── POST /api/budgets : publication citoyenne
-    └── POST /api/votes : soutien d'un budget
-              │
-       Fonctions serverless Vercel (Node.js)
-              │ DATABASE_URL (secret serveur)
-              ▼
-          Neon PostgreSQL
-```
+**Résultat : les citoyens sont invités à juger des promesses sans toujours disposer des moyens d'en mesurer les conséquences budgétaires.**
 
-**Neon est la source de vérité** pour les catégories budgétaires, les mesures et les budgets publics. Les budgets politiques et citoyens utilisent le même modèle `budgets` + `measures`, différenciés par `origin`. Les règles de ventilation du moteur de projection restent **partiellement codées** dans `src/projection.ts` : leur migration est suivie par [l'issue #22](https://github.com/dsissoko/france-budget/issues/22).
+Ce projet est né d'une conviction simple : **le débat public sera meilleur si chacun peut voir les chiffres, comprendre les contraintes et expérimenter les choix par lui-même.**
 
-Les scénarios **enregistrés** restent locaux au navigateur/profil : ils ne sont ni synchronisés entre appareils ni publiés automatiquement. Une **publication** crée une copie indépendante dans Neon. Le site n'impose pas de compte utilisateur ; un nom/pseudonyme public est demandé lors de la publication.
+## Une autre manière de parler du budget
 
-## Développement
+**Mon Budget Citoyen** est une application citoyenne, gratuite, open source et non partisane. Elle ne cherche pas à dire quel parti a raison ni à imposer une recette miracle. Elle veut rendre le budget public français **compréhensible, concret et discutable**.
 
-Prérequis : Node.js compatible avec Vite 6 et npm.
+L'idée est de passer de « il faudrait faire des économies » ou « il faut investir davantage » à des questions plus précises : *sur quoi, à quelle hauteur, pour financer quoi, et avec quel effet sur le déficit ?*
 
-```bash
-npm install
-npm run dev
-npm run check
-npm test
-npm run build
-```
+Pour y parvenir, nous avons fait quelques choix assumés :
 
-Le frontend utilise les routes `/api/*` : `vite dev` seul ne fournit pas les fonctions Vercel ni Neon. Pour tester les parcours avec base de données, utiliser un environnement Vercel adapté et une `DATABASE_URL` **côté serveur uniquement**, jamais avec le préfixe `VITE_`. Ne pas pointer les tests d'écriture vers la production.
+- **Partir du réel.** Les grands totaux viennent des comptes publics de référence. Les catégories ont des noms accessibles, et leur part d'estimation ou de regroupement pédagogique est clairement indiquée.
+- **Regarder l'ensemble des finances publiques.** L'État ne suffit pas : la Sécurité sociale et les collectivités comptent aussi. Comparer des budgets exige un périmètre commun.
+- **Ne pas masquer les arbitrages.** Augmenter un poste ou réduire un impôt change l'équilibre. Les effets sont visibles immédiatement.
+- **Traiter les partis de la même manière.** Leurs propositions sont reliées à des sources publiques, datées, et distinguées de nos interprétations comptables. Un extrait de programme n'est pas présenté comme un budget complet.
+- **Rester humble sur les calculs.** Voir l'effet comptable d'une mesure ne signifie pas prédire son effet sur la croissance, l'emploi ou les comportements.
+- **Ouvrir la discussion.** Chacun peut élaborer un scénario, le partager et découvrir ceux des autres.
 
-## Projet collaboratif et roadmap
+## Quatre façons de participer
 
-Le développement s'organise désormais autour de **trois piliers parallèles** :
+### 1. Comprendre
 
-1. **Participation citoyenne (v1.x)** — améliorer le partage des budgets, l'invitation au vote et la gestion des soutiens, sans refonte de l'interface.
-2. **Crédibilité économique (en démarrage)** — renforcer la ventilation des mesures, les trajectoires de dette et, progressivement, les modèles macroéconomiques documentés et testables.
-3. **Contribution ouverte (en démarrage)** — accueillir les propositions d'économistes, de chercheurs, de développeurs, de formations politiques et les initiatives de diffusion non partisane.
+**Avant de débattre, voir de quoi nous parlons.**
 
-Voir la [roadmap](docs/roadmap.md) et le [guide des contributions](CONTRIBUTING.md). Une équipe politique peut soumettre des corrections sourcées et leur ventilation via une [issue dédiée](.github/ISSUE_TEMPLATE/political-programme.yml) ou une [PR structurée](.github/PULL_REQUEST_TEMPLATE/political-programme.md). Une contribution ne vaut ni certification officielle ni validation scientifique.
+Combien la France dépense-t-elle ? D'où viennent les recettes ? Quels sont les grands postes ? Quel déficit en résulte ?
 
-## Documentation
+L'interface privilégie quelques chiffres essentiels, des catégories familières, des explications courtes et une visualisation simple de la trajectoire. Pas besoin d'être économiste pour commencer.
 
-- [Roadmap à trois piliers](docs/roadmap.md)
-- [Participer au projet](CONTRIBUTING.md)
-- [Vision produit et versions](docs/vision.md)
-- [Architecture et modèle de données](docs/architecture.md)
-- [Intégration Neon, publication et sécurité](docs/neon-integration.md)
-- [Schéma SQL versionné](db/schema.sql)
-- [Issues et recette](https://github.com/dsissoko/france-budget/issues) : `v1.0.0` en validation, `v1.1.0` pour les évolutions de projection.
+### 2. Comparer
 
-## Livraison
+**Mettre les choix côte à côte plutôt que les slogans face à face.**
 
-GitHub `main` déclenche les déploiements Vercel via l'intégration Git native. GitHub Actions vérifie la compilation et les contrôles définis dans les workflows ; aucun jeton de déploiement Vercel n'est requis dans les actions. Les publications et votes existants dans Neon ne sont pas réinitialisés par les déploiements du frontend.
+On choisit deux budgets et on voit ce qui les rapproche ou les oppose : recettes, dépenses, déficit, priorités et propositions. La référence commune permet de mesurer les écarts, sans favoriser une formation politique.
 
-## Limites connues
+Une comparaison ne vaut que si elle est loyale : les mesures sourcées sont distinguées des hypothèses et des effets qui restent incertains.
 
-- Ventilation des catégories indicative, même lorsque les agrégats sont officiels.
-- Interactions entre mesures, effets macroéconomiques et risques de double compte non modélisés exhaustivement.
-- Limitation des votes par cookie/navigateur, sans garantie d'unicité par personne.
-- Migration des règles de projection vers Neon inachevée (issue #22).
-- La qualification du désendettement, de la dette/PIB et des intérêts relève de `v1.1.0`.
+### 3. Mon budget
 
-## Licence
+**Et si c'était à nous de faire les arbitrages ?**
 
-MIT. Les données et documents tiers conservent leurs propres licences.
+On part du budget de référence ou d'un scénario existant, puis on modifie les montants, active des propositions et observe le résultat.
+
+C'est volontairement interactif : un curseur, un montant qui change, un déficit qui évolue. L'objectif n'est pas de trouver une combinaison magique, mais de prendre conscience que **chaque priorité a un coût et chaque économie implique un choix**.
+
+On peut conserver son travail dans son navigateur ou publier une proposition pour en débattre.
+
+### 4. Voter
+
+**Découvrir les budgets des autres et exprimer son soutien.**
+
+Les budgets citoyens et politiques publiés sont réunis dans un même espace. On peut les explorer, consulter leurs propositions, les confronter aux chiffres et soutenir ceux qui nous semblent intéressants.
+
+Ces votes expriment une préférence parmi les visiteurs : **ce ne sont ni un sondage représentatif ni une élection**.
+
+## Une interface pensée pour donner envie de comprendre
+
+Le budget de la France ne devrait pas être réservé aux spécialistes. C'est pourquoi l'expérience repose sur quelques principes simples : **des mots compréhensibles avant le jargon, une vue d'ensemble avant les détails, une action à la fois et des résultats visibles immédiatement**.
+
+Le site fonctionne aussi sur mobile. Il n'exige pas de compte pour explorer ou construire son budget. L'accès aux explications détaillées et aux sources reste possible à chaque étape, sans encombrer la lecture principale.
+
+L'ambition n'est pas de simplifier les enjeux à l'excès, mais de **rendre leur complexité abordable progressivement**.
+
+## Un outil citoyen, pas un arbitre de vérité
+
+Les agrégats de référence utilisés pour 2025 sont de **1 561,7 milliards d'euros de recettes**, **1 714,2 milliards de dépenses**, soit **152,5 milliards de déficit**. Ils couvrent l'ensemble des administrations publiques. La ventilation en catégories compréhensibles constitue en partie un travail de rapprochement et d'estimation, et non une certification officielle poste par poste.
+
+Les mesures des partis sont des **chiffrages revendiqués par leurs auteurs** ; leur reproduction comptable n'est pas une validation de leur faisabilité. Les projections du site sont des exercices mécaniques et pédagogiques, **pas des prévisions économiques**. Certains programmes ne sont encore documentés que partiellement : nous préférons montrer honnêtement les limites plutôt qu'inventer ce qui manque.
+
+C'est en assumant ces distinctions que le projet espère contribuer à un débat plus exigeant et plus constructif.
+
+## Un projet ouvert à toutes les bonnes volontés
+
+Citoyens curieux, économistes, chercheurs, journalistes, développeurs et formations politiques : chacun peut aider à améliorer le projet.
+
+Une proposition mieux sourcée, un chiffre corrigé, une explication plus claire ou une idée pour faciliter la compréhension sont autant de contributions utiles. Les mêmes exigences de transparence et de méthode s'appliquent à tous, quelles que soient les convictions.
+
+**La finalité est simple : faire du budget un sujet que l'on peut enfin discuter ensemble, chiffres à l'appui.**
+
+[**Découvrir l'application**](https://mon-budget-citoyen.vercel.app) · [**Contribuer au projet**](CONTRIBUTING.md)
+
+---
+
+## Pour aller plus loin
+
+Le README présente la démarche. Les explications méthodologiques, détails techniques et modalités de contribution sont réunis dans les documents dédiés :
+
+- **[Notre méthode](docs/methode.md)** — Sources, périmètre, chiffres officiels, estimations et limites des projections.
+- **[Vision produit](docs/vision.md)** — Objectifs, expérience utilisateur et évolutions envisagées.
+- **[Feuille de route](docs/roadmap.md)** — Priorités et prochains développements.
+- **[Architecture technique](docs/architecture.md)** — Fonctionnement de l'application et responsabilités des composants.
+- **[Schéma de données](docs/schema.md)** — Modèle relationnel, clés, contraintes et index.
+- **[Intégration et exploitation](docs/neon-integration.md)** — Base de données, publication, votes et sécurité.
+- **[Moteur de projection](docs/projections.md)** — Calculs, hypothèses et précautions d'interprétation.
+- **[Guide de contribution](CONTRIBUTING.md)** — Comment proposer une amélioration ou corriger des données.
+- **[Suivi des travaux](https://github.com/dsissoko/france-budget/issues)** — Questions ouvertes, anomalies et demandes d'évolution.
+
+**Licence :** MIT pour le code du projet. Les données et documents tiers conservent leurs propres conditions d'utilisation.
