@@ -113,7 +113,12 @@ export function calculateScenario(
       entries.push(...projected);
       if (measure.status === 'illustration') warnings.push('Chiffrage fictif : ' + measure.title);
       if (!measure.apuEntries && rules[measure.id]?.kind === 'specific') warnings.push('Hypothèse spécifique : ' + rules[measure.id].explanation);
-    } catch (err) { warnings.push(String(err)); }
+    } catch (err) {
+      // Un budget documenté doit être cohérent en entier : jamais de solde
+      // partiel si une écriture APU a été corrompue ou mal renseignée.
+      if (measure.apuEntries !== undefined) throw err;
+      warnings.push(String(err));
+    }
   }
   // Fail closed : une affectation sourcée invalide annule entièrement
   // l'extension documentaire ; ne jamais comptabiliser un sous-ensemble silencieux.
