@@ -94,6 +94,20 @@ describe('Contrat des écritures APU normalisées', () => {
     }
   });
 
+  it('calcule un référentiel injecté sans modifier les tableaux globaux', () => {
+    const reference = {
+      revenues: [{ id: 'vat', label: 'TVA', amount: 100, canonical: 'test', description: 'test' }],
+      expenses: [{ id: 'education', label: 'Éducation', amount: 120, canonical: 'test', description: 'test' }],
+      offBudget: [],
+      measures: [{ ...documented, referenceOrigin: 'neon' as const }],
+    };
+    const result = calculateScenario([documented.id], { revenues: {}, expenses: {} }, [], reference);
+    expect(result.revenueTotal).toBe(103);
+    expect(result.expenseTotal).toBe(122);
+    expect(result.deficit).toBe(19);
+    expect(result.balanceDelta).toBe(1);
+  });
+
   it('reproduit les six écritures APU Neon des cinq mesures RN/LFI historiques', () => {
     // Snapshot contrôlé sur une branche Neon isolée le 20/11/2026.
     const fixtures = [
