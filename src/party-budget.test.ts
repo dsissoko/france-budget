@@ -28,6 +28,12 @@ describe('Moteur à deux modes : agrégats sourcés ou référence + deltas',()=
   expect(result.balanceDelta).toBeCloseTo(24.7,2);
   expect(result.entries).toHaveLength(2);
  });
+ it('revient au mode partiel si une seule des deux masses est disponible',()=>{
+  const incomplete={...claim,expensesBn:undefined as unknown as number};
+  const p={...party,scenario:{...party.scenario,claimedTotals:incomplete}};
+  expect(aggregateMode(p)).toBe(false);
+  expect(calculatePublishedBudget(p,reference).balanceDelta).toBe(-5);
+ });
  it('emploie la référence INSEE et les mesures actives sans agrégats globaux',()=>{
   const result=calculatePublishedBudget({...party,scenario:{picked:['item'],budget:{revenues:{},expenses:{}}}},reference);
   expect(result.balanceDelta).toBe(-5);
