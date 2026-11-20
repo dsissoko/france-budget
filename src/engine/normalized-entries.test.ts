@@ -78,4 +78,44 @@ describe('Contrat des écritures APU normalisées', () => {
       ...documented, apuEntries: [{ side: 'revenues', categoryId: 'vat', amount: Number.NaN }],
     })).toThrow('Écriture APU invalide');
   });
+  it('interdit le retour silencieux aux règles locales pour une mesure Neon', () => {
+    const fromNeon = { ...documented, id: 'rn-vat', referenceOrigin: 'neon' as const };
+    expect(() => projectMeasure(fromNeon)).toThrow('Affectation APU Neon absente');
+    expect(() => projectMeasure({ ...fromNeon, apuEntries: [] })).toThrow('Affectation APU absente');
+  });
+
+  it('reproduit les six écritures APU Neon des cinq mesures RN/LFI historiques', () => {
+    // Snapshot contrôlé sur une branche Neon isolée le 20/11/2026.
+    const fixtures = [
+      { id: 'rn-vat', revenueDelta: -14.46, expenseDelta: 0, entries: [['revenues', 'vat', -14.46]] },
+      { id: 'rn-social', revenueDelta: 0, expenseDelta: -6.1, entries: [['expenses', 'social', -6.1]] },
+      { id: 'rn-agencies', revenueDelta: 0, expenseDelta: -8.213, entries: [['expenses', 'general', -8.213]] },
+      { id: 'lfi-school', revenueDelta: 0, expenseDelta: 3.6, entries: [['expenses', 'education', 3.6]] },
+      { id: 'lfi-green', revenueDelta: 0, expenseDelta: 10.6, entries: [['expenses', 'environment', 4.24], ['expenses', 'economy', 6.36]] },
+    ] as const;
+    const baseline = calculateScenario([]);
+    for (const fixture of fixtures) {
+      const measure: Measure = {
+        ...documented, id: fixture.id, revenueDelta: fixture.revenueDelta,
+        expenseDelta: fixture.expenseDelta, referenceOrigin: 'neon',
+        apuEntries: fixture.entries.map(([side, categoryId, amount]) => ({ side, categoryId, amount })),
+      };
+      const entries = projectMeasure(measure);
+      expect(entries.map(e => [e.side, e.categoryId, e.amount])).toEqual(fixture.entries.map(e => [...e]));
+      // Le moteur doit employer les écritures Neon et non les anciennes règles.
+      const previous = measures.findIndex(m => m.id === fixture.id);
+      const original = previous >= 0 ? measures[previous] : undefined;
+      if (previous >= 0) measures[previous] = measure;
+      else measures.push(measure);
+      try {
+        const actual = calculateScenario([fixture.id]);
+        expect(actual.balanceDelta).toBeCloseTo(fixture.revenueDelta - fixture.expenseDelta, 2);
+        expect(actual.deficit).toBeCloseTo(baseline.deficit - actual.balanceDelta, 2);
+      } finally {
+        if (previous >= 0 && original) measures[previous] = original;
+        else measures.splice(measures.findIndex(m => m.id === fixture.id), 1);
+      }
+    }
+  });
+
 });
