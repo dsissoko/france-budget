@@ -22,6 +22,12 @@ describe('Moteur à deux modes : agrégats sourcés ou référence + deltas',()=
   expect(result.entries).toHaveLength(2);
   expect(aggregateMode(party)).toBe(true);
  });
+ it('restitue un budget global avec deux masses seulement, sans troisième chiffre',()=>{
+  const {balanceDeltaBn:_,...twoNumbers}=claim;
+  const result=calculatePublishedBudget({...party,scenario:{...party.scenario,claimedTotals:twoNumbers}},reference);
+  expect(result.balanceDelta).toBeCloseTo(24.7,2);
+  expect(result.entries).toHaveLength(2);
+ });
  it('emploie la référence INSEE et les mesures actives sans agrégats globaux',()=>{
   const result=calculatePublishedBudget({...party,scenario:{picked:['item'],budget:{revenues:{},expenses:{}}}},reference);
   expect(result.balanceDelta).toBe(-5);
