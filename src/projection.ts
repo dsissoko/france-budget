@@ -118,7 +118,7 @@ export function calculateScenario(
     } catch (err) {
       // Un budget documenté doit être cohérent en entier : jamais de solde
       // partiel si une écriture APU a été corrompue ou mal renseignée.
-      if (measure.apuEntries !== undefined) throw err;
+      if (measure.apuEntries !== undefined || measure.referenceOrigin === 'neon') throw err;
       warnings.push(String(err));
     }
   }
