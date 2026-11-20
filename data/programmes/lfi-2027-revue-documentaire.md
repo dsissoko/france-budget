@@ -34,8 +34,8 @@ Source : [document officiel LFI 2027](https://melenchon2027.fr/wp-content/upload
 ## Qualification et publication
 
 - **Extraction des montants primaires et arithmétique : effectuées** (28 lignes dans le CSV).
-- **APU calculable : non validé** pour ces nouvelles lignes. Chaque montant nécessite une correspondance explicite avec les catégories 2025, le périmètre consolidé, l'année, les recouvrements et une décision argumentée.
-- **Production : inchangée** pour les calculs ; le scénario public LFI 2026 conserve ses deux mesures historiques, séparées du dossier documentaire 2027.
+- **APU : 6 mesures à effet direct qualifiées** par les catégories de la référence 2025 (CVAE, emplois enseignants, places universitaires, budget hospitalier, retraites, chômage), pour un sous-ensemble de **+3 Md€ de recettes et +19 Md€ de dépenses revendiquées**. La ventilation est comptable et pédagogique, **pas une validation indépendante des effets économiques**. Les 22 autres lignes restent non activées : 13 candidates, 8 à ventiler et 1 au millésime incertain. Chaque montant non activé nécessite une correspondance explicite, une vérification d'année et de recouvrement.
+- **Déploiement de calcul** : migration préparée dans `db/migrations/20261120_lfi_2027_activate_direct_apu.sql`, validée sur une branche Neon de recette. Elle substitue les **six mesures 2027** aux deux mesures 2026 sélectionnées, **sans supprimer les deux historiques** ; aucun mélange des années. Le solde du sous-ensemble calculé est **-16 Md€**, ce qui **n'est pas le solde revendiqué du contre-budget 2027** (+24,7 Md€).
 - Pour activer des mesures 2027, préparer des liens `source_accounting_links` et `proposal_accounting_measures`, puis des écritures `measure_accounting_entries` dûment validées. La seule existence d'un montant sourcé ne garantit pas qu'il soit incrémental par rapport aux comptes APU 2025.
 
 Références : [issue #72](https://github.com/dsissoko/france-budget/issues/72) et [chantier #59](https://github.com/dsissoko/france-budget/issues/59).
