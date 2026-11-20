@@ -23,7 +23,7 @@ const reg=csv('data/programmes/registre-programmes.csv').filter(r=>r.actor_type=
 const latest=new Map();
 for(const r of reg)if(!latest.has(r.party_code)||Number(latest.get(r.party_code).year)<Number(r.year))latest.set(r.party_code,r);
 const plans=[...latest.values()].map(r=>{
- const themes=csv(r.themes_csv),measures=csv(r.mesures_csv),aggregates=csv(r.agregats_csv),sources=csv(r.sources_csv);
+ const themes=csv(r.themes_csv).filter(t=>t.status!=='historical_unsourced'),measures=csv(r.mesures_csv),aggregates=csv(r.agregats_csv),sources=csv(r.sources_csv);
  const a=aggregates.find(x=>x.revenues_bn!==''&&x.expenses_bn!=='');
  if(a&&(!Number.isFinite(Number(a.revenues_bn))||!Number.isFinite(Number(a.expenses_bn))||
  Math.abs(Number(a.revenues_bn)-Number(a.expenses_bn)-Number(a.balance_delta_bn))>0.011||
@@ -43,7 +43,7 @@ const column=await query("SELECT count(*)::int AS n FROM information_schema.colu
 if(column[0].n!==1)throw Error('budget_mode migration missing');
 for(const p of plans){
  const r=p.r,party=r.party_code,year=Number(r.year);
- if(!p.a&&!p.themes.length)continue; // no fabricated budgets
+ if(!p.a&&!p.themes.length)continue; // no fabricated budgets or unsourced themes
  await query("INSERT INTO political_parties(code,name) VALUES ($1,$2) ON CONFLICT(code) DO NOTHING",[party,r.name]);
  const claim=p.a?{year,basis:p.a.basis,revenuesBn:Number(p.a.revenues_bn),expensesBn:Number(p.a.expenses_bn),
   balanceDeltaBn:Number(p.a.balance_delta_bn),sourceUrl:p.a.source_url,
