@@ -1,0 +1,15 @@
+source_row,party_code,source_year,group_id,direction,existing_title,claimed_amount_bn,primary_source_path,primary_source_page,document_heading,review_status,apu_decision
+1,EQX,2027,retraites,expense_decrease,"Rééquilibrer les hautes pensions",25.0,data/programmes/Equinoxe-Contre-budget-2027.pdf,41,"Retraites",primary_summary_matched_detail_pending,not_assigned
+2,EQX,2027,retraites,revenue_increase,"Fiscalité des pensions (abattement et CSG)",5.9,data/programmes/Equinoxe-Contre-budget-2027.pdf,41,"Renouer le pacte intergénérationnel",primary_summary_matched_detail_pending,not_assigned
+3,EQX,2027,etat,expense_decrease,"État et collectivités exemplaires",14.0,data/programmes/Equinoxe-Contre-budget-2027.pdf,41,"Dépenses de l’État et des collectivités",primary_summary_matched_detail_pending,not_assigned
+4,EQX,2027,etat,expense_decrease,"Charge de la dette",0.8,data/programmes/Equinoxe-Contre-budget-2027.pdf,41,"Charge de la dette",primary_summary_matched_detail_pending,not_assigned
+5,EQX,2027,sante,expense_decrease,"Économies sur les dépenses de santé",6.0,data/programmes/Equinoxe-Contre-budget-2027.pdf,41,"Une protection sociale juste et efficace (santé)",primary_summary_matched_detail_pending,not_assigned
+6,EQX,2027,sante,expense_decrease,"Économies de protection sociale",0.6,data/programmes/Equinoxe-Contre-budget-2027.pdf,41,"Une protection sociale juste et efficace (protection sociale)",primary_summary_matched_detail_pending,not_assigned
+7,EQX,2027,sante,expense_increase,"Mieux soigner, protéger et enseigner",7.0,data/programmes/Equinoxe-Contre-budget-2027.pdf,41,"Mieux soigner, protéger et enseigner",primary_summary_matched_detail_pending,not_assigned
+8,EQX,2027,entreprises,revenue_increase,"Contribution des grandes entreprises",15.0,data/programmes/Equinoxe-Contre-budget-2027.pdf,41,"Mettre les grandes entreprises à contribution",primary_summary_matched_detail_pending,not_assigned
+9,EQX,2027,patrimoine,revenue_increase,"Contribution des ménages aisés",31.8,data/programmes/Equinoxe-Contre-budget-2027.pdf,41,"Un effort juste, surtout pour les plus aisés",primary_summary_matched_detail_pending,not_assigned
+10,EQX,2027,ecotaxes,revenue_increase,"Fiscalité pollueur-payeur",6.3,data/programmes/Equinoxe-Contre-budget-2027.pdf,41,"Pollueur, payeur",primary_summary_matched_detail_pending,not_assigned
+11,EQX,2027,climat,expense_increase,"Transition écologique",5.8,data/programmes/Equinoxe-Contre-budget-2027.pdf,41,"La transition écologique, maintenant",primary_summary_matched_detail_pending,not_assigned
+12,EQX,2027,climat,expense_increase,"Adaptation aux canicules",9.5,data/programmes/Equinoxe-Contre-budget-2027.pdf,41,"Grand plan d’adaptation face aux canicules",primary_summary_matched_detail_pending,not_assigned
+13,EQX,2027,industrie,expense_increase,"Réindustrialisation",2.7,data/programmes/Equinoxe-Contre-budget-2027.pdf,41,"Réindustrialiser pour reprendre la main",primary_summary_matched_detail_pending,not_assigned
+14,EQX,2027,industrie,expense_increase,"Pouvoir d'achat",7.0,data/programmes/Equinoxe-Contre-budget-2027.pdf,41,"Rendre du pouvoir d’achat",primary_summary_matched_detail_pending,not_assigned
