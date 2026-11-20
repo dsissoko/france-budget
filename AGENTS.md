@@ -129,3 +129,10 @@ Metricool ne doit pas être présenté comme capable de parcourir l'ensemble des
 - Utiliser **Release Please** dans un workflow GitHub Actions dédié pour préparer les PR de release, le changelog et les tags. **Les jalons GitHub ne pilotent pas nativement Release Please** : encadrer explicitement les changements de version mineure afin de ne publier la version cible qu'à la validation du jalon correspondant.
 - La PR de release reste soumise à revue et fusion manuelles ; **fusionner une PR de release ne vaut pas autorisation de déployer en production**. Vérifier séparément les déclencheurs réels de CI/CD et de Vercel.
 - Conserver l'historique Git antérieur sans réécriture. Initialiser la première release `v1.1.0` à la validation de M1 ; ne pas créer cette version tant que le jalon n'est pas validé.
+
+### Consignes opérationnelles pour les agents
+
+- Avant chaque commit, choisir un type Conventional Commits correspondant **à la nature réelle du changement** (`feat:`, `fix:`, `docs:`, `refactor:`, `test:`, `chore:`). Ne jamais employer artificiellement `feat:` pour forcer une version mineure.
+- Donner également aux PR un titre conforme à Conventional Commits. En cas de *squash merge*, vérifier que le titre du commit final respecte cette convention : c'est ce commit que Release Please analysera sur `main`.
+- Ne pas modifier manuellement les numéros de version, créer de tag Git, fusionner une PR de release ou déclencher une publication sans validation explicite. Les montées de version mineure restent conditionnées à la validation du jalon correspondant.
+- Le contrôle automatique des titres de PR relève de la CI GitHub Actions ; ces instructions seules ne constituent pas un contrôle technique.
