@@ -7,26 +7,30 @@ export default async function handler(req:any,res:any){
    sql`SELECT id,side,label,amount::float8 AS amount,canonical,description FROM reference_categories WHERE reference_year=2025 ORDER BY side,sort_order`,
    sql`SELECT COALESCE(m.legacy_id,m.id::text) AS id,b.party_code AS party,m.theme,m.title,m.revenue_delta::float8 AS "revenueDelta",m.expense_delta::float8 AS "expenseDelta",(SELECT COALESCE(jsonb_agg(jsonb_build_object('side',e.side,'categoryId',e.category_id,'amount',e.amount::float8) ORDER BY e.line_number),'[]'::jsonb) FROM measure_accounting_entries e WHERE e.measure_id=m.id) AS "apuEntries",m.source,m.reference_year AS year,m.status,m.description,
    CASE WHEN m.legacy_id IS NOT NULL THEN true ELSE
+      -- Validation granulaire : seule la mesure et ses lignes SOURCES doivent
+      -- être validées. Les autres lignes du groupe peuvent rester en revue.
+      -- Un groupe entier ne doit pas bloquer une mesure déjà qualifiée.
       EXISTS (
         SELECT 1 FROM proposal_accounting_measures pam
-        JOIN party_proposals pp ON (pp.party_code,pp.source_year,pp.group_id)=(pam.party_code,pam.source_year,pam.group_id)
-        JOIN source_accounting_links sal ON sal.measure_id=pam.measure_id
-        JOIN party_source_lines sl ON (sl.party_code,sl.source_year,sl.source_row)=(sal.party_code,sal.source_year,sal.source_row)
-        WHERE pam.measure_id=m.id AND pp.review_status='validated'
-          AND sl.validation_status='validated' AND sl.apu_decision='calculate'
+        JOIN source_accounting_links sal
+          ON sal.measure_id=pam.measure_id
+         AND (sal.party_code,sal.source_year,sal.group_id)=(pam.party_code,pam.source_year,pam.group_id)
+        JOIN party_source_lines sl
+          ON (sl.party_code,sl.source_year,sl.group_id,sl.source_row)
+           =(sal.party_code,sal.source_year,sal.group_id,sal.source_row)
+        WHERE pam.measure_id=m.id
+          AND pam.budget_id=m.budget_id
+          AND pam.party_code=b.party_code
+          AND pam.source_year=m.reference_year
+          AND sl.validation_status='validated'
+          AND sl.apu_decision='calculate'
           AND NOT EXISTS (
-            SELECT 1 FROM party_source_lines pending
-            WHERE (pending.party_code,pending.source_year,pending.group_id)=(pam.party_code,pam.source_year,pam.group_id)
-              AND (pending.validation_status<>'validated' OR pending.apu_decision IS NULL)
-          )
-          AND NOT EXISTS (
-            SELECT 1 FROM party_source_lines calc
-            WHERE (calc.party_code,calc.source_year,calc.group_id)=(pam.party_code,pam.source_year,pam.group_id)
-              AND calc.apu_decision='calculate'
-              AND NOT EXISTS (
-                SELECT 1 FROM source_accounting_links linked
-                WHERE (linked.party_code,linked.source_year,linked.source_row)=(calc.party_code,calc.source_year,calc.source_row)
-              )
+            SELECT 1 FROM source_accounting_links other
+            JOIN party_source_lines other_source
+              ON (other_source.party_code,other_source.source_year,other_source.group_id,other_source.source_row)
+               =(other.party_code,other.source_year,other.group_id,other.source_row)
+            WHERE other.measure_id=pam.measure_id
+              AND (other_source.validation_status<>'validated' OR other_source.apu_decision<>'calculate')
           )
       ) END AS "sourceValidated"
    FROM measures m JOIN budgets b ON b.id=m.budget_id WHERE b.origin='party' AND b.visibility='public' AND b.party_code IS NOT NULL AND m.status='publié' ORDER BY b.featured_order NULLS LAST,b.party_code,m.created_at,m.legacy_id`,
