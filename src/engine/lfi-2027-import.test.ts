@@ -8,8 +8,10 @@ import type { Measure } from '../model';
 // Les entrées candidates sont un TEST de capacité du moteur, jamais un scénario public.
 const csv = (filename: string) => {
   const text = readFileSync(new URL('../../data/programmes/' + filename, import.meta.url), 'utf8').trim();
-  const lines = text.split(/\r?\n/).map(line => [...line.matchAll(/"((?:[^"]|"")*)"(?:,|$)/g)].map(m => m[1].replace(/""/g, '"')));
-  const headers = lines.shift()!;
+  const [header, ...data] = text.split(/\r?\n/);
+  // Compatible avec les en-têtes CSV simples ou entourés de guillemets.
+  const headers = header.split(',').map(h => h.replace(/^"|"$/g, ''));
+  const lines = data.map(line => [...line.matchAll(/"((?:[^"]|"")*)"(?:,|$)/g)].map(m => m[1].replace(/""/g, '"')));
   return lines.map(columns => Object.fromEntries(headers.map((h, i) => [h, columns[i]])));
 };
 const source = csv('lfi-2027-mesures-primaires.csv');
