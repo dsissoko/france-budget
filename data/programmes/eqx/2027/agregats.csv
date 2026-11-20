@@ -1,0 +1,2 @@
+aggregate_id,party_code,year,basis,revenues_bn,expenses_bn,balance_delta_bn,source_url,source_section,scope,notes
+"eqx2027","EQX","2027","delta","59","-14.4","73.4","https://parti-equinoxe.fr/contre-budget-2027/","Les chiffres clés; tableau de synthèse","Variations directes recettes et dépenses du contre-budget 2027 vs PLF","+59 recettes -46.4 économies +32 nouvelles dépenses = +73.4; bilan politique +78 inclut +6.1 effet activité et -1.5 correction technique (écart +4.6 à afficher distinctement)."
