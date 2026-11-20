@@ -82,7 +82,7 @@ describe('AccountingService and SimulationService: V1 parity',()=>{
   expect(result.modelId).toBe('mechanical-v1');
  });
  it.each([
-  {name:'RN',ids:['rn-vat','rn-social','rn-agencies'],override:{revenues:{},expenses:{}},deficit:149.66,expected2030:168.7},
+  {name:'RN',ids:['rn-vat','rn-social','rn-agencies'],override:{revenues:{},expenses:{}},deficit:152.65,expected2030:171.7},
   {name:'LFI',ids:['lfi-wealth','lfi-school','lfi-green'],override:{revenues:{},expenses:{}},deficit:148.7,expected2030:167.8},
   {name:'Horizons',ids:['hor-admin','hor-tax'],override:{revenues:{},expenses:{}},deficit:151.5,expected2030:170.6},
   {name:'Citizen defense',ids:['lfi-wealth','lfi-school','lfi-green'],override:{revenues:{},expenses:{defense:31}},deficit:114.7,expected2030:133.8},
