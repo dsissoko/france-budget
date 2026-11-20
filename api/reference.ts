@@ -3,7 +3,7 @@ export default async function handler(req:any,res:any){
  if(!method(req,'GET',res))return;
  try{
   const sql=db();
-  const [categories,measures,offBudget,parties]=await Promise.all([
+  const [categories,measures,offBudget,parties,parameters]=await Promise.all([
    sql`SELECT id,side,label,amount::float8 AS amount,canonical,description FROM reference_categories WHERE reference_year=2025 ORDER BY side,sort_order`,
    sql`SELECT COALESCE(m.legacy_id,m.id::text) AS id,b.party_code AS party,m.theme,m.title,m.revenue_delta::float8 AS "revenueDelta",m.expense_delta::float8 AS "expenseDelta",(SELECT COALESCE(jsonb_agg(jsonb_build_object('side',e.side,'categoryId',e.category_id,'amount',e.amount::float8) ORDER BY e.line_number),'[]'::jsonb) FROM measure_accounting_entries e WHERE e.measure_id=m.id) AS "apuEntries",m.source,m.reference_year AS year,m.status,m.description,
    CASE WHEN m.legacy_id IS NOT NULL THEN true ELSE
@@ -31,8 +31,13 @@ export default async function handler(req:any,res:any){
       ) END AS "sourceValidated"
    FROM measures m JOIN budgets b ON b.id=m.budget_id WHERE b.origin='party' AND b.visibility='public' AND b.party_code IS NOT NULL AND m.status='publié' ORDER BY b.featured_order NULLS LAST,b.party_code,m.created_at,m.legacy_id`,
    sql`SELECT id,label,amount::float8 AS amount,canonical,description,revenue_impact_category AS "revenueImpactCategory" FROM reference_off_budget ORDER BY sort_order`,
-   sql`SELECT DISTINCT b.party_code AS code,p.name AS name FROM budgets b JOIN political_parties p ON p.code=b.party_code WHERE b.origin='party' AND b.visibility='public' AND b.party_code IS NOT NULL ORDER BY name,code`
+   sql`SELECT DISTINCT b.party_code AS code,p.name AS name FROM budgets b JOIN political_parties p ON p.code=b.party_code WHERE b.origin='party' AND b.visibility='public' AND b.party_code IS NOT NULL ORDER BY name,code`,
+   sql`SELECT rv.id AS version,rv.reference_year AS "referenceYear",mp.parameter_key AS key,mp.numeric_value::float8 AS value FROM reference_versions rv JOIN model_parameters mp ON mp.reference_version_id=rv.id WHERE rv.status='active' AND rv.reference_year=2025 AND mp.model_id='mechanical-v1' ORDER BY rv.published_at DESC,rv.id DESC`
   ]);
+  const version=parameters[0]?.version;
+  const paramRows=parameters.filter((p:any)=>p.version===version);
+  const params=Object.fromEntries(paramRows.map((p:any)=>[p.key,p.value]));
+  if(!version||new Set(paramRows.map((p:any)=>p.key)).size!==4||!['baselineRatePerIndex','budgetYear','applicationYear','horizonYear'].every(k=>Number.isFinite(params[k]))||params.baselineRatePerIndex<0||params.baselineRatePerIndex>1||![params.budgetYear,params.applicationYear,params.horizonYear].every(Number.isInteger)||params.horizonYear<2025||params.horizonYear>2100||params.applicationYear>params.horizonYear)throw new Error('Paramètres de simulation Neon invalides');
   const categoryKeys=new Set(categories.map((c:any)=>c.side+':'+c.id));
   // Cohérence tout-ou-rien : une ventilation APU incohérente ne doit pas
   // générer un déficit partiel ou présenter une mesure comme validée.
@@ -48,6 +53,6 @@ export default async function handler(req:any,res:any){
      throw new Error('Incohérence APU mesure '+m.id);
   }
   res.setHeader('Cache-Control','public, max-age=60, stale-while-revalidate=300');
-  return reply(res,200,{referenceYear:2025,revenues:categories.filter((x:any)=>x.side==='revenues').map(({side,...x}:any)=>x),expenses:categories.filter((x:any)=>x.side==='expenses').map(({side,...x}:any)=>x),offBudget,measures:measures.map(({sourceValidated,...m}:any)=>({...m,referenceOrigin:'neon'})),parties});
+  return reply(res,200,{referenceYear:2025,referenceVersion:version,simulation:{referenceYear:2025,...params},revenues:categories.filter((x:any)=>x.side==='revenues').map(({side,...x}:any)=>x),expenses:categories.filter((x:any)=>x.side==='expenses').map(({side,...x}:any)=>x),offBudget,measures:measures.map(({sourceValidated,...m}:any)=>({...m,referenceOrigin:'neon'})),parties});
  }catch(error){console.error('GET /api/reference failed',error);return reply(res,503,{error:'Référentiel temporairement indisponible'})}
 }
