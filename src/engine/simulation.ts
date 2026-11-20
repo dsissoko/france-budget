@@ -1,4 +1,4 @@
-import {assessmentService,type Assessment} from './assessment';
+import {assessmentService,type Assessment,type AssessmentThresholds} from './assessment';
 import {impactService,type ImpactService} from './impact';
 
 // One shared calendar for every annual projection. All rates remain V1 mechanical assumptions.
@@ -16,7 +16,7 @@ export const V1_ASSUMPTIONS={
  baselineRatePerIndex:0.025,
  ...PROJECTION_CALENDAR,
 } as const;
-export type SimulationParameters={referenceYear:number;budgetYear:number;applicationYear:number;horizonYear:number;baselineRatePerIndex:number};
+export type SimulationParameters={referenceYear:number;budgetYear:number;applicationYear:number;horizonYear:number;baselineRatePerIndex:number;assessment?:AssessmentThresholds};
 export const yearsFor=(p:SimulationParameters)=>Array.from({length:p.horizonYear-p.referenceYear+1},(_,i)=>p.referenceYear+i);
 export interface ProjectionYear {year:number;reference:number;scenario:number}
 export interface ProjectionResult {
@@ -46,7 +46,7 @@ export function createSimulationService(impacts:ImpactService=impactService):Sim
     modelId:'mechanical-v1',assumptions:parameters,rows,
     assessment:assessmentService.assess(
       rows.map(({year,scenario})=>({year,deficit:scenario})),
-      parameters.applicationYear,
+      parameters.applicationYear,parameters.assessment,
     ),
     warnings:[
       'Simulation mécanique indicative, non prédictive : prolongation de la référence de '+(parameters.baselineRatePerIndex*100)+' % de sa valeur initiale par année.',
