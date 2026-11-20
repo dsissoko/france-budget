@@ -32,7 +32,7 @@ export default async function handler(req: any, res: any) {
     typeof b.description!=='string'||b.description.length>500||
     b.referenceYear!==2025||typeof b.scenario?.author!=='string'||b.scenario.author.trim().length<2||b.scenario.author.length>60||!Array.isArray(b.measures)||b.measures.length>100||
     !b.scenario||typeof b.scenario!=='object'||Array.isArray(b.scenario)||
-    !b.scenario.budget||!Array.isArray(b.scenario.picked)||b.scenario.picked.length>30)
+    !b.scenario.budget||(b.scenario.referenceFingerprint!==undefined&&(typeof b.scenario.referenceFingerprint!=='string'||!/^[a-f0-9]{64}$/.test(b.scenario.referenceFingerprint)))||!Array.isArray(b.scenario.picked)||b.scenario.picked.length>30)
     return reply(res,400,{error:'Budget invalide'});
   if(!b.measures.every((m:any)=>m&&typeof m.title==='string'&&m.title.length>0&&m.title.length<=160&&
     typeof m.description==='string'&&m.description.length<=2000&&
