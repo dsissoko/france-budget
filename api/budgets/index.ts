@@ -9,6 +9,12 @@ export default async function handler(req: any, res: any) {
        (SELECT COALESCE(jsonb_agg(jsonb_build_object(
           'id',p.group_id,'title',p.title,'year',p.source_year,
           'sourceCount',p.source_measure_count,'reviewStatus',p.review_status,
+          'sourceLines',(SELECT COALESCE(jsonb_agg(jsonb_build_object(
+             'id',l.source_row,'title',l.title,'direction',l.direction,
+             'claimedAmountBn',l.claimed_amount_bn,'sourceUrl',l.source_url,
+             'validationStatus',l.validation_status,'apuDecision',l.apu_decision
+           ) ORDER BY l.source_row),'[]'::jsonb)
+           FROM party_source_lines l WHERE (l.party_code,l.source_year,l.group_id)=(p.party_code,p.source_year,p.group_id)),
           'sourceUrl',(SELECT MIN(l.source_url) FROM party_source_lines l
                        WHERE (l.party_code,l.source_year,l.group_id)=(p.party_code,p.source_year,p.group_id))
         ) ORDER BY p.source_year DESC,p.group_id),'[]'::jsonb)
