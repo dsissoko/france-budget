@@ -33,11 +33,14 @@ export default async function handler(req:any,res:any){
    sql`SELECT id,label,amount::float8 AS amount,canonical,description,revenue_impact_category AS "revenueImpactCategory" FROM reference_off_budget ORDER BY sort_order`,
    sql`SELECT DISTINCT b.party_code AS code,p.name AS name FROM budgets b JOIN political_parties p ON p.code=b.party_code WHERE b.origin='party' AND b.visibility='public' AND b.party_code IS NOT NULL ORDER BY name,code`
   ]);
+  const categoryKeys=new Set(categories.map((c:any)=>c.side+':'+c.id));
   // Cohérence tout-ou-rien : une ventilation APU incohérente ne doit pas
   // générer un déficit partiel ou présenter une mesure comme validée.
   for(const m of measures){
    if(!m.sourceValidated)throw new Error('Mesure non validée documentairement : '+m.id);
    const entries=m.apuEntries as Array<{side:string;categoryId:string;amount:number}>;
+   if(entries.some(e=>!['revenues','expenses'].includes(e.side)||!categoryKeys.has(e.side+':'+e.categoryId)||!Number.isFinite(e.amount)))
+     throw new Error('Catégorie ou montant APU invalide : '+m.id);
    const revenueDelta=entries.filter(e=>e.side==='revenues').reduce((s,e)=>s+e.amount,0);
    const expenseDelta=entries.filter(e=>e.side==='expenses').reduce((s,e)=>s+e.amount,0);
    if(!entries.length || Math.abs(revenueDelta-m.revenueDelta)>0.001 ||
