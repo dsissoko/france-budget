@@ -9,8 +9,8 @@ export const PROJECTION_CALENDAR={
  horizonYear:2032,
 } as const;
 export const projectionYears=Array.from(
- {length:PROJECTION_CALENDAR.horizonYear-parameters.referenceYear+1},
- (_,i)=>parameters.referenceYear+i,
+ {length:PROJECTION_CALENDAR.horizonYear-PROJECTION_CALENDAR.referenceYear+1},
+ (_,i)=>PROJECTION_CALENDAR.referenceYear+i,
 );
 export const V1_ASSUMPTIONS={
  baselineRatePerIndex:0.025,
