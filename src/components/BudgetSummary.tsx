@@ -1,7 +1,6 @@
 import {useState} from 'react';
 import {Share2} from 'lucide-react';
 import {currency} from '../data';
-import {budgetMaturity,type BudgetMaturity} from '../budget-maturity';
 import {publishedBudgetUrl} from '../share';
 import './BudgetSummary.css';
 
@@ -13,16 +12,14 @@ type BudgetSummaryProps = {
   deficit: number;
   referenceDeficit: number;
   shareBudget?: {id: string; title: string};
-  maturityBudget?: BudgetMaturity;
 };
 
 export const formatSummaryAmount = (value:number) => new Intl.NumberFormat('fr-FR',{maximumFractionDigits:1}).format(value);
 const percent = (value: number) => value.toLocaleString('fr-FR', {maximumFractionDigits: 1});
 const closeToZero = (value: number) => Math.abs(value) < 0.05;
 
-export default function BudgetSummary({title,side,revenues,expenses,deficit,referenceDeficit,shareBudget,maturityBudget}:BudgetSummaryProps) {
+export default function BudgetSummary({title,side,revenues,expenses,deficit,referenceDeficit,shareBudget}:BudgetSummaryProps) {
   const [shareFeedback,setShareFeedback]=useState('');
-  const maturity=maturityBudget?budgetMaturity(maturityBudget):null;
   const share=async()=>{
     if(!shareBudget)return;
     setShareFeedback('');
@@ -57,7 +54,6 @@ export default function BudgetSummary({title,side,revenues,expenses,deficit,refe
       <h3>{side&&<span className="budget-summary__side">{side.toUpperCase()}</span>}{title}</h3>
       <div className="budget-summary__heading-actions"><span className="budget-summary__period">2025 · Md€</span>{shareBudget&&<button type="button" className="budget-summary__share" aria-label={'Partager '+shareBudget.title} onClick={()=>void share()}><Share2 size={13}/> Partager</button>}</div>
     </div>
-    {maturity&&<div className="budget-summary__maturity"><span className={"budget-maturity budget-maturity--"+maturity.tone} title={maturity.description}>{maturity.label}</span><span className="budget-summary__maturity-note">Maturité des données du parti</span></div>}
     <div className="budget-summary__figures">
       <div><span>Recettes</span><strong className="green-text">{formatSummaryAmount(revenues)}</strong></div>
       <div><span>Dépenses</span><strong>{formatSummaryAmount(expenses)}</strong></div>
