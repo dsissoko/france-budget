@@ -1,4 +1,5 @@
-import { expenses, revenues, offBudget, measures, type Category, type Measure } from './data';
+import { expenses, revenues, offBudget, measures } from './data';
+import type {Category,Measure} from './model';
 
 /**
  * Les règles traduisent des mesures politiques en lignes budgétaires.
@@ -45,7 +46,10 @@ const round = (n: number) => Math.round(n * 100) / 100;
 const sum = (values: Record<string, number>) => Object.values(values).reduce((a, b) => a + b, 0);
 const baseline = (items: Category[]) => Object.fromEntries(items.map(c => [c.id, c.amount]));
 export type ReferenceModel = { revenues: ReadonlyArray<Category>; expenses: ReadonlyArray<Category>; offBudget: ReadonlyArray<Category>; measures: ReadonlyArray<Measure> }; 
-const legacyReference = (): ReferenceModel => ({ revenues, expenses, offBudget, measures });
+const legacyReference = (): ReferenceModel => {
+ if (typeof window !== 'undefined') throw new Error('Référentiel Neon obligatoire dans le navigateur');
+ return {revenues,expenses,offBudget,measures};
+};
 const categoryExists = (side: Side, id: string, reference: ReferenceModel) => (side === 'revenues' ? reference.revenues : side==='expenses'?reference.expenses:reference.offBudget).some(c => c.id === id);
 
 /** 
