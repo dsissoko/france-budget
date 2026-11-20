@@ -110,11 +110,36 @@ political_parties.code
         └── party_source_lines (party_code, source_year, source_row)
 ```
 
-**Raccordement encore manquant :** rattacher les mesures comptables validées aux lignes sources et aux groupes par des clés stables et des contraintes d'unicité. Ne pas supposer que ce lien existe déjà dans le schéma ; aucun groupe préparatoire ne doit être compté automatiquement.
+**Raccordement structurel réalisé** par les deux tables de liaison décrites ci-dessous, avec FK composites et unicité. Les données de liaison et les décisions APU sont encore vides : aucune activation des groupes préparatoires.
 
 Migration reproductible : [`db/migrations/20261120_party_proposals_relational.sql`](../db/migrations/20261120_party_proposals_relational.sql).
 
 Modèle de contribution synchronisé : [PR programme politique](../.github/PULL_REQUEST_TEMPLATE/political-programme.md) et [issue de soumission](../.github/ISSUE_TEMPLATE/political-programme.yml). Ils exigent désormais identifiants stables, validation APU, contrôle des doublons et mise à jour du schéma.
+
+## Traçabilité des impacts APU (créée, non activée)
+
+Deux tables de liaison complètent désormais la chaîne de provenance, **sans dupliquer les montants** :
+
+```text
+political_parties (code)
+    ├── budgets (id, party_code) ── measures (id, budget_id)
+    │                                     └── measure_accounting_entries (measure_id, line_number)
+    └── party_proposals (party_code, source_year, group_id)
+           └── party_source_lines (party_code, source_year, group_id, source_row)
+                          │
+              source_accounting_links (une ligne source -> une mesure)
+                          │
+              proposal_accounting_measures (une mesure -> un groupe, un budget et un parti)
+```
+
+- `proposal_accounting_measures` : `measure_id UUID` PK, `budget_id`, `party_code`, `source_year`, `group_id`. FK composites vers la mesure et son budget, le budget et son parti, ainsi que le groupe documentaire. Une mesure ne peut appartenir qu'à **un** groupe.
+- `source_accounting_links` : PK `(party_code,source_year,source_row)`, `group_id`, `measure_id`. FK composite vers la ligne source et vers la mesure liée au **même** groupe ; une ligne source ne peut alimenter qu'une seule mesure, y compris après changement de titre. Index de lecture `idx_source_accounting_links_measure(measure_id)`.
+- `party_source_lines.apu_decision` : optionnelle, valeurs `calculate` ou `non_chiffrable_apu`. Si `non_chiffrable_apu`, `apu_reason` doit expliquer le motif. Le champ hérité `apu_manual_tag` est une annotation libre, **pas** une décision de validation.
+- **État effectif** : 0 liens et 0 décisions APU dans ces nouvelles structures. Les 232 lignes et 25 groupes ne sont pas automatiquement calculables. Les cinq mesures RN/LFI historiques continuent à être servies par le contrat de compatibilité.
+- **Porte de publication pour les nouvelles mesures** (`legacy_id IS NULL`) : `GET /api/reference` utilise `m.id::text` comme identifiant stable, exige un groupe `validated`, une ligne source `calculate` et `validated` liée à la mesure, et **toutes les lignes du groupe** explicitement revues ; toutes les lignes calculables doivent être liées. Il vérifie aussi que les montants des écritures équilibrent les deltas des mesures. En cas d'incohérence, l'API échoue plutôt que de renvoyer un résultat partiel.
+- Le fait qu'une ligne soit rattachée ne certifie pas son effet économique. La revue documentaire, la décision APU et la revue des doubles comptes restent des étapes humaines distinctes.
+
+Migrations : [`20261120_party_source_accounting_links.sql`](../db/migrations/20261120_party_source_accounting_links.sql) et [`20261120_party_source_apu_decisions.sql`](../db/migrations/20261120_party_source_apu_decisions.sql).
 
 ## Tables opérationnelles
 
@@ -194,7 +219,7 @@ Mesures ponctuelles `EXPLAIN (ANALYZE,BUFFERS)` : lectures de budgets/mesures pu
 
 ## Points restant à traiter dans le modèle
 
-- **Partiellement réalisé** : \`party_proposals\` et \`party_source_lines\` ont maintenant des FK réelles. Il reste à lier explicitement les écritures comptables actives aux lignes sources des propositions validées.
+- **Structure réalisée** : les FK composites relient désormais les lignes sources, propositions, mesures et budgets, indirectement jusqu'aux écritures APU. **Population non réalisée** : aucune mesure de groupe préparatoire n'a encore été validée et reliée ; les 5 mesures historiques restent compatibles.
 - Éliminer la double représentation transitoire `measures.apu_entries` et `measure_accounting_entries` après recette, en conservant **uniquement la table normalisée**.
 - Refuser explicitement les mesures politiques actives sans écritures validées, et vérifier qu'une source documentaire ne contribue qu'à un seul calcul.
 - Remplacer les reliquats de règles V1 et fixtures codées en dur ; garder les mêmes modèles, calculs et 25 catégories pour les citoyens et les partis.
