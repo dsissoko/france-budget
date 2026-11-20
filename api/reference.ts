@@ -37,7 +37,7 @@ export default async function handler(req:any,res:any){
   const version=parameters[0]?.version;
   const paramRows=parameters.filter((p:any)=>p.version===version);
   const params=Object.fromEntries(paramRows.map((p:any)=>[p.key,p.value]));
-  if(!version||new Set(paramRows.map((p:any)=>p.key)).size!==4||!['baselineRatePerIndex','budgetYear','applicationYear','horizonYear'].every(k=>Number.isFinite(params[k]))||params.baselineRatePerIndex<0||params.baselineRatePerIndex>1||![params.budgetYear,params.applicationYear,params.horizonYear].every(Number.isInteger)||params.horizonYear<2025||params.horizonYear>2100||params.applicationYear>params.horizonYear)throw new Error('Paramètres de simulation Neon invalides');
+  if(!version||new Set(paramRows.map((p:any)=>p.key)).size!==7||!['baselineRatePerIndex','budgetYear','applicationYear','horizonYear','balanceThreshold','changeThreshold','momentumThreshold'].every(k=>Number.isFinite(params[k]))||params.baselineRatePerIndex<0||params.baselineRatePerIndex>1||![params.budgetYear,params.applicationYear,params.horizonYear].every(Number.isInteger)||params.horizonYear<2025||params.horizonYear>2100||params.applicationYear>params.horizonYear||[params.balanceThreshold,params.changeThreshold,params.momentumThreshold].some((v:number)=>v<0))throw new Error('Paramètres de simulation Neon invalides');
   const categoryKeys=new Set(categories.map((c:any)=>c.side+':'+c.id));
   // Cohérence tout-ou-rien : une ventilation APU incohérente ne doit pas
   // générer un déficit partiel ou présenter une mesure comme validée.
@@ -53,6 +53,6 @@ export default async function handler(req:any,res:any){
      throw new Error('Incohérence APU mesure '+m.id);
   }
   res.setHeader('Cache-Control','public, max-age=60, stale-while-revalidate=300');
-  return reply(res,200,{referenceYear:2025,referenceVersion:version,simulation:{referenceYear:2025,...params},revenues:categories.filter((x:any)=>x.side==='revenues').map(({side,...x}:any)=>x),expenses:categories.filter((x:any)=>x.side==='expenses').map(({side,...x}:any)=>x),offBudget,measures:measures.map(({sourceValidated,...m}:any)=>({...m,referenceOrigin:'neon'})),parties});
+  return reply(res,200,{referenceYear:2025,referenceVersion:version,simulation:{referenceYear:2025,...params,assessment:{balanceThreshold:params.balanceThreshold,changeThreshold:params.changeThreshold,momentumThreshold:params.momentumThreshold}},revenues:categories.filter((x:any)=>x.side==='revenues').map(({side,...x}:any)=>x),expenses:categories.filter((x:any)=>x.side==='expenses').map(({side,...x}:any)=>x),offBudget,measures:measures.map(({sourceValidated,...m}:any)=>({...m,referenceOrigin:'neon'})),parties});
  }catch(error){console.error('GET /api/reference failed',error);return reply(res,503,{error:'Référentiel temporairement indisponible'})}
 }
