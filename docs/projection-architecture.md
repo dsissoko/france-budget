@@ -112,7 +112,7 @@ Les seuils numériques de tolérance sont documentés et testés. La **direction
 
 ## Non-objectifs de cette itération
 
-Pas de nouvelle hypothèse économique, de dette/PIB, de taux, de rétroaction, de modèle macro, de recalcul de la trajectoire historique, ni de migration Neon. Pas de refonte des autres composants. Le README reste fonctionnel/métier ; les détails d'architecture et hypothèses demeurent dans `docs/`.
+Pas de nouvelle hypothèse économique, de dette/PIB, de taux, de rétroaction ou de modèle macro. **Depuis la rédaction initiale de ce document, la migration Neon des écritures APU a bien été réalisée** ; les détails sont dans [schema.md](schema.md). Pas de refonte des autres composants. Le README reste fonctionnel/métier ; les détails d'architecture et hypothèses demeurent dans `docs/`.
 
 ## Validation
 
@@ -120,3 +120,9 @@ Pas de nouvelle hypothèse économique, de dette/PIB, de taux, de rétroaction, 
 2. Tests de table pour toutes les qualifications, cas frontière et seuils.
 3. Vérification du même composant sur Comprendre, Comparer, Mon budget et Voter, desktop et mobile.
 4. `npm run check`, `npm test`, `npm run build`, puis preview Vercel et non-régression fonctionnelle avant fusion.
+
+## Évolution de l'alimentation comptable — novembre 2026
+
+Le principe V1 du moteur n'a pas changé. `AccountingService` délègue toujours à `calculateScenario`, mais ce dernier accepte facultativement des écritures `sourcedEntries`. Les mesures politiques actives peuvent être ventilées depuis `measure_accounting_entries` dans Neon, via `GET /api/reference` et `apuEntries` ; les règles `rules` historiques sont conservées seulement comme repli. Une écriture documentaire mal formée bloque le calcul plutôt que d'être ignorée silencieusement.
+
+Le regroupement éditorial RN/LFI/Équinoxe est préparé dans des tables `_draft` non consommées par le parcours public ; `documented-budget.ts` fournit l'adaptateur facultatif mais ne signifie pas publication. Le périmètre APU et les **25 catégories** (dont les deux catégories « Autres ») restent inchangés. Document de référence : [schema.md](schema.md).
