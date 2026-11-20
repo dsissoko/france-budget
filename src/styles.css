@@ -174,3 +174,9 @@
 .vote-card-badges{display:flex;flex-wrap:wrap;align-items:center;gap:7px;margin:-9px 0 14px;min-height:24px}
 .vote-card-badges .deficit-trajectory__badge,.vote-card-badges .budget-maturity{max-width:100%;white-space:normal;overflow-wrap:anywhere}
 @media(max-width:650px){.vote-card-badges{gap:6px}.vote-card-badges .budget-maturity{max-width:none}}
+
+/* Navigation principale : quatre onglets sur une seule ligne, desktop et mobile. */
+.tabs{width:100%;max-width:none;grid-template-columns:repeat(4,minmax(0,1fr));overflow-x:visible}
+.tabs button{min-width:0;white-space:nowrap}
+@media(max-width:650px){.tabs{gap:2px;padding:4px}.tabs button{gap:4px;padding:10px 2px;font-size:clamp(10px,2.7vw,12px)}.tabs button svg{width:14px;height:14px;flex-shrink:0}}
+@media(max-width:360px){.tabs button{gap:3px;font-size:10px}.tabs button svg{width:12px;height:12px}}
