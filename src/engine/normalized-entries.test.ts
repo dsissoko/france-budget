@@ -84,6 +84,16 @@ describe('Contrat des écritures APU normalisées', () => {
     expect(() => projectMeasure({ ...fromNeon, apuEntries: [] })).toThrow('Affectation APU absente');
   });
 
+  it('refuse un scénario entier lorsque la mesure Neon n’a aucune écriture', () => {
+    const invalid: Measure = { ...documented, id: 'fixture-neon-without-entries', referenceOrigin: 'neon', apuEntries: undefined };
+    measures.push(invalid);
+    try {
+      expect(() => calculateScenario([invalid.id])).toThrow('Affectation APU Neon absente');
+    } finally {
+      measures.splice(measures.findIndex(m => m.id === invalid.id), 1);
+    }
+  });
+
   it('reproduit les six écritures APU Neon des cinq mesures RN/LFI historiques', () => {
     // Snapshot contrôlé sur une branche Neon isolée le 20/11/2026.
     const fixtures = [
