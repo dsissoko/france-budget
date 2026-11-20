@@ -238,6 +238,30 @@ Mesures ponctuelles `EXPLAIN (ANALYZE,BUFFERS)` : lectures de budgets/mesures pu
 6. CI : [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) — `npm run check`, `npm test`, `npm run build` à chaque push sur `main` et chaque PR. Vérifier le résultat de la **dernière** exécution avant bascule.
 7. Après validation de production et test de restauration : nettoyer les snapshots temporaires, pas les inventaires sources. Les historiques contenant empreintes ou votes ne doivent **jamais** être exportés publiquement sur GitHub.
 
+
+## Publication documentaire contrôlée — 20 novembre 2026
+
+**État vérifié dans Neon après déploiement Vercel READY du commit `218e8bf`** :
+
+| Formation | Visibilité | Maturité | Groupes documentaires affichés | Propositions chiffrées actives |
+| --- | --- | --- | ---: | ---: |
+| RN 2026 | Publique | En préparation | 9 | 3 |
+| LFI 2026 | Publique | En préparation | 8 | 2 |
+| Équinoxe 2027 | Publique | En préparation | 8 | 0 |
+| Horizons | Masquée | En préparation | 0 | 0 public |
+
+Deux budgets citoyens restent publics et inchangés.
+
+- `GET /api/budgets` expose désormais `documentaryProposals` depuis `party_proposals` avec les libellés, millésimes, compte de sources et URL officielle provenant de `party_source_lines`. **Le catalogue n'est pas injecté dans le moteur comptable**.
+- Équinoxe a été créé par [`db/migrations/20261120_publish_equinoxe_documentary.sql`](../db/migrations/20261120_publish_equinoxe_documentary.sql), **d'abord masqué** ; puis rendu public seulement après disponibilité du déploiement compatible. `scenario.documentaryOnly=true`, `picked=[]`, et aucun montant de scénario n'a été inventé.
+- Dans **Voter**, les fiches documentaires présentent les groupes et sources, sans synthèse du déficit ni courbe financière. Les tris par équilibre les placent après les budgets chiffrables.
+- Dans **Comparer** et comme point de départ de **Mon budget**, les scénarios exclusivement documentaires sont exclus afin de ne jamais simuler leur déficit sur la simple référence INSEE.
+- Pour RN/LFI, la fiche présente séparément les lignes déjà calculées et les groupes documentaires non revus ; une ligne source n'est jamais additionnée deux fois.
+- Les statuts `review_pending` des **25 groupes** et les **232 lignes** ne sont pas promus en « validés » par leur seule publication documentaire. Un badge `En préparation` n'est pas une confirmation officielle.
+
+**Important :** cette publication rend visibles les données documentaires déjà structurées ; elle ne transforme pas des inventaires provisoires en programmes complets ni en prévisions économiques.
+
+
 ## Points restant à traiter dans le modèle
 
 - **Structure réalisée** : les FK composites relient désormais les lignes sources, propositions, mesures et budgets, indirectement jusqu'aux écritures APU. **Population non réalisée** : aucune mesure de groupe préparatoire n'a encore été validée et reliée ; les 5 mesures historiques restent compatibles.
