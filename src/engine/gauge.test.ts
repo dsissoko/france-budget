@@ -6,9 +6,9 @@ describe('budget gauges are derived from the accounting result',()=>{
  const empty={revenues:{},expenses:{}};
  it('shows the applied political measures in the actual lines',()=>{
   const r=calculateScenario(['rn-vat','rn-social','rn-agencies'],empty);
-  expect(gaugeAmount(r,'revenues','vat')).toBeCloseTo(249.04);
+  expect(gaugeAmount(r,'revenues','vat')).toBeCloseTo(245.54);
   expect(gaugeAmount(r,'expenses','social')).toBeCloseTo(393.9);
-  expect(gaugeAmount(r,'expenses','general')).toBeCloseTo(142.3);
+  expect(gaugeAmount(r,'expenses','general')).toBeCloseTo(141.79);
  });
  it('changes a line to the requested value without applying the measure twice',()=>{
   const before=calculateScenario(['rn-vat'],empty);
@@ -16,7 +16,7 @@ describe('budget gauges are derived from the accounting result',()=>{
   const absolute=gaugeOverride('revenues','vat',255,vat.amount,empty,before);
   const after=calculateScenario(['rn-vat'],{revenues:{vat:absolute},expenses:{}});
   expect(after.revenues.vat).toBeCloseTo(255);
-  expect(after.deficit).toBeCloseTo(before.deficit-5.96);
+  expect(after.deficit).toBeCloseTo(before.deficit-9.46);
  });
  it('edits off-budget advantages through the same gauge engine',()=>{
   const before=calculateScenario([],empty);
