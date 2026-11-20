@@ -98,8 +98,8 @@ describe('projection de contre-budgets',()=>{
    const base=calculateScenario([]);
    const scenario=calculateScenario(['rn-vat','rn-agencies']);
    expect(scenario.entries).toHaveLength(2);
-   expect(scenario.balanceDelta).toBeCloseTo(-14.46+8.213,8);
-   expect(scenario.deficit).toBeCloseTo(base.deficit+6.247,8);
+   expect(scenario.balanceDelta).toBeCloseTo(-6.25,8); // Moteur V1 arrondit le solde à 0,01 Md€
+   expect(scenario.deficit).toBeCloseTo(base.deficit+6.25,8);
  });
  it('conserve le solde de la référence quand aucune mesure n’est activée',()=>{
   const base=calculateScenario([]);
