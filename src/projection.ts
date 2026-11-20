@@ -77,6 +77,8 @@ export function projectMeasure(measure: Measure): Entry[] {
       throw new Error('Écritures APU et montant revendiqué incohérents : '+measure.id);
     return entries;
   }
+  // Une mesure chargée depuis Neon ne peut jamais revenir aux règles historiques locales.
+  if (measure.referenceOrigin === 'neon') throw new Error('Affectation APU Neon absente : ' + measure.id);
   const rule = rules[measure.id];
   if (!rule) throw new Error('Règle absente pour ' + measure.id);
   if (rule.kind === 'specific') return specific(measure);
