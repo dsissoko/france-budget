@@ -51,7 +51,7 @@ export default function BudgetSummary({title,side,revenues,expenses,deficit,refe
       : 'Déficit augmenté de '+currency(Math.abs(improvement))+' vs référence';
   return <article className={'budget-summary budget-summary--'+(side||'personal')} aria-label={'Synthèse du budget '+title}>
     <div className="budget-summary__heading">
-      <h3>{side&&<span className="budget-summary__side">{side.toUpperCase()}</span>}{title}</h3>
+      <h3>{title}</h3>
       <div className="budget-summary__heading-actions"><span className="budget-summary__period">2025 · Md€</span>{shareBudget&&<button type="button" className="budget-summary__share" aria-label={'Partager '+shareBudget.title} onClick={()=>void share()}><Share2 size={13}/> Partager</button>}</div>
     </div>
     <div className="budget-summary__figures">
