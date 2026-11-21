@@ -31,3 +31,17 @@
 .budget-summary__share:focus-visible{outline:2px solid #239a84;outline-offset:2px}
 .budget-summary__share-feedback{margin:6px 0 0;font-size:11px;color:#396f60}
 @media(max-width:370px){.budget-summary__heading-actions{width:100%;justify-content:space-between}}
+
+/* Comparison: each budget retains a full-width summary with its own collapsed detail. */
+.compare-summary-pair{display:grid;grid-template-columns:minmax(0,1fr);gap:16px}
+.compare-budget-group{min-width:0;display:flex;flex-direction:column}
+.compare-budget-detail{border:1px solid #e9e8e4;border-top:0;border-radius:0 0 15px 15px;background:#fff;min-width:0}
+.compare-budget-group>.budget-summary{border-radius:15px 15px 0 0}
+.compare-budget-detail>summary{display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer;list-style:none;padding:13px 18px;font-size:13px;font-weight:650;color:#343b38}
+.compare-budget-detail>summary::-webkit-details-marker{display:none}
+.compare-budget-detail>summary svg{flex:none;transition:transform .15s ease}
+.compare-budget-detail[open]>summary svg{transform:rotate(180deg)}
+.compare-budget-detail>summary:focus-visible{outline:2px solid #238e7b;outline-offset:-3px;border-radius:8px}
+.compare-budget-detail-content{padding:4px 14px 14px;min-width:0}
+.compare-budget-detail-content>.card{margin-top:12px}
+.compare-budget-detail-content .compare-group{min-width:0}
