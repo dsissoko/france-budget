@@ -82,6 +82,12 @@ describe('Issue #94 — reprise citoyenne d’un budget AGGREGATE',()=>{
   expect(citizen.balanceDelta).toBeCloseTo(19.7,2);
   expect(citizen.entries).toHaveLength(3);
  });
+ it('ne rejoue pas les mesures politiques déjà comprises dans les agrégats',()=>{
+  const citizen=calculateAggregateCitizenBudget(claim,['item'],{revenues:{},expenses:{}},reference,['item']);
+  expect(citizen.expenseTotal).toBeCloseTo(211.7,2);
+  expect(citizen.balanceDelta).toBeCloseTo(24.7,2);
+  expect(citizen.entries).toHaveLength(2);
+ });
  it('combine les nouvelles mesures et les réglages citoyens sur les agrégats',()=>{
   const citizen=calculateAggregateCitizenBudget(claim,['item'],{revenues:{business:110},expenses:{}},reference);
   expect(citizen.revenueTotal).toBeCloseTo(216.4,2);
