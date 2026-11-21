@@ -51,6 +51,57 @@ export default async function handler(req: any, res: any) {
     categories.get(m.kind+':'+m.categoryCode)===m.referenceAmount&&
     m.deltaAmount>=-m.referenceAmount&&m.deltaAmount<=m.referenceAmount))
     return reply(res,400,{error:'Mesures invalides'});
+  // Une proposition citoyenne décrit une ou plusieurs affectations du pivot ;
+  // aucun poste ne peut être revendiqué deux fois dans le même budget.
+  const rawProposals=b.scenario.citizenMeasures??[];
+  if(!Array.isArray(rawProposals)||rawProposals.length>100)
+    return reply(res,400,{error:'Propositions invalides'});
+  const baseByPost=new Map<string,number>([
+    ...refs.map((x:any):[string,number]=>[x.side+':'+x.id,Number(x.amount)]),
+    ...offBudget.map((x:any):[string,number]=>['offBudget:'+x.id,Number(x.amount)])
+  ]);
+  const assigned=new Set<string>();
+  const expectedEntries=new Map<string,number>();
+  for(const p of rawProposals){
+    if(!p||typeof p.id!=='string'||!p.id||p.id.length>120||
+       typeof p.title!=='string'||!p.title.trim()||p.title.length>160||
+       typeof p.description!=='string'||!p.description.trim()||p.description.length>2000)
+      return reply(res,400,{error:'Description de proposition invalide'});
+    const impacts=Array.isArray(p.impacts)?p.impacts:
+      (p.kind&&p.categoryId&&Number.isFinite(p.delta)?[{kind:p.kind,categoryId:p.categoryId,delta:p.delta}]:[]);
+    if(!impacts.length||impacts.length>100)
+      return reply(res,400,{error:'Impacts de proposition manquants'});
+    for(const i of impacts){
+      const key=i.kind+':'+i.categoryId;
+      const reference=baseByPost.get(key);
+      if(reference===undefined||assigned.has(key)||typeof i.categoryId!=='string'||
+         !Number.isFinite(i.delta)||Math.abs(i.delta)<0.000001||
+         i.delta < -reference || i.delta > reference)
+        return reply(res,400,{error:'Poste invalide ou déjà affecté à une autre proposition'});
+      assigned.add(key);
+      const value=b.scenario.budget?.[i.kind]?.[i.categoryId]??reference;
+      if(!Number.isFinite(value)||Math.abs(value-(reference+i.delta))>0.0011)
+        return reply(res,400,{error:'Valeur budgétaire incohérente avec la proposition'});
+      const measureKey=(i.kind==='expenses'?'expense:':'revenue:')+i.categoryId;
+      expectedEntries.set(measureKey,i.kind==='offBudget'?-i.delta:i.delta);
+    }
+  }
+  // Pour un nouveau budget citoyen de référence, aucune jauge modifiée
+  // ne peut subsister hors d'une proposition.
+  if(!b.scenario.aggregateOrigin&&!b.scenario.picked.length){
+    for(const side of ['revenues','expenses','offBudget'] as const)
+      for(const [id,value] of Object.entries(b.scenario.budget?.[side]??{})){
+        const reference=baseByPost.get(side+':'+id);
+        if(reference===undefined||typeof value!=='number'||!Number.isFinite(value)||
+           (Math.abs(value-reference)>0.0011&&!assigned.has(side+':'+id)))
+          return reply(res,400,{error:'Une modification du budget n’est liée à aucune proposition'});
+      }
+    if(b.measures.length!==assigned.size||
+       !b.measures.every((m:any)=>{
+         const key=m.kind+':'+m.categoryCode;
+         return expectedEntries.has(key)&&Math.abs(Number(m.deltaAmount)-expectedEntries.get(key)!)<0.0011;
+       }))return reply(res,400,{error:'Les mesures comptables ne correspondent pas aux propositions'});
+  }
   const expected=categories;
   if(!b.scenario.budget.revenues||!b.scenario.budget.expenses||
     !['revenues','expenses','offBudget'].every(kind=>Object.entries(b.scenario.budget[kind]??{}).every(([id,value])=>{

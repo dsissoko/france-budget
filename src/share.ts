@@ -1,10 +1,11 @@
+import {normalizeCitizenMeasures} from './citizen-proposals';
 export const publishedBudgetUrl = (id: string, origin: string) =>
   origin.replace(/\/$/, '') + '/b/' + encodeURIComponent(id);
 
 type ComparableScenario = {
   budget: { revenues: Record<string, number>; expenses: Record<string, number> };
   picked: string[];
-  citizenMeasures?: Array<{ id: string; title: string; description: string; kind: string; categoryId: string; delta: number }>;
+  citizenMeasures?: unknown;
 };
 
 // Compare effective values, not JSON key order (Neon JSONB may reorder object properties).
@@ -19,7 +20,7 @@ export function samePublishedScenario(
   if (!revenueDefaults.every(c => (current.budget.revenues[c.id] ?? c.amount) === (published.budget.revenues[c.id] ?? c.amount)) ||
       !expenseDefaults.every(c => (current.budget.expenses[c.id] ?? c.amount) === (published.budget.expenses[c.id] ?? c.amount))) return false;
   const normalized = (items: ComparableScenario['citizenMeasures']) =>
-    (items || []).map(m => [m.id, m.title, m.description, m.kind, m.categoryId, m.delta].join('\u001f')).sort();
+    normalizeCitizenMeasures(items).map(m => [m.id, m.title, m.description, ...m.impacts.map(i=>[i.kind,i.categoryId,i.delta].join(':')).sort()].join('\u001f')).sort();
   return JSON.stringify(normalized(current.citizenMeasures)) === JSON.stringify(normalized(published.citizenMeasures));
 }
 
