@@ -78,10 +78,12 @@ export function calculateAggregateCitizenBudget(
   newMeasureIds:string[],
   citizen:Override,
   reference:ReferenceModel,
+  alreadyIncludedIds:ReadonlyArray<string>=[],
 ):Result {
   const base=calculatePublishedBudget({origin:'party',scenario:{picked:[],claimedTotals:claim}},reference);
   const initial=calculateScenario([],{revenues:{},expenses:{}},[],reference);
-  const additions=calculateScenario(newMeasureIds,citizen,[],reference);
+  const included=new Set(alreadyIncludedIds);
+  const additions=calculateScenario(newMeasureIds.filter(id=>!included.has(id)),citizen,[],reference);
   const merge=(baseValues:Record<string,number>,added:Record<string,number>,original:Record<string,number>)=>
     Object.fromEntries(Object.entries(baseValues).map(([id,value])=>[id,value+(added[id]??0)-(original[id]??0)]));
   const revenues=merge(base.revenues,additions.revenues,initial.revenues);
