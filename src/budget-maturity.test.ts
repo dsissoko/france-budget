@@ -1,30 +1,21 @@
 import {describe,expect,it} from 'vitest';
 import {budgetMaturity,maturityStatuses} from './budget-maturity';
 
-describe('maturité générique des budgets, affichage initial réservé aux partis',()=>{
- it('définit exactement quatre statuts métier stables',()=>{
-  expect(maturityStatuses).toEqual(['en_preparation','complet','a_confirmer','confirme']);
+describe('maturité conditionnelle, sans discrimination par origine',()=>{
+ it('conserve les quatre statuts métier',()=>expect(maturityStatuses).toEqual(['en_preparation','complet','a_confirmer','confirme']));
+ it('ne crée aucun statut en absence de valeur ou valeur inconnue',()=>{
+  expect(budgetMaturity({origin:'citizen'})).toBeNull();
+  expect(budgetMaturity({origin:'party',maturity_status:null})).toBeNull();
+  expect(budgetMaturity({origin:'party',maturity_status:'unexpected'})).toBeNull();
  });
- it('ne montre aucun badge de maturité aux citoyens',()=>{
-  expect(budgetMaturity({origin:'citizen',maturity_status:'a_confirmer'})).toBeNull();
- });
- it('affiche les états des partis, avec À confirmer en vert',()=>{
-  expect(budgetMaturity({origin:'party',maturity_status:'en_preparation'})?.label).toBe('En préparation');
+ it('affiche le statut présent indépendamment de l’origine',()=>{
+  expect(budgetMaturity({origin:'citizen',maturity_status:'a_confirmer'})?.label).toBe('À confirmer');
   expect(budgetMaturity({origin:'party',maturity_status:'complet'})?.label).toBe('Complet');
-  const ready=budgetMaturity({origin:'party',maturity_status:'a_confirmer'});
-  expect(ready?.label).toBe('À confirmer');
-  expect(ready?.tone).toBe('ready');
+  expect(budgetMaturity({origin:'party',maturity_status:'en_preparation'})?.label).toBe('En préparation');
  });
- it('n’attribue jamais une confirmation sans organisation, date et preuve HTTPS',()=>{
-  expect(budgetMaturity({origin:'party',maturity_status:'confirme'})?.label).not.toBe('Confirmé');
-  expect(budgetMaturity({origin:'party',maturity_status:'confirme',
-   confirmation_organization:'Parti exemple',confirmed_at:'2026-11-20T09:00:00Z',
-   confirmation_evidence_url:'http://example.org/confirmation'})?.label).not.toBe('Confirmé');
-  expect(budgetMaturity({origin:'party',maturity_status:'confirme',
-   confirmation_organization:'Parti exemple',confirmed_at:'2026-11-20T09:00:00Z',
-   confirmation_evidence_url:'https://example.org/confirmation'})?.label).toBe('Confirmé');
- });
- it('n’interprète pas un statut inconnu comme une confirmation',()=>{
-  expect(budgetMaturity({origin:'party',maturity_status:'unexpected'})?.status).toBe('en_preparation');
+ it('ne présente pas Confirmé sans preuve valide',()=>{
+  expect(budgetMaturity({origin:'party',maturity_status:'confirme'})).toBeNull();
+  expect(budgetMaturity({origin:'party',maturity_status:'confirme',confirmation_organization:'Parti exemple',confirmed_at:'2026-11-20T09:00:00Z',confirmation_evidence_url:'http://example.org'})).toBeNull();
+  expect(budgetMaturity({origin:'party',maturity_status:'confirme',confirmation_organization:'Parti exemple',confirmed_at:'2026-11-20T09:00:00Z',confirmation_evidence_url:'https://example.org'})?.label).toBe('Confirmé');
  });
 });

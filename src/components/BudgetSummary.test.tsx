@@ -9,8 +9,9 @@ describe('Synthèse budget : unités et maturité',()=>{
   expect(formatSummaryAmount(166.7)).toBe('166,7');
   expect(formatSummaryAmount(0)).toBe('0');
  });
- it('montre le badge de maturité pour un parti seulement',()=>{
+ it('montre le badge de maturité lorsqu’un statut explicite existe',()=>{
   expect(budgetMaturity({origin:'party',maturity_status:'en_preparation'})?.label).toBe('En préparation');
-  expect(budgetMaturity({origin:'citizen',maturity_status:'en_preparation'})).toBeNull();
+  expect(budgetMaturity({origin:'citizen',maturity_status:'en_preparation'})?.label).toBe('En préparation');
+  expect(budgetMaturity({origin:'citizen',maturity_status:null})).toBeNull();
  });
 });
