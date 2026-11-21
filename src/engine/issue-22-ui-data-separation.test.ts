@@ -13,6 +13,6 @@ describe('Issue #22 — aucune valeur comptable officielle figée dans la prése
  it('publie l’année Neon et n’utilise pas un millésime fixe',()=>{
   expect(app).toContain('referenceYear:simulationParams!.referenceYear');
   expect(app).toContain('yearsFor(simulationParams)');
-  expect(app).toContain('voteBudgetImpact(b.result.deficit,b.result.balanceDelta');
+  expect(app).toContain('voteQualification(BASE,b.result.balanceDelta,years,simulationParams??undefined)');
  });
 });
