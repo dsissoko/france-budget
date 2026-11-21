@@ -57,6 +57,22 @@ export default async function handler(req: any, res: any) {
       const base=expected.get((kind==='expenses'?'expense:':'revenue:')+id);
       return base!==undefined&&typeof value==='number'&&Number.isFinite(value)&&value>=0&&value<=base*2;
     })))return reply(res,400,{error:'Montants invalides'});
+  // La reprise d'agrégats politiques doit être vérifiée côté serveur :
+  // jamais de montants arbitraires injectés dans un budget citoyen.
+  if(b.scenario.aggregateOrigin!=null){
+    const sourceId=b.scenario.aggregateSourceId;
+    if(typeof sourceId!=='string'||!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(sourceId)||
+      !Array.isArray(b.scenario.aggregateIncludedIds)||
+      !b.scenario.aggregateIncludedIds.every((id:any)=>typeof id==='string'))
+      return reply(res,400,{error:'Référence du budget politique manquante ou invalide'});
+    const check=await sql`SELECT EXISTS(
+      SELECT 1 FROM budgets
+      WHERE id=${sourceId}::uuid AND origin='party' AND visibility='public'
+        AND scenario->'claimedTotals'=${JSON.stringify(b.scenario.aggregateOrigin)}::jsonb
+        AND coalesce(scenario->'picked','[]'::jsonb)=${JSON.stringify(b.scenario.aggregateIncludedIds)}::jsonb
+    ) AS valid`;
+    if(!check[0]?.valid)return reply(res,400,{error:'Agrégats politiques non vérifiés'});
+  }
   const canonical=JSON.stringify(b.scenario);
   if(canonical.length>25000)return reply(res,413,{error:'Budget trop volumineux'});
   const ip=String(req.headers['x-forwarded-for']||'').split(',')[0].trim();

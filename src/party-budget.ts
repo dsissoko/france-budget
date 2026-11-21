@@ -66,3 +66,36 @@ export function calculatePublishedBudget(b:PartyBudgetInput,reference:ReferenceM
 }
 
 export const aggregateMode=(b:PartyBudgetInput)=>b.origin==='party'&&Number.isFinite(b.scenario.claimedTotals?.revenuesBn)&&Number.isFinite(b.scenario.claimedTotals?.expensesBn);
+
+
+/**
+ * Reprise citoyenne d'un AGGREGATE : les montants revendiqués forment la base.
+ * Les mesures originelles du parti sont déjà comprises dans cette base et ne
+ * sont donc jamais rejouées. Seuls les ajouts citoyens sont des deltas.
+ */
+export function calculateAggregateCitizenBudget(
+  claim:PublishedAggregate,
+  newMeasureIds:string[],
+  citizen:Override,
+  reference:ReferenceModel,
+  alreadyIncludedIds:ReadonlyArray<string>=[],
+):Result {
+  const base=calculatePublishedBudget({origin:'party',scenario:{picked:[],claimedTotals:claim}},reference);
+  const initial=calculateScenario([],{revenues:{},expenses:{}},[],reference);
+  const included=new Set(alreadyIncludedIds);
+  const additions=calculateScenario(newMeasureIds.filter(id=>!included.has(id)),citizen,[],reference);
+  const merge=(baseValues:Record<string,number>,added:Record<string,number>,original:Record<string,number>)=>
+    Object.fromEntries(Object.entries(baseValues).map(([id,value])=>[id,value+(added[id]??0)-(original[id]??0)]));
+  const revenues=merge(base.revenues,additions.revenues,initial.revenues);
+  const expenses=merge(base.expenses,additions.expenses,initial.expenses);
+  const offBudget=merge(base.offBudget,additions.offBudget,initial.offBudget);
+  const revenueTotal=Math.round(Object.values(revenues).reduce((a,b)=>a+b,0)*100)/100;
+  const expenseTotal=Math.round(Object.values(expenses).reduce((a,b)=>a+b,0)*100)/100;
+  return {
+    revenues,expenses,offBudget,revenueTotal,expenseTotal,
+    deficit:Math.round((expenseTotal-revenueTotal)*100)/100,
+    balanceDelta:Math.round((initial.deficit-(expenseTotal-revenueTotal))*100)/100,
+    entries:[...base.entries,...additions.entries],
+    warnings:[...base.warnings,...additions.warnings],
+  };
+}

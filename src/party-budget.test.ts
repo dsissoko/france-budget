@@ -1,5 +1,5 @@
 import {describe,it,expect} from 'vitest';
-import {calculatePublishedBudget,aggregateMode} from './party-budget';
+import {calculatePublishedBudget,calculateAggregateCitizenBudget,aggregateMode} from './party-budget';
 import type {ReferenceModel} from './projection-core';
 
 const reference:ReferenceModel={
@@ -60,5 +60,38 @@ describe('Moteur à deux modes : agrégats sourcés ou référence + deltas',()=
  it('n’emploie pas des agrégats politiques pour un budget citoyen',()=>{
   const b={...party,origin:'citizen' as const};
   expect(calculatePublishedBudget(b,reference).balanceDelta).toBe(-5);
+ });
+});
+
+
+describe('Issue #94 — reprise citoyenne d’un budget AGGREGATE',()=>{
+ it('conserve les masses du parti même sans mesure détaillée',()=>{
+  const baseline=calculatePublishedBudget(party,reference);
+  const citizen=calculateAggregateCitizenBudget(claim,[],{revenues:{},expenses:{}},reference);
+  expect(citizen.revenueTotal).toBe(baseline.revenueTotal);
+  expect(citizen.expenseTotal).toBe(baseline.expenseTotal);
+  expect(citizen.balanceDelta).toBe(baseline.balanceDelta);
+  expect(citizen.entries).toHaveLength(2);
+ });
+ it('ajoute seulement les mesures nouvelles sans réadditionner les mesures du parti',()=>{
+  // La mesure "item" existe déjà dans le budget politique initial ; le
+  // citoyen ne la sélectionne pas de nouveau à la reprise.
+  const citizen=calculateAggregateCitizenBudget(claim,['item'],{revenues:{},expenses:{}},reference);
+  expect(citizen.revenueTotal).toBeCloseTo(206.4,2);
+  expect(citizen.expenseTotal).toBeCloseTo(216.7,2);
+  expect(citizen.balanceDelta).toBeCloseTo(19.7,2);
+  expect(citizen.entries).toHaveLength(3);
+ });
+ it('ne rejoue pas les mesures politiques déjà comprises dans les agrégats',()=>{
+  const citizen=calculateAggregateCitizenBudget(claim,['item'],{revenues:{},expenses:{}},reference,['item']);
+  expect(citizen.expenseTotal).toBeCloseTo(211.7,2);
+  expect(citizen.balanceDelta).toBeCloseTo(24.7,2);
+  expect(citizen.entries).toHaveLength(2);
+ });
+ it('combine les nouvelles mesures et les réglages citoyens sur les agrégats',()=>{
+  const citizen=calculateAggregateCitizenBudget(claim,['item'],{revenues:{business:110},expenses:{}},reference);
+  expect(citizen.revenueTotal).toBeCloseTo(216.4,2);
+  expect(citizen.expenseTotal).toBeCloseTo(216.7,2);
+  expect(citizen.balanceDelta).toBeCloseTo(29.7,2);
  });
 });
