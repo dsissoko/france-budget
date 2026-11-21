@@ -24,6 +24,17 @@ describe('2032 public budget verdict',()=>{
       expect(projectionVerdict(mk(reference,trajectory))).toMatchObject({label:'Redressement',tone:'positive'});
     }
   });
+  it('calls NoPasaran-like balance in 2032 redressement despite rising after 2027',()=>{
+    const trajectory=[100,105,-19,-15,-11,-7,-3,0];
+    expect(projectionVerdict(mk(reference,trajectory))).toMatchObject({label:'Redressement',tone:'positive'});
+  });
+  it('calls a surplus at the 2032 horizon redressement despite rising from a deeper surplus',()=>{
+    expect(projectionVerdict(mk(reference,[100,105,-30,-26,-22,-18,-14,-10]))).toMatchObject({label:'Redressement',tone:'positive'});
+  });
+  it('keeps degradation when a near-zero balance is worse than the reference',()=>{
+    const betterReference=[-40,-35,-30,-25,-20,-15,-10,-5];
+    expect(projectionVerdict(mk(betterReference,[100,105,-25,-20,-15,-10,-5,0]))).toMatchObject({label:'Dégradation',tone:'negative'});
+  });
   it('marks worse 2032 deficit as degradation even while declining',()=>{
     expect(projectionVerdict(mk(reference,[100,105,155,151,147,143,139,136]))).toMatchObject({label:'Dégradation',tone:'negative'});
   });
