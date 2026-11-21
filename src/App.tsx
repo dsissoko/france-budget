@@ -1,6 +1,6 @@
 import './compact-measures.css';
 import {useEffect,useMemo,useState} from 'react';
-import {Landmark,ChevronDown,Info,RefreshCcw,SlidersHorizontal,ArrowRight,ArrowLeft,ExternalLink,BookOpen,Scale,Wallet,ChartNoAxesCombined,Check,Download,X,Heart,UserRound,CalendarDays,ListChecks,Trash2} from 'lucide-react';
+import {Landmark,ChevronDown,RefreshCcw,SlidersHorizontal,ArrowRight,ArrowLeft,ExternalLink,BookOpen,Scale,Wallet,ChartNoAxesCombined,Check,Download,X,Heart,UserRound,CalendarDays,ListChecks,Trash2} from 'lucide-react';
 import {sum,currency,type Category,type Party,type Measure} from './model';
 import {auditMeasure as auditMeasureWithReference,auditSelected as auditSelectedWithReference,calculateScenario as calculateWithReference,type ReferenceModel} from './projection-core';
 import {simulationService,yearsFor,type SimulationParameters} from './engine/simulation';
@@ -13,6 +13,7 @@ import DeficitTrajectory from './components/DeficitTrajectory';
 import {availablePost,migrateLegacyOverrides,normalizeCitizenMeasures,updateImpact,validExclusiveProposals,type CitizenImpact,type CitizenMeasure,type BudgetSide} from './citizen-proposals';
 
 import BudgetSummary from './components/BudgetSummary';
+import InfoHint from './components/InfoHint';
 import {readBudgetLink,samePublishedScenario} from './share';
 type Tab='comprendre'|'comparer'|'budget'|'voter';
 type Custom={revenues:Record<string,number>;expenses:Record<string,number>;offBudget?:Record<string,number>};
@@ -26,7 +27,6 @@ const loadSaved=():SavedScenario[]=>{try{const v=JSON.parse(localStorage.getItem
 const defaults:Custom={revenues:{},expenses:{},offBudget:{}};
 const load=():Custom=>{try{const parsed=JSON.parse(localStorage.getItem('france-budget-v1')||'{}');return {...defaults,...parsed,revenues:parsed.revenues??{},expenses:parsed.expenses??{},offBudget:parsed.offBudget??{}}}catch{return defaults}};
 const numeric=(n:number)=>Math.round(n*10)/10;
-function InfoHint({item}:{item:Category}){return <span className="info-hint" tabIndex={0} role="note" aria-label={item.label+' : '+item.description} title={item.description}><Info size={13}/><span className="info-tooltip">{item.description}<small>Référentiel : {item.canonical}</small></span></span>}
 function ImpactTags({revenueDelta=0,expenseDelta=0}:{revenueDelta?:number;expenseDelta?:number}){return <span className="measure-impact-tags">{revenueDelta!==0&&<em className="impact-tag revenue">Recettes · {revenueDelta>0?'Hausse':'Baisse'} de {currency(Math.abs(revenueDelta))}</em>}{expenseDelta!==0&&<em className="impact-tag expense">Dépenses · {expenseDelta>0?'Hausse':'Baisse'} de {currency(Math.abs(expenseDelta))}</em>}{revenueDelta===0&&expenseDelta===0&&<em className="impact-tag">Impact non chiffré</em>}</span>}
 function MaturityTag({budget}:{budget:BudgetMaturity}){const maturity=budgetMaturity(budget);return maturity?<span className={'budget-maturity budget-maturity--'+maturity.tone} title={maturity.description} aria-label={'Maturité des données : '+maturity.label+'. '+maturity.description}>{maturity.label}</span>:null}
 function Pill({children}:{children:React.ReactNode}){return <span className="pill">{children}</span>}
