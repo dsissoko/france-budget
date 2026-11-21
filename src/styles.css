@@ -3,8 +3,13 @@
 /* Les jauges de lecture deviennent des curseurs uniquement en mode édition. */
 .gauge-container{position:relative;height:16px;margin:10px 0 7px;display:flex;align-items:center}.gauge-track{width:100%;height:11px;background:#f2f2f0;border-radius:7px;overflow:hidden;pointer-events:none}.gauge-fill{height:100%;border-radius:7px}.gauge-fill.green{background:#279b89}.gauge-fill.coral{background:#d98971}.gauge-input{position:absolute;inset:0;width:100%;height:16px;margin:0!important;opacity:.04;cursor:ew-resize;accent-color:#238f80}.gauge-container:has(.gauge-input){outline:1px dashed #c6d7d1;outline-offset:4px;border-radius:3px}.gauge-container:has(.gauge-input):focus-within{outline:3px solid #8abdb6}.saved-choices{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:12px 0}.saved-choices select{font:inherit;font-size:12px;padding:9px 12px;border:1px solid #e6e5e1;border-radius:9px;background:#fff;color:#333}.saved-choices label{color:#767670}
 
-/* Infobulles accessibles au survol, au clavier et au toucher (focus). */
-.info-hint{display:inline-flex;vertical-align:middle;position:relative;margin-left:4px;color:#667b79;cursor:help;outline-offset:3px}.info-hint .info-tooltip{display:none;position:absolute;z-index:20;bottom:calc(100% + 8px);left:0;width:min(290px,75vw);padding:12px;background:#292927;color:white;border-radius:9px;box-shadow:0 6px 20px #0003;font-size:12px;line-height:1.5;font-weight:400;white-space:normal;text-align:left}.info-hint .info-tooltip small{display:block;margin-top:7px;color:#ddd;font-size:10px}.info-hint:hover .info-tooltip,.info-hint:focus .info-tooltip,.info-hint:focus-within .info-tooltip{display:block}.bar-head>span:first-child,.slider-label label{min-width:0;white-space:normal}
+/* Reusable, viewport-aware category tooltip (also used inside budget sheets). */
+.info-hint{display:inline-flex;vertical-align:middle;margin-left:4px}
+.info-hint-trigger{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;min-width:24px;padding:0;border:0;border-radius:6px;background:transparent;color:#667b79;cursor:help;vertical-align:middle}
+.info-hint-trigger:focus-visible{outline:2px solid #238e7b;outline-offset:2px}
+.info-tooltip-portal{position:fixed;z-index:10000;box-sizing:border-box;max-height:min(55dvh,420px);overflow:auto;overflow-wrap:anywhere;white-space:normal;padding:12px 14px;background:#292927;color:#fff;border-radius:9px;box-shadow:0 6px 20px #0003;font-size:13px;line-height:1.5;font-weight:400;text-align:left;word-break:normal}
+.info-tooltip-portal small{display:block;margin-top:8px;color:#ddd;font-size:11px;line-height:1.4}
+.bar-head>span:first-child,.slider-label label{min-width:0;white-space:normal}
 
 /* Comparaison visuelle : mêmes échelles pour les deux scénarios d'une famille. */
 .compare-group{margin-top:22px}.compare-group h4{font-size:13px;margin:0 0 12px}.compare-item{margin:0 0 17px}.compare-item .bar-head{align-items:center}.compare-track{display:flex;flex-direction:column;gap:3px;margin:7px 0}.compare-baseline,.compare-scenario{height:8px;border-radius:4px}.compare-baseline{background:#c6c6c2}.compare-scenario.green{background:#279b89}.compare-scenario.coral{background:#d98971}.compare-item .legend{font-size:10px}
@@ -211,20 +216,3 @@
 .origin-select-label{display:block;margin:12px 0 7px;font-size:12px;font-weight:600;color:#555650}
 .origin-native-select{display:block;width:100%;max-width:100%;min-width:0;padding:11px 12px;border:1px solid #deded8;border-radius:9px;background:#fff;color:#292924;font:inherit;font-size:14px}
 .origin-native-select:focus-visible{outline:2px solid #238e7b;outline-offset:2px}
-
-/* Keep reference-category explanations inside the mobile viewport, including in Voter budget details. */
-@media(max-width:650px){
-  .info-hint .info-tooltip{
-    position:fixed;
-    top:auto;
-    bottom:calc(16px + env(safe-area-inset-bottom, 0px));
-    left:16px;
-    right:16px;
-    width:auto;
-    max-width:none;
-    max-height:min(60dvh, 420px);
-    overflow-y:auto;
-    overflow-wrap:anywhere;
-    z-index:1000;
-  }
-}
