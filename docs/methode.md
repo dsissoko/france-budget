@@ -91,6 +91,8 @@ Le chiffre « **déficit évité** » ou « **déficit supplémentaire** » est 
 
 ### Autres labels de l'application — ne pas les confondre
 
+Dans l’onglet **Voter**, les badges financiers des cartes utilisent **exactement cette même qualification de projection 2032**. Le calcul s’applique aux deux modes de restitution : **AGGREGATE** (agrégats revendiqués) et **PARTIAL** (référence INSEE corrigée des mesures chiffrées présentes). Un budget partiel sans effet chiffré projette la référence sans correction : sa trajectoire haussière est qualifiée « Dégradation », et son statut documentaire permet d’en signaler le caractère incomplet. « Non chiffré », « Déficit réduit », « Déficit aggravé » et « Déficit stable » ne sont plus des labels financiers des cartes Voter. 
+
 Les **statuts documentaires** décrivent l'état de vérification et de restitution du contenu, **pas** son impact budgétaire. Ils s'appliquent à un budget de parti ou citoyen lorsque la donnée correspondante est renseignée :
 
 | Label documentaire | Signification |
