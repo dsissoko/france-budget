@@ -55,7 +55,7 @@ export default function InfoHint({item}:{item:Category}) {
       onClick={event=>{event.preventDefault();event.stopPropagation();setOpen(value=>!value);}}
       onMouseEnter={()=>{if(window.matchMedia('(hover: hover)').matches)setOpen(true);}}
       onMouseLeave={()=>{if(window.matchMedia('(hover: hover)').matches)setOpen(false);}}
-      onFocus={()=>setOpen(true)}>
+      onFocus={event=>{if(event.currentTarget.matches(':focus-visible'))setOpen(true);}}>
       <Info size={14} aria-hidden="true"/>
     </button>
     {open&&createPortal(<div ref={panel} id={id} role="tooltip" className="info-tooltip-portal"
