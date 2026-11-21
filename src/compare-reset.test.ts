@@ -1,11 +1,13 @@
 import {describe,it,expect} from 'vitest';
-import {resetCompareToReference} from './compare-reset';
+import {resetCompareSelection} from './compare-reset';
 
 describe('Comparer: Réinitialiser',()=>{
- it('restores the INSEE reference as budget A and frees slot B',()=>{
-  expect(resetCompareToReference('insee-reference-2025')).toEqual({a:'insee-reference-2025',b:null});
+ it('clears both slots so the next budget can be selected as A',()=>{
+  expect(resetCompareSelection()).toEqual({a:null,b:null});
  });
- it('uses the current canonical reference id rather than a frozen budget',()=>{
-  expect(resetCompareToReference('another-reference')).toEqual({a:'another-reference',b:null});
+ it('does not implicitly preselect the INSEE reference',()=>{
+  const selection=resetCompareSelection();
+  expect(selection.a).toBeNull();
+  expect(selection.b).toBeNull();
  });
 });
