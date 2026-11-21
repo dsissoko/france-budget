@@ -33,15 +33,14 @@ const statuses: Record<BudgetMaturityStatus,{label:string;description:string;ton
   }
 };
 
-/** Only party budgets show the feature during its initial rollout. */
+/** Render only an explicitly supplied, recognized status, regardless of budget origin. */
 export function budgetMaturity(b:BudgetMaturity){
-  if(b.origin!=='party')return null;
   const raw=b.maturity_status;
-  const status:BudgetMaturityStatus = maturityStatuses.includes(raw as BudgetMaturityStatus)
-    ? raw as BudgetMaturityStatus : 'en_preparation';
+  if(!raw||!maturityStatuses.includes(raw as BudgetMaturityStatus))return null;
+  const status=raw as BudgetMaturityStatus;
   // Never present a budget as officially confirmed without evidence.
   if(status==='confirme'&&(!b.confirmation_organization?.trim()||!b.confirmed_at||!b.confirmation_evidence_url?.startsWith('https://'))){
-    return {...statuses.en_preparation,status:'en_preparation' as const};
+    return null;
   }
   return {...statuses[status],status};
 }
