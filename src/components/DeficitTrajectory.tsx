@@ -1,4 +1,5 @@
-import {QUALIFICATIONS,type QualificationTone} from '../engine/qualification';
+import {projectionVerdict} from '../engine/projection-verdict';
+import type {QualificationTone} from '../engine/qualification';
 import type {ProjectionResult} from '../engine/simulation';
 import {buildSlopeGraph,type SlopeSeries} from './slopegraph';
 import './DeficitTrajectory.css';
@@ -20,8 +21,8 @@ const last=<T,>(items:T[])=>items[items.length-1];
 
 export default function DeficitTrajectory({primary,secondary,referenceOnly=false}:Props){
  const graph=buildSlopeGraph(primary,secondary,referenceOnly);
- const qA=QUALIFICATIONS[primary.assessment.code];
- const qB=secondary?QUALIFICATIONS[secondary.assessment.code]:null;
+ const qA=projectionVerdict(primary);
+ const qB=secondary?projectionVerdict(secondary):null;
  const comparison=Boolean(secondary);
  const caption=graph.startYear+' → '+graph.endYear+' · Effets dès '+graph.applicationYear;
  const seriesName=(id:SlopeSeries['id'])=>
@@ -34,10 +35,10 @@ export default function DeficitTrajectory({primary,secondary,referenceOnly=false
  return <div className="deficit-trajectory" aria-label="Projection indicative du déficit public">
   <div className="deficit-trajectory__header">
    <div>
-    <h3>{comparison?'Évolution des déficits':referenceOnly?'Évolution du déficit':qA.title}</h3>
+    <h3>{comparison?'Évolution des déficits':referenceOnly?'Trajectoire du déficit de référence':qA.title}</h3>
     <p>{caption}</p>
    </div>
-   {!comparison&&!referenceOnly&&<span className={'deficit-trajectory__badge deficit-trajectory__badge--'+qA.tone}>{qA.label}</span>}
+   {!comparison&&<span className={'deficit-trajectory__badge deficit-trajectory__badge--'+qA.tone}>{qA.label}</span>}
   </div>
   <div className="deficit-trajectory__plot">
    <svg viewBox="0 0 360 162" role="img" aria-label={chartDescription} preserveAspectRatio="xMidYMid meet">

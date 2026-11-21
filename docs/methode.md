@@ -74,6 +74,35 @@ La trajectoire V1 prolonge de manière **mécanique** le déficit de référence
 
 Les budgets citoyens sont des scénarios personnels, pas des lois de finances. La publication et le vote ne valent ni certification économique ni scrutin représentatif. Une révision du référentiel doit préserver le contexte des anciens budgets publiés, notamment les montants de référence utilisés à leur création.
 
+### Lecture des labels de projection en 2032
+
+Les **labels de trajectoire** synthétisent deux faits calculés : (1) le niveau du **déficit projeté en 2032** comparé au déficit de **référence projeté en 2032** et (2) la pente du déficit du scénario **de 2027 à 2032**, après l'application initiale des mesures. Un déficit positif plus élevé est moins favorable. Un écart ponctuel lors de l'application en 2027 n'est pas une pente descendante. Les écarts insignifiants (seuil de 0,1 Md€, configurable) ne donnent pas lieu à une différence artificielle.
+
+| Label public | Couleur | Définition exacte |
+| --- | --- | --- |
+| **Redressement** | Vert | Déficit 2032 inférieur à la référence **et** trajectoire 2027–2032 stable ou descendante |
+| **Amélioration relative** | Orange | Déficit 2032 inférieur à la référence **mais** trajectoire 2027–2032 encore montante |
+| **Dégradation** | Rouge | Déficit 2032 supérieur à la référence, **quelle que soit la pente** ; ou déficit égal à la référence avec trajectoire montante |
+| **Non qualifié** (cas de bord) | Gris | Série insuffisante ou égalité à la référence sans trajectoire montante ; aucun redressement présumé |
+
+Le budget **de référence** appartient à « Dégradation » tant que sa projection est montante. Une **amélioration relative** n'implique pas que le déficit baisse. À l'inverse, une trajectoire descendante qui demeure au-dessus de la référence est classée « Dégradation » : l'écart à la référence en 2032 est prioritaire. Ces labels ne sont **ni un vote politique ni une prédiction** : ils décrivent le modèle mécanique annoncé ci-dessus.
+
+Le chiffre « **déficit évité** » ou « **déficit supplémentaire** » est **distinct** de la qualification : il mesure exclusivement l'écart entre scénario et référence **à l'horizon 2032**. « Même déficit que la référence » signale un écart nul à la précision affichée.
+
+### Autres labels de l'application — ne pas les confondre
+
+Les **statuts documentaires** décrivent l'état de vérification et de restitution du contenu, **pas** son impact budgétaire. Ils s'appliquent à un budget de parti ou citoyen lorsque la donnée correspondante est renseignée :
+
+| Label documentaire | Signification |
+| --- | --- |
+| **Non vérifié** | Budget publié sans vérification documentaire indépendante |
+| **En préparation** | Collecte ou rapprochement des données encore en cours |
+| **Complet** | Propositions intégrées sur le périmètre annoncé, restitution restant à contrôler |
+| **À confirmer** | Restitution prête à être soumise à la formation politique, sans confirmation reçue |
+| **Confirmé** | Fidélité documentaire explicitement confirmée par la formation, preuves requises ; ne garantit pas la faisabilité |
+
+Les mentions **« budget global / agrégats »** et **« simulation partielle »** décrivent le **mode de restitution** expliqué à la section 3. Elles ne constituent pas un classement de qualité économique. Les **statuts de publication** et les **votes citoyens** sont des dimensions séparées, sans effet sur les trois qualifications de projection.
+
 ## 6. Comment vérifier les chiffres
 
 L'inventaire et les contrôles sont publics :
