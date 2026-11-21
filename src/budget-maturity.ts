@@ -1,5 +1,5 @@
 /** Budget-level data maturity, distinct from financial performance and publication visibility. */
-export const maturityStatuses = ['en_preparation','complet','a_confirmer','confirme'] as const;
+export const maturityStatuses = ['non_verifie','en_preparation','complet','a_confirmer','confirme'] as const;
 export type BudgetMaturityStatus = typeof maturityStatuses[number];
 
 export type BudgetMaturity = {
@@ -11,6 +11,7 @@ export type BudgetMaturity = {
 };
 
 const statuses: Record<BudgetMaturityStatus,{label:string;description:string;tone:string}> = {
+  non_verifie: {label:'Non vérifié',description:'Budget publié sans vérification documentaire indépendante.',tone:'unverified'},
   en_preparation: {
     label:'En préparation',
     description:'Collecte ou rapprochement des données en cours. Le budget ne représente pas nécessairement tout le programme.',
