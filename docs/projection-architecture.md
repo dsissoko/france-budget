@@ -76,28 +76,26 @@ type ProjectionResult = {
 
 La même logique de simulation alimente Comprendre, Mon budget, Voter et Comparer (deux résultats A/B partageant une référence). Un futur modèle peut varier les valeurs annuelles, mais pas le format de sortie ; les vues n'auront pas à recalculer la tendance. Les libellés français et les couleurs sont une table de présentation associée aux codes métier.
 
-## Classification exhaustive du scénario
+## Qualification publique de la trajectoire à l'horizon 2032
 
-**Convention :** un déficit est positif ; zéro = équilibre ; un solde excédentaire est représenté par un déficit négatif. Les titres portent sur le *scénario* entre la première et la dernière année, non sur une simple amélioration relativement au budget de référence.
+La **qualification publique** est produite par `src/engine/projection-verdict.ts`. Elle combine le **déficit du scénario en 2032 par rapport à la référence en 2032** et sa **pente après l'activation des mesures (2027–2032)**. Les montants positifs représentent des déficits, les montants négatifs des excédents.
 
-| Priorité / condition | Code | Titre court | Label | Ton |
-| --- | --- | --- | --- | --- |
-| Passage d'un déficit à un excédent | `SURPLUS_REACHED` | Le budget devient excédentaire | Excédent | Vert |
-| Passage d'un déficit à l'équilibre | `BALANCE_REACHED` | Le budget atteint l'équilibre | Équilibre | Vert |
-| Déficit qui réapparaît depuis équilibre/excédent | `DEFICIT_RETURNED` | Le budget repasse dans le rouge | Déficit de retour | Rouge |
-| Excédent qui revient à l'équilibre | `SURPLUS_TO_BALANCE` | Le budget revient à l'équilibre | Équilibre | Gris |
-| Équilibre maintenu | `BALANCE_STABLE` | Le budget reste à l'équilibre | Équilibre | Vert |
-| Excédent maintenu / renforcé | `SURPLUS_STABLE` | Le budget reste excédentaire | Excédent | Vert |
-| Déficit en baisse, encore positif | `DEFICIT_DECREASING` | Le déficit diminue | En bonne voie | Vert |
-| Déficit croissant avec hausse qui ralentit | `INCREASE_DECELERATING` | La hausse du déficit ralentit | Ralentissement | Vert |
-| Déficit approximativement stable | `DEFICIT_STABLE` | Le déficit reste stable | Stagnation | Gris |
-| Déficit croissant à rythme régulier | `INCREASE_STEADY` | Le déficit continue de grimper | Hausse persistante | Orange |
-| Déficit croissant avec hausse qui accélère | `INCREASE_ACCELERATING` | Le déficit grimpe de plus en plus vite | Accélération | Rouge |
-| Déficit en baisse mais baisse ralentissante | `DEFICIT_DECREASING` | Le déficit diminue | En bonne voie | Vert |
+| Label public | Couleur | Critère |
+| --- | --- | --- |
+| **Redressement** | Vert | Déficit 2032 strictement inférieur à la référence, pente post-2027 non montante |
+| **Amélioration relative** | Orange | Déficit 2032 strictement inférieur à la référence, pente post-2027 montante |
+| **Dégradation** | Rouge | Déficit 2032 strictement supérieur à la référence ; ou égal à la référence avec pente montante (cas du référentiel projeté) |
+| **Non qualifié** (cas de bord) | Gris | Données insuffisantes ; ou écart nul avec pente non montante |
 
-Les cas initiaux à zéro ou en excédent sont qualifiés prioritairement par leur état final. Pas de vert pour une **simple diminution relative au scénario de référence** ; la courbe doit réellement baisser ou **la hausse doit réellement décélérer**. Une hausse décélérante reste une hausse : le titre doit le dire.
+Un seuil de **0,1 Md€** (ou `assessment.changeThreshold` si configuré) tient compte de l'arrondi des valeurs affichées. La pente est calculée entre le point de début de la phase post-application et celui de fin, sans confondre le choc initial d'application et une diminution durable. Les chiffres de **déficit évité / supplémentaire** décrivent uniquement l'écart **2032** et restent visibles séparément.
 
-Les seuils numériques de tolérance sont documentés et testés. La **direction** et la distinction d'accélération prennent en compte les variations **des pentes annuelles après l'année d'activation des mesures** ; le saut ponctuel de l'année d'application (2027) ne doit ni être qualifié de baisse durable, ni de décélération structurelle. Les transitions vers l'équilibre, l'excédent ou le déficit sont toujours évaluées sur les états initial et final. Une série trop courte ou incohérente retourne `UNDETERMINED` (gris). Pour les courbes fluctuantes, la classification doit être prudente et ne pas déduire de causalité. La qualification n'a aucune prétention prédictive.
+**La référence n'est pas neutre en soi :** puisque la projection mécanique actuelle est haussière, son label est « Dégradation ». Cette classification publique est synthétique, ne constitue ni prévision ni certification économique, et ne modifie aucune donnée.
+
+### Classification technique conservée
+
+`AssessmentService` continue de produire des codes internes (`SURPLUS_REACHED`, `BALANCE_REACHED`, `DEFICIT_RETURNED`, `SURPLUS_TO_BALANCE`, `BALANCE_STABLE`, `SURPLUS_STABLE`, `DEFICIT_DECREASING`, `INCREASE_DECELERATING`, `DEFICIT_STABLE`, `INCREASE_STEADY`, `INCREASE_ACCELERATING`, `UNDETERMINED`). Ils analysent **la trajectoire propre du scénario**, indépendamment de la référence ; les anciens textes « En bonne voie », « Stagnation », « Hausse persistante », etc., restent historiques dans la table de présentation technique mais **ne servent plus de verdict public**.
+
+Les détails exhaustifs des **labels affichés** et des **statuts documentaires** sont décrits dans [Notre méthode](methode.md#lecture-des-labels-de-projection-en-2032).
 
 ## Présentation ultra-compacte : slopegraph (2025 → 2032)
 
