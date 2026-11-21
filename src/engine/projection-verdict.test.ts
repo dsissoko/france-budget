@@ -37,6 +37,6 @@ describe('2032 public budget verdict',()=>{
   it('checks current mechanical model without changing numeric outputs',()=>{
     const projection=simulationService.simulate(152.5,1,projectionYears);
     expect(projectionVerdict(projection)).toMatchObject({label:'Amélioration relative',tone:'warning'});
-    expect(projection.rows.at(-1)?.scenario).toBeCloseTo(178.2,1);
+    expect(projection.rows[projection.rows.length-1]?.scenario).toBeCloseTo(178.2,1);
   });
 });
