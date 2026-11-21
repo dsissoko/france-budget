@@ -82,8 +82,8 @@ La **qualification publique** est produite par `src/engine/projection-verdict.ts
 
 | Label public | Couleur | Critère |
 | --- | --- | --- |
-| **Redressement** | Vert | Déficit 2032 strictement inférieur à la référence, pente post-2027 non montante |
-| **Amélioration relative** | Orange | Déficit 2032 strictement inférieur à la référence, pente post-2027 montante |
+| **Redressement** | Vert | Déficit 2032 strictement inférieur à la référence, avec pente post-2027 non montante **ou** équilibre/excédent atteint en 2032 |
+| **Amélioration relative** | Orange | Déficit 2032 strictement inférieur à la référence, mais encore déficitaire en 2032 avec pente post-2027 montante |
 | **Dégradation** | Rouge | Déficit 2032 strictement supérieur à la référence ; ou égal à la référence avec pente montante (cas du référentiel projeté) |
 | **Non qualifié** (cas de bord) | Gris | Données insuffisantes ; ou écart nul avec pente non montante |
 

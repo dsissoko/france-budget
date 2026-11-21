@@ -8,7 +8,7 @@ type Props={primary:ProjectionResult;secondary?:ProjectionResult;referenceOnly?:
 const seriesColors:Record<SlopeSeries['id'],string>={
  reference:'#9b9e9a',a:'#c58b39',b:'#238d80',
 };
-const amount=(value:number)=>new Intl.NumberFormat('fr-FR',{maximumFractionDigits:1}).format(value)+' Md€';
+const amount=(value:number)=>new Intl.NumberFormat('fr-FR',{maximumFractionDigits:1}).format(Math.abs(value)<.05?0:value)+' Md€';
 const benefit=(difference:number)=>{
  if(Math.abs(difference)<.05)return 'Même déficit que la référence';
  return amount(Math.abs(difference))+(difference>0?' de déficit évité':' de déficit supplémentaire')+' vs référence';

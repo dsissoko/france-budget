@@ -25,6 +25,12 @@ export function projectionVerdict(projection:ProjectionResult):ProjectionVerdict
   const rise=post[post.length-1].scenario-post[0].scenario;
   if(gap< -tolerance || (Math.abs(gap)<=tolerance && rise>tolerance))
     return {label:'Dégradation',tone:'negative',title:'Trajectoire du déficit en dégradation'};
+  // Reaching balance or a surplus in 2032 is redressement regardless of
+  // the post-2027 slope: a deficit can rise toward zero from a surplus.
+  // Keep the reference comparison first: never praise a worse scenario.
+  const balanceTolerance=projection.assumptions.assessment?.balanceThreshold??0.05;
+  if(gap>tolerance && end.scenario<=balanceTolerance)
+    return {label:'Redressement',tone:'positive',title:'Déficit résorbé ou budget excédentaire en 2032'};
   if(gap>tolerance && rise>tolerance)
     return {label:'Amélioration relative',tone:'warning',title:'Déficit moindre que la référence, mais toujours en hausse'};
   if(gap>tolerance && rise<=tolerance)
