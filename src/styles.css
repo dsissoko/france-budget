@@ -196,9 +196,13 @@
 .vote-action{margin-top:0}
 
 /* #119 — Keep aligned bands compact; ellipsis when presentation exceeds three lines. */
-.vote-card-main{grid-template-rows:54px 32px 46px 66px 24px;row-gap:8px}
+.vote-card-main{grid-template-rows:44px 32px 46px 66px 24px;row-gap:8px}
 .vote-card-main>.vote-card-badges{align-self:center;overflow:hidden}
 .vote-card-main>h3{align-self:start;overflow:hidden}
 .vote-card-main>p{align-self:start;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden;text-overflow:ellipsis}
 .vote-card-main>.vote-meta{align-self:center}
-@media(max-width:390px){.vote-card-main{grid-template-rows:58px 34px 46px 66px 24px}}
+@media(max-width:390px){.vote-card-main{grid-template-rows:48px 34px 46px 66px 24px}}
+
+/* #121 — Move documentary and qualitative badges closer to the author, retaining fixed alignment. */
+.vote-card-main{grid-template-rows:44px 32px 46px 66px 24px;row-gap:6px}
+@media(max-width:390px){.vote-card-main{grid-template-rows:48px 34px 46px 66px 24px;row-gap:6px}}
