@@ -45,18 +45,44 @@ export function updateImpact(impacts: CitizenImpact[], kind: BudgetSide, categor
     ? [...without, {kind, categoryId, delta: Math.round(delta * 1000) / 1000}] : without;
 }
 
+// Préserve les budgets locaux créés avant l'édition par propositions :
+ // leurs anciennes modifications libres deviennent une proposition explicite.
+export function migrateLegacyOverrides(
+  proposals: CitizenMeasure[],
+  budget: BudgetOverrides,
+  referenceAmount: (kind: BudgetSide, id: string) => number | undefined,
+): CitizenMeasure[] {
+  const occupied = new Set(proposals.flatMap(p=>p.impacts.map(sideKey)));
+  const impacts: CitizenImpact[] = [];
+  for (const kind of ['revenues','expenses','offBudget'] as const) {
+    for (const [categoryId, value] of Object.entries(budget[kind] || {})) {
+      const base = referenceAmount(kind, categoryId);
+      const key = kind + ':' + categoryId;
+      if (base === undefined || occupied.has(key) || !Number.isFinite(value)) continue;
+      const delta = Math.round((value - base) * 1000) / 1000;
+      if (Math.abs(delta) > 0.000001) impacts.push({kind,categoryId,delta});
+    }
+  }
+  if (!impacts.length) return proposals;
+  let id = 'legacy-adjustments';
+  while (proposals.some(p=>p.id===id)) id += '-1';
+  return [...proposals,{
+    id,title:'Ajustements antérieurs',
+    description:'Modifications reprises de mon ancien budget. Je peux préciser leur objectif.',
+    impacts
+  }];
+}
+
 export function overridesFromProposals(
   proposals: CitizenMeasure[],
   referenceAmount: (kind: BudgetSide, id: string) => number | undefined,
   current: BudgetOverrides
 ): BudgetOverrides {
-  const oldPosts = Object.keys(current).flatMap(side => Object.keys(current[side as BudgetSide] || {}).map(id => ({kind: side as BudgetSide, id})));
   const next: BudgetOverrides = { revenues: {...current.revenues}, expenses: {...current.expenses}, offBudget: {...current.offBudget} };
   // Only proposal-owned values are controlled here; other imported/reference-origin overrides are preserved.
   for (const p of proposals) for (const i of p.impacts) {
     const base = referenceAmount(i.kind, i.categoryId);
     if (base !== undefined) next[i.kind]![i.categoryId] = Math.max(0, Math.min(base * 2, base + i.delta));
   }
-  void oldPosts;
   return next;
 }
