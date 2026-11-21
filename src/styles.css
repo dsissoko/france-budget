@@ -223,3 +223,8 @@
 .build-version[href]:hover{text-decoration:underline;color:#265f53}
 .build-version:focus-visible{outline:2px solid #238e7b;outline-offset:3px}
 @media(max-width:650px){.header-end{min-width:0}.build-version{font-size:10px;padding:5px 7px}}
+
+/* Featured citizen budget is chosen automatically by vote count; distinct from financial/documentary labels. */
+.citizen-champion{display:inline-flex;align-items:center;gap:5px;max-width:100%;padding:4px 8px;border:1px solid #e8d6a4;border-radius:999px;background:#fff8e5;color:#805b1f;font-size:11px;font-weight:700;line-height:1.25;white-space:nowrap}
+.citizen-champion svg{flex:none}
+.compare-choice-label .citizen-champion{width:max-content;max-width:100%;margin-top:4px}
