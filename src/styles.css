@@ -216,3 +216,9 @@
 .origin-select-label{display:block;margin:12px 0 7px;font-size:12px;font-weight:600;color:#555650}
 .origin-native-select{display:block;width:100%;max-width:100%;min-width:0;padding:11px 12px;border:1px solid #deded8;border-radius:9px;background:#fff;color:#292924;font:inherit;font-size:14px}
 .origin-native-select:focus-visible{outline:2px solid #238e7b;outline-offset:2px}
+
+/* Build identity is produced during deployment, never hardcoded in the header. */
+.build-version{display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;max-width:100%;padding:5px 9px;border-radius:999px;background:#f5f5f2;color:#777771;text-decoration:none;font-size:11px;font-weight:600;white-space:nowrap;font-variant-numeric:tabular-nums}
+.build-version[href]:hover{text-decoration:underline;color:#265f53}
+.build-version:focus-visible{outline:2px solid #238e7b;outline-offset:3px}
+@media(max-width:650px){.header-end{min-width:0}.build-version{font-size:10px;padding:5px 7px}}
