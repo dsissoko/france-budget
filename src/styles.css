@@ -206,3 +206,8 @@
 /* #121 — Move documentary and qualitative badges closer to the author, retaining fixed alignment. */
 .vote-card-main{grid-template-rows:44px 32px 46px 66px 24px;row-gap:6px}
 @media(max-width:390px){.vote-card-main{grid-template-rows:48px 34px 46px 66px 24px;row-gap:6px}}
+
+/* Native budget starting-point selector: compact on desktop, platform-native picker on mobile. */
+.origin-select-label{display:block;margin:12px 0 7px;font-size:12px;font-weight:600;color:#555650}
+.origin-native-select{display:block;width:100%;max-width:100%;min-width:0;padding:11px 12px;border:1px solid #deded8;border-radius:9px;background:#fff;color:#292924;font:inherit;font-size:14px}
+.origin-native-select:focus-visible{outline:2px solid #238e7b;outline-offset:2px}
