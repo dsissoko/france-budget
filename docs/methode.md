@@ -80,8 +80,8 @@ Les **labels de trajectoire** synthétisent deux faits calculés : (1) le niveau
 
 | Label public | Couleur | Définition exacte |
 | --- | --- | --- |
-| **Redressement** | Vert | Déficit 2032 inférieur à la référence **et** trajectoire 2027–2032 stable ou descendante |
-| **Amélioration relative** | Orange | Déficit 2032 inférieur à la référence **mais** trajectoire 2027–2032 encore montante |
+| **Redressement** | Vert | Déficit 2032 inférieur à la référence **et** trajectoire 2027–2032 stable ou descendante **ou** équilibre/excédent atteint en 2032 |
+| **Amélioration relative** | Orange | Déficit 2032 inférieur à la référence, **toujours déficitaire** et trajectoire 2027–2032 encore montante |
 | **Dégradation** | Rouge | Déficit 2032 supérieur à la référence, **quelle que soit la pente** ; ou déficit égal à la référence avec trajectoire montante |
 | **Non qualifié** (cas de bord) | Gris | Série insuffisante ou égalité à la référence sans trajectoire montante ; aucun redressement présumé |
 
