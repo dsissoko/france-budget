@@ -1,29 +1,29 @@
-source_row,source_measure_id,party_code,year,citizen_post_ids,group_id,mapping_status
-1,src-1,LFI,2027,"income",citizen-01,agent_proposed
-2,src-2,LFI,2027,"property",citizen-02,agent_proposed
-3,src-3,LFI,2027,"otherTax;contributions",citizen-03,agent_proposed
-4,src-4,LFI,2027,"business",citizen-04,agent_proposed
-5,src-5,LFI,2027,"property",citizen-02,agent_proposed
-6,src-6,LFI,2027,"property",citizen-02,agent_proposed
-7,src-7,LFI,2027,"business",citizen-04,agent_proposed
-8,src-8,LFI,2027,"business",citizen-04,agent_proposed
-9,src-9,LFI,2027,"business",citizen-04,agent_proposed
-10,src-10,LFI,2027,"business",citizen-04,agent_proposed
-11,src-11,LFI,2027,"otherTax",citizen-03,agent_proposed
-12,src-12,LFI,2027,"otherTax",citizen-03,agent_proposed
-13,src-13,LFI,2027,"otherTax",citizen-03,agent_proposed
-14,src-14,LFI,2027,"otherTax",citizen-03,agent_proposed
-15,src-15,LFI,2027,"general",citizen-15,agent_proposed
-16,src-16,LFI,2027,"social;family;housing",citizen-16,agent_proposed
-17,src-17,LFI,2027,"housing",citizen-16,agent_proposed
-18,src-18,LFI,2027,"solidarity",citizen-18,agent_proposed
-19,src-19,LFI,2027,"education",citizen-19,agent_proposed
-20,src-20,LFI,2027,"education",citizen-19,agent_proposed
-21,src-21,LFI,2027,"education",citizen-19,agent_proposed
-22,src-22,LFI,2027,"health",citizen-22,agent_proposed
-23,src-23,LFI,2027,"safety",citizen-16,agent_proposed
-24,src-24,LFI,2027,"safety;family",citizen-16,agent_proposed
-25,src-25,LFI,2027,"general",citizen-15,agent_proposed
-26,src-26,LFI,2027,"environment",citizen-26,agent_proposed
-27,src-27,LFI,2027,"social",citizen-16,agent_proposed
-28,src-28,LFI,2027,"unemployment",citizen-28,agent_proposed
+source_row,source_measure_id,party_code,year,citizen_post_ids,group_id,mapping_status,rationale,source_page
+"1","src-1","LFI","2027","income","citizen-01","agent_reviewed_documentary","Revenus du capital imposés aux personnes","13"
+"2","src-2","LFI","2027","property","citizen-02","agent_reviewed_documentary","Taxation des grandes fortunes","13"
+"3","src-3","LFI","2027","otherTax;contributions","citizen-03","agent_reviewed_documentary","Avantages fiscaux et exonérations sociales : ventilation inconnue","13"
+"4","src-4","LFI","2027","business","citizen-04","agent_reviewed_documentary","Taxe assise sur l'activité des entreprises","13"
+"5","src-5","LFI","2027","property","citizen-02","agent_reviewed_documentary","Patrimoine supérieur à 100 M€","13"
+"6","src-6","LFI","2027","property","citizen-02","agent_reviewed_documentary","Impôt sur les successions","14"
+"7","src-7","LFI","2027","business","citizen-04","agent_reviewed_documentary","Bénéfices des sociétés","14"
+"8","src-8","LFI","2027","business","citizen-04","agent_reviewed_documentary","Activité en France des multinationales","14"
+"9","src-9","LFI","2027","business","citizen-04","agent_reviewed_documentary","Grandes entreprises du numérique","14"
+"10","src-10","LFI","2027","business","citizen-04","agent_reviewed_documentary","Bénéfices exceptionnels des entreprises","14"
+"11","src-11","LFI","2027","otherTax","citizen-03","agent_reviewed_documentary","Transactions financières","14"
+"12","src-12","LFI","2027","otherTax","citizen-03","agent_reviewed_documentary","Rachats d'actions","14"
+"13","src-13","LFI","2027","otherTax","citizen-03","agent_reviewed_documentary","Opérations sur crypto-actifs","14"
+"14","src-14","LFI","2027","otherTax","citizen-03","agent_reviewed_documentary","Fraude et recettes fiscales diverses","14"
+"15","src-15","LFI","2027","general","citizen-15","agent_reviewed_documentary","Rémunérations publiques réparties entre administrations : ventilation non donnée","8"
+"16","src-16","LFI","2027","social;family;housing","citizen-16","agent_reviewed_documentary","Pensions, famille et logement sans détail de l'enveloppe","8"
+"17","src-17","LFI","2027","housing","citizen-16","agent_reviewed_documentary","Logements d'urgence","8"
+"18","src-18","LFI","2027","solidarity","citizen-18","agent_reviewed_documentary","Aides aux jeunes","8"
+"19","src-19","LFI","2027","education","citizen-19","agent_reviewed_documentary","Recrutements dans l'enseignement","9"
+"20","src-20","LFI","2027","education","citizen-19","agent_reviewed_documentary","Cantine scolaire","9"
+"21","src-21","LFI","2027","education","citizen-19","agent_reviewed_documentary","Places universitaires","10"
+"22","src-22","LFI","2027","health","citizen-22","agent_reviewed_documentary","Hôpitaux publics","10"
+"23","src-23","LFI","2027","safety","citizen-16","agent_reviewed_documentary","Protection face aux violences sexistes et sexuelles","10"
+"24","src-24","LFI","2027","safety;family","citizen-16","agent_reviewed_documentary","Protection des enfants : justice et famille","10"
+"25","src-25","LFI","2027","general","citizen-15","agent_reviewed_documentary","Services publics de plusieurs secteurs, sans ventilation","10"
+"26","src-26","LFI","2027","environment","citizen-26","agent_reviewed_documentary","Adaptation climatique","11"
+"27","src-27","LFI","2027","social","citizen-16","agent_reviewed_documentary","Pensions de retraite","11"
+"28","src-28","LFI","2027","unemployment","citizen-28","agent_reviewed_documentary","Assurance chômage","12"
