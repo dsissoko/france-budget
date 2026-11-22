@@ -1,5 +1,5 @@
 import {describe,it,expect} from 'vitest';
-import {readDraftProposals,proposalEntries,reportedAggregate,validExclusiveProposals,updateImpact,computeBudget,computeCitizenDraft,type PublishedBudget} from './v2-budget';
+import {readDraftProposals,proposalEntries,reportedAggregate,validExclusiveProposals,measuredProposals,impactedProposals,declaredAmountForDisplay,hasQualifiedBudgetImpact,updateImpact,computeBudget,computeCitizenDraft,type PublishedBudget} from './v2-budget';
 import {simulationService,V1_ASSUMPTIONS,yearsFor} from './engine/simulation';
 import type {ReferenceModel} from './projection-core';
 describe('V2 canonical frontend domain',()=>{
@@ -77,5 +77,30 @@ describe('V2 accounting parity with unchanged engine',()=>{
   const persisted=makeBudget(p,'PARTIAL',{citizenSource:{budgetKey:a.budgetKey,title:a.title,
     budgetMode:'AGGREGATE',aggregate:a.documentary.aggregates![0],proposals:[]}});
   expect(computeBudget(persisted,reference).deficit).toBeCloseTo(draft.deficit,5);
+ });
+});
+
+describe('Party declared quantified proposals - display without accounting',()=>{
+ const base={id:'test',budgetKey:'lfi-2027',version:'latest',origin:'party' as const,
+ title:'Budget déclaré',description:'Programme',referenceYear:2025,
+ budgetMode:'PARTIAL' as const,documentary:{},votes:0,featured:false,featured_order:null,
+ proposals:[
+  {proposalKey:'sourced',title:'Recette annoncée',description:'',impacts:[],
+   claimedAmountBn:'106.400',sourceUrl:'https://example.org/source.pdf',sourceStatus:'publié'},
+  {proposalKey:'preliminary',title:'Inventaire non validé',description:'',impacts:[],
+   claimedAmountBn:'99.000',sourceUrl:'https://example.org/source.pdf',
+   sourceStatus:'preliminary_source_inventory_unverified'}
+ ]};
+ it('shows source-qualified amounts but not preliminary inventory',()=>{
+  const shown=measuredProposals(base);
+  expect(shown.map(x=>x.proposalKey)).toEqual(['sourced']);
+  expect(declaredAmountForDisplay(shown[0])).toBe(106.4);
+  expect(impactedProposals(base)).toEqual([]);
+ });
+ it('never injects declared amounts into engine or impact qualification',()=>{
+  const result=computeBudget(base,reference);
+  expect(result.entries).toEqual([]);
+  expect(result.balanceDelta).toBe(0);
+  expect(hasQualifiedBudgetImpact(base)).toBe(false);
  });
 });

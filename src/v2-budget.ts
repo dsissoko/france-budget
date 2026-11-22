@@ -7,6 +7,7 @@ export type BudgetImpact={side:BudgetSide;categoryId:string;deltaAmountBn:number
 export type BudgetProposal={
  proposalKey:string;title:string;description:string;
  impacts:BudgetImpact[];sourceUrl?:string|null;claimedAmountBn?:string|null;
+ sourceStatus?:string|null;direction?:string|null;
 };
 export type BudgetMode='PARTIAL'|'AGGREGATE';
 export type BudgetDocumentary={
@@ -33,8 +34,20 @@ export type CitizenBudgetDraft={
 export const emptyBudgetOverrides=()=>({revenues:{},expenses:{},offBudget:{}});
 
 export const eligibleForDisplay=(b:PublishedBudget)=>b.origin==='citizen'||b.origin==='party';
-export const measuredProposals=(b:PublishedBudget)=>b.proposals.filter(p=>p.impacts.some(i=>Number(i.deltaAmountBn)!==0));
-export const hasQualifiedBudgetImpact=(b:PublishedBudget)=>measuredProposals(b).length>0||!!reportedAggregate(b)||!!b.documentary?.citizenSource;
+/** Numeric proposals shown to readers: assigned impacts OR a sourced, qualified declared
+ * amount. The latter is DISPLAY ONLY: never feed claimed amounts into the calculation.
+ * Preliminary inventories and editorial groupings are excluded until reviewed. */
+const qualifiedDeclaredStatuses=new Set(['publié','validated','primary_source_checked_apu_review_pending']);
+export const impactedProposals=(b:PublishedBudget)=>b.proposals.filter(p=>p.impacts.some(i=>Number(i.deltaAmountBn)!==0));
+export const declaredAmountForDisplay=(p:BudgetProposal):number|null=>{
+ const amount=p.claimedAmountBn===null||p.claimedAmountBn===undefined||p.claimedAmountBn===''?NaN:Number(p.claimedAmountBn);
+ return Number.isFinite(amount)&&amount!==0&&
+   qualifiedDeclaredStatuses.has(p.sourceStatus??'')&&
+   (p.sourceUrl??'').startsWith('https://')?amount:null;
+};
+export const measuredProposals=(b:PublishedBudget)=>b.proposals.filter(p=>
+ p.impacts.some(i=>Number(i.deltaAmountBn)!==0)||declaredAmountForDisplay(p)!==null);
+export const hasQualifiedBudgetImpact=(b:PublishedBudget)=>impactedProposals(b).length>0||!!reportedAggregate(b)||!!b.documentary?.citizenSource;
 
 export function reportedAggregate(b:Pick<PublishedBudget,'documentary'|'budgetMode'>):PublishedAggregate|null{
  if(b.budgetMode!=='AGGREGATE')return null;

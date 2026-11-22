@@ -22,7 +22,7 @@ export default async function handler(req:any,res:any){
           (SELECT COALESCE(jsonb_agg(jsonb_build_object(
             'proposalKey',p.proposal_key,'title',p.title,'description',p.description,
             'claimedAmountBn',p.claimed_amount_bn::text,'sourceUrl',p.source_url,
-            'sourceStatus',p.source_status,
+            'sourceStatus',p.source_status,'direction',p.direction,
             'impacts',(SELECT COALESCE(jsonb_agg(jsonb_build_object(
               'side',i.side,'categoryId',i.category_id,'deltaAmountBn',i.delta_amount_bn::text)
               ORDER BY i.side,i.category_id),'[]'::jsonb)

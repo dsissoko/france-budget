@@ -7,7 +7,7 @@ import {voteQualification} from './engine/vote-qualification';
 import {budgetMaturity} from './budget-maturity';
 import {
  computeBudget,computeCitizenDraft,readDraftProposals,eligibleForDisplay,measuredProposals,
- reportedAggregate,hasQualifiedBudgetImpact,availablePost,updateImpact,validExclusiveProposals,
+ reportedAggregate,hasQualifiedBudgetImpact,declaredAmountForDisplay,availablePost,updateImpact,validExclusiveProposals,
  type PublishedBudget,type BudgetProposal,type BudgetImpact,type BudgetSide
 } from './v2-budget';
 import DeficitTrajectory from './components/DeficitTrajectory';
@@ -217,15 +217,21 @@ export default function AppV2(){
      g.items.filter(c=>Math.abs((r[g.side][c.id]??c.amount)-c.amount)>.005).map(c=>
       <Gauge key={c.id} id={'view-'+b.id+'-'+c.id} item={c} value={r[g.side][c.id]} tone={g.tone}/>)
    }</div>)}</div><div className="card"><div className="card-title"><h3>Présentation et mesures</h3>
-    <span className="pill">{measuredProposals(b).length} mesures</span></div>
+    <span className="pill">{measuredProposals(b).length} mesures chiffrées</span></div>
     {b.description&&<p className="muted small">{b.description}</p>}
+    {measuredProposals(b).some(p=>p.impacts.length===0)&&<p className="muted small">Les montants annoncés des propositions sont présentés à titre documentaire ; ils ne sont pas ajoutés aux agrégats ni à la simulation.</p>}
     <div className="compact-measure-list" aria-label="Propositions en lecture seule">
     {measuredProposals(b).map(p=><div key={p.proposalKey} className="compact-measure-item">
      <div className="compact-measure-row"><button className="compact-measure-content compact-measure-open"
       aria-expanded={openedProposal===p.proposalKey} onClick={()=>setOpenedProposal(x=>x===p.proposalKey?null:p.proposalKey)}>
       <span className="compact-measure-title">{p.title}</span><ChevronDown size={17}/></button></div>
      {openedProposal===p.proposalKey&&<div className="compact-measure-detail proposal-panel vote-proposal-readonly">
-      <p className="muted small">{p.description}</p>
+      {p.description?.trim()&&<p className="muted small">{p.description}</p>}
+      {declaredAmountForDisplay(p)!==null&&p.impacts.length===0&&
+        <p className="muted small"><strong>Montant annoncé : {money(declaredAmountForDisplay(p)!)}</strong>
+         {' · '}Chiffrage déclaré par son auteur, non imputé aux postes comptables.
+         {p.sourceStatus==='primary_source_checked_apu_review_pending'&&' · Qualification comptable en attente.'}
+        </p>}
       {groups.map(g=>{const impacts=p.impacts.filter(i=>i.side===g.side);
        return impacts.length?<div className="card" key={g.side}><h4>{g.title}</h4>{impacts.map(i=>{
         const c=g.items.find(c=>c.id===i.categoryId);
