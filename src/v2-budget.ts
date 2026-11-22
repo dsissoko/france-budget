@@ -13,7 +13,7 @@ export type BudgetDocumentary={
  sources?:Array<{source_url?:string;sourceUrl?:string;title?:string}>;
  aggregates?:Array<{basis?:'delta'|'total';year?:number;revenues_bn?:string|number;expenses_bn?:string|number;balance_delta_bn?:string|number;source_url?:string;scope?:string}>;
  citizenSource?:{budgetKey:string;title:string;budgetMode?:BudgetMode;
-   aggregate?:BudgetDocumentary['aggregates'] extends Array<infer T>?T|null:never;
+   aggregate?:NonNullable<BudgetDocumentary['aggregates']>[number]|null;
    proposals?:BudgetProposal[]};
 };
 export type PublishedBudget={
