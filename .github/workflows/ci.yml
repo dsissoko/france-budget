@@ -53,5 +53,5 @@ jobs:
       - name: Vérifier les CSV et les modes des programmes (sans écriture Neon)
         run: npm run test:programmes
 
-      - name: Vérifier le build de production
+      - name: Vérifier V2 (tests unitaires + CSV intégral, sans Neon)\n        run: npm run test:v2\n\n      - name: Vérifier le build de production
         run: npm run build
