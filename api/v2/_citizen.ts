@@ -44,7 +44,8 @@ export function normalizeCitizenBody(body:any,key:string){
   demand(['PARTIAL','AGGREGATE'].includes(mode),'Mode invalide');
   demand(Array.isArray(body.proposals)&&body.proposals.length<=100,'Propositions invalides');
   const publish=body.publish!==false;
-  demand(!publish||body.proposals.length>0,'Publication sans proposition');
+  demand(body.sourceBudgetKey===undefined||/^[a-zA-Z0-9_.-]{1,160}$/.test(body.sourceBudgetKey),'Budget source invalide');
+  demand(!publish||body.proposals.length>0||typeof body.sourceBudgetKey==='string','Publication sans proposition');
   const proposals:any[]=[],impacts:any[]=[];
   const proposalKeys=new Set<string>(),postKeys=new Set<string>();
   for(const [index,p] of body.proposals.entries()){

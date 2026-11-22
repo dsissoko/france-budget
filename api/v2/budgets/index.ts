@@ -42,6 +42,18 @@ export default async function handler(req:any,res:any){
     const key=makeCitizenKey();
     const payload=normalizeCitizenBody(body,key);
     const sql=v2db();
+    if(body.sourceBudgetKey){
+      const source=await sql`SELECT id,budget_key,title,budget_mode,documentary FROM v2.latest_budgets WHERE budget_key=${body.sourceBudgetKey} LIMIT 1`;
+      if(!source.length)return respond(res,400,{error:'Budget de départ introuvable'});
+      const p=await sql`SELECT p.proposal_key AS "proposalKey",p.title,p.description,
+         (SELECT COALESCE(jsonb_agg(jsonb_build_object('side',i.side,'categoryId',i.category_id,
+          'deltaAmountBn',i.delta_amount_bn::float8)),'[]'::jsonb) FROM v2.budget_proposal_impacts i WHERE i.proposal_id=p.id) AS impacts
+         FROM v2.budget_proposals p WHERE p.budget_id=${source[0].id}::uuid`;
+      payload.budget.documentary={citizenSource:{budgetKey:source[0].budget_key,
+       title:source[0].title,budgetMode:source[0].budget_mode,
+       aggregate:source[0].documentary?.aggregates?.[0]??null,
+       proposals:p}};
+    }
     const reference=await sql`SELECT side,category_id,reference_amount_bn::text
       FROM v2.reference_posts WHERE reference_year=2025`;
     validatePivotImpacts(payload.impacts,reference as any);
