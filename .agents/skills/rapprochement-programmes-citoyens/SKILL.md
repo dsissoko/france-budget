@@ -1,7 +1,7 @@
 ---
 name: rapprochement-programmes-citoyens
 description: Collecter, préserver et regrouper les mesures de programmes politiques dans les CSV de Mon Budget Citoyen, avec classification agentique auditée et calcul comptable déterministe.
-version: 0.2.0
+version: 0.3.0
 ---
 
 # Skill — Rapprochement des programmes avec les postes citoyens
@@ -59,13 +59,34 @@ Pour chaque candidat à impact : vérifier la direction, la catégorie existante
 
 Lorsqu'au moins deux mesures qualifiées alimentent le même poste **à l'intérieur de son groupe exclusif**, produire un impact consolidé unique par poste, traçable vers toutes les composantes, *après* élimination des recouvrements. Rejeter les incohérences de sens, d'unité et de millésime ; ne pas additionner une enveloppe et ses sous-mesures.
 
-### 5. Exporter puis importer (déterministe)
+### 5. Rédiger les champs publics (agentique, puis contrôle éditorial)
+
+**Public cible : une personne sans connaissances économiques ou budgétaires.** Les textes issus des programmes politiques constituent la base éditoriale privilégiée : conserver leurs formulations courantes lorsqu'elles sont compréhensibles, sans recopier inutilement leur jargon ou leur rhétorique partisane. La mission de l'agent est de **rendre la proposition immédiatement compréhensible**, pas de rédiger une note d'expertise.
+
+- Produire pour chaque proposition et regroupement un **titre court**, puis une **description de une à trois phrases courtes** : ce qui est proposé, à qui cela s'adresse, et éventuellement pourquoi cela concerne le poste citoyen.
+- Employer des mots usuels, des verbes concrets, une seule idée par phrase. Préférer « Créer des places à l'université » à « Accroître la capacité d'accueil de l'enseignement supérieur ».
+- Ne pas introduire des notions comme « APU », « COFOG », « imputation », « agrégats », « rendement fiscal » ou « catégorie comptable » dans les textes destinés aux citoyens. Les réserver aux champs techniques et aux sources.
+- **Priorité à la pédagogie plutôt qu'à l'exhaustivité technique** : omettre les détails techniques qui n'aident pas le lecteur, sans déformer l'intention, changer les bénéficiaires, les conditions, les chiffres, l'année ou le sens d'une mesure. Ne jamais inventer un effet ou transformer une promesse en fait établi.
+- Pour un regroupement, rédiger une présentation de synthèse simple, fidèle aux mesures incluses, sans suggérer une somme financière vérifiée. Garder les titres, descriptions et sources des mesures consultables dans le détail.
+- Conserver distincts : **texte source exact ou référence**, **texte public reformulé**, **note de qualification technique** et **statut du chiffrage**. Ne pas écraser le texte du programme dans les CSV.
+- Si le programme emploie déjà une formulation simple, la réutiliser autant que possible. En cas d'ambiguïté ou de formule politique invérifiable, préférer « Le programme propose… » et laisser la qualification détaillée hors de la description publique.
+
+**Relecture obligatoire** : un lecteur non initié comprend-il en une lecture de quoi il s'agit ? Le texte conserve-t-il la substance de la proposition ? Est-il compréhensible sans sigle non expliqué ? Toute réponse négative impose une nouvelle rédaction.
+
+**Exemple**
+
+- Document/source : « Création de 250 000 places universitaires ».
+- Titre public : « Créer 250 000 places à l'université ».
+- Description publique : « Le programme propose d'ouvrir 250 000 places supplémentaires à l'université pour accueillir davantage d'étudiants. »
+- Métadonnées conservées séparément : montant revendiqué 3,5 Md€, source, millésime et statut de qualification comptable.
+
+### 6. Exporter puis importer (déterministe)
 
 Les CSV versionnés sont le référentiel réutilisable de provenance et d'enrichissement. Conserver dans des fichiers adjacents ou colonnes versionnées (selon le schéma adopté) les rattachements proposés, preuves, décisions et groupes ; ne pas écraser les lignes originales. Générer ensuite une migration/import idempotent vers Neon. Importer **toutes les mesures documentaires** en tant que contenu visible, indépendamment de leur activation comptable. Les seules écritures calculées proviennent du flux qualifié.
 
 Le code de l'interface/API doit lire les mesures documentaires pour les budgets `AGGREGATE` **et** `PARTIAL`. Le nombre affiché doit provenir du même ensemble dédupliqué que la liste effectivement consultable ; le label « chiffrées » est réservé aux lignes réellement dotées d'un montant, sans suggérer qu'elles ont un impact calculé.
 
-### 6. Vérifier le résultat (déterministe)
+### 7. Vérifier le résultat (déterministe)
 
 Contrôles obligatoires avant fusion :
 - inventaire sources = lignes CSV distinctes = lignes importées visibles (à exclusions explicites et documentées près) ;
@@ -74,7 +95,7 @@ Contrôles obligatoires avant fusion :
 - les montants consolidés sont réconciliés, sans chevauchement ni duplication multi-postes ;
 - `AGGREGATE` : trajectoire et bilan identiques avant/après ajout des détails documentaires ;
 - `PARTIAL` : seules les écritures validées changent les résultats ;
-- interface mobile et desktop : liste, dépliants, compteurs et sources concordent ;
+- interface mobile et desktop : liste, dépliants, compteurs et sources concordent ; titres et descriptions compréhensibles par un non-initié et fidèles aux sources ;
 - non-régression des budgets citoyens, votes, exports, tests TypeScript/Vitest/build et migrations.
 
 ## Cas de référence : LFI 2027
@@ -97,3 +118,8 @@ Après chaque campagne, conserver dans la PR les nouvelles ambiguïtés rencontr
 - Regroupement défini précisément par les composantes connexes du graphe propositions ↔ postes citoyens.
 - Exclusivité de **chaque poste au niveau du budget**, et non uniquement des écritures ou couples poste/sens.
 - Groupes autorisés à toucher zéro, un ou plusieurs postes ; fusion transitive obligatoire ; propositions sans poste conservées.
+
+### v0.3.0 — 2026-11-22
+- Génération éditoriale en langage courant, inspirée prioritairement des formulations déjà pédagogiques des programmes.
+- Titres et descriptions courts, sans jargon comptable, avec relecture « non-initié ».
+- Préférence donnée à la clarté plutôt qu'à l'exhaustivité technique, sans altérer la substance des engagements ni les chiffres.
