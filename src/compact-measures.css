@@ -3,3 +3,14 @@
 
 /* Mobile-friendly, branded origin selection */
 .origin-choice-card{min-width:0;max-width:100%;overflow:hidden}.origin-choice-list{display:flex;flex-direction:column;gap:5px;max-height:min(52vh,420px);overflow-y:auto;overscroll-behavior:contain;margin:14px 0;padding:3px;min-width:0}.origin-choice-group{font-weight:700;font-size:.82rem;letter-spacing:.02em;color:var(--muted,#777);padding:12px 8px 5px}.origin-choice-item{display:flex;align-items:center;gap:12px;border:1px solid #dededb;border-radius:12px;padding:12px;min-width:0;cursor:pointer;background:var(--card,#fff)}.origin-choice-item.is-selected{border-color:#258a78;background:rgba(37,138,120,.07)}.origin-choice-item input{flex:0 0 auto;width:18px;height:18px;accent-color:#258a78}.origin-choice-name{display:block;min-width:0;overflow-wrap:anywhere;font-weight:600;line-height:1.35}.origin-choice-name small{display:block;font-weight:400;color:#777;margin-top:3px}.origin-choice-actions{display:flex;flex-wrap:wrap;gap:10px}.origin-choice-actions button{white-space:normal;min-width:0;max-width:100%}@media(max-width:540px){.origin-choice-card{padding:16px}.origin-choice-actions{flex-direction:column-reverse}.origin-choice-actions button{width:100%;justify-content:center}}
+
+/* Shared Voter/Comparer proposal accordion: keep the detail next to its trigger. */
+.compact-measure-item{min-width:0;border-bottom:1px solid #e9e9e9}
+.compact-measure-item:last-child{border-bottom:0}
+.compact-measure-item .compact-measure-row{border-bottom:0}
+.compact-measure-item .compact-measure-content{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%}
+.compact-measure-item .compact-measure-title{white-space:normal;overflow:visible;text-overflow:clip;overflow-wrap:anywhere;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;overflow:hidden;line-height:1.4}
+.compact-measure-chevron{flex-shrink:0;color:#777;transition:transform .15s ease}
+.compact-measure-chevron.is-open{transform:rotate(180deg)}
+.compact-measure-item .compact-measure-detail{border-top:1px solid #e9e9e9;border-bottom:0;background:var(--card,#fff);margin-top:0}
+.compact-measure-item .vote-proposal-readonly{margin-top:0}
