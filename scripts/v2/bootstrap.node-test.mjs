@@ -25,6 +25,6 @@ describe('Bootstrap V2 indépendant de public',()=>{
   assert.match(sql,/^BEGIN;/);
   assert.match(sql,/COMMIT;\s*$/);
   assert.match(sql,/db:init refuses nonempty v2.budgets/);
-  assert.doesNotMatch(sql,/(?:FROM|INTO|UPDATE|JOIN|ALTER TABLE)\s+public\./i);
+  assert.doesNotMatch(sql.replace(/^--.*$/gm,''),/(?:FROM|INTO|UPDATE|JOIN|ALTER TABLE)\s+public\./i);
  });
 });
