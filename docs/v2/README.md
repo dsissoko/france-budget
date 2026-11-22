@@ -11,7 +11,7 @@
 | Composants et sécurité | [Architecture](architecture.md) |
 | Entités, clés, contraintes | [MCD Mermaid](mcd.md) |
 | PDF → qualification → CSV → SQL | [Intégration](integration.md) |
-| Contrats HTTP réels | [API V2](api.md) |
+| Contrats HTTP réels | [API V2](api.md) et [OpenAPI 3.1](openapi.yaml) |
 | Initialisation, cutover et retour arrière | [Exploitation](exploitation.md) |
 | Décisions structurantes | [ADR](adr/README.md) |
 
