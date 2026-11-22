@@ -221,7 +221,7 @@ export default function AppV2(){
     {!!b.documentary?.citizenGroups?.length&&<div style={{display:'flex',flexDirection:'column',alignItems:'flex-start',gap:4,marginBottom:12}}>
       <span className="pill">{measuredProposals(b).length} propositions</span>
       <span className="muted small">Issues de {measuredSourceCount(b)} mesures du programme</span>
-    </div>
+    </div>}
     {b.description&&<p className="muted small">{b.description}</p>}
     {b.origin==='party'&&measuredProposals(b).length===0&&
      <p className="muted small" role="status">
