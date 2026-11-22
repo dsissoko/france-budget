@@ -2,7 +2,7 @@
 
 [Spécification OpenAPI 3.1 versionnée](openapi.yaml) — contrats de la branche #142 ; la validation automatique contre les handlers reste à compléter.
 
-Les endpoints ci-dessous reflètent les handlers actuels de [api/v2](../../api/v2/), **et non une API V2 déjà publiée sur le domaine de production**.
+Les endpoints ci-dessous sont ceux de l'API V2 publiée sur [Mon Budget Citoyen](https://mon-budget-citoyen.vercel.app). Le contrat normatif reste le code des handlers [api/v2](../../api/v2/) et les tests associés.
 
 | Méthode | Endpoint | Réponse normale |
 |---|---|---|
@@ -12,7 +12,7 @@ Les endpoints ci-dessous reflètent les handlers actuels de [api/v2](../../api/v
 | GET | `/api/v2/budgets/{key}` | Budget, présentation et `proposals[]` avec leurs `impacts[]` |
 | PATCH | `/api/v2/budgets/{key}` | Mutation du brouillon avec token Bearer et révision |
 | DELETE | `/api/v2/budgets/{key}` | Retrait logique avec token et révision |
-| GET | `/api/v2/budgets/{key}/positions` | Pour PARTIAL, postes de référence et impacts ; pour AGGREGATE, statut documentaire et tableau de positions vide **actuellement** |
+| GET | `/api/v2/budgets/{key}/positions` | Pour PARTIAL, postes de référence et impacts ; pour AGGREGATE ventilé, positions et statut `aggregate_allocated`, sinon retour documentaire sans positions |
 | POST | `/api/v2/votes` | `{voted:true}` / HTTP 201, ou HTTP 409 si déjà voté |
 | GET | `/api/v2/share/{id}` | HTML partage / métadonnées sociales / redirection |
 
@@ -23,7 +23,7 @@ Les endpoints ci-dessous reflètent les handlers actuels de [api/v2](../../api/v
 - `budgetMode` : `PARTIAL` ou `AGGREGATE`.
 - `documentary` : références, contexte et masses publiées ; ses chiffres ne sont pas ajoutés aux impacts.
 
-Le handler `GET /budgets/{key}/positions` restitue désormais les postes ventilés pour les AGGREGATE possédant `documentary.claimedAllocations` ; il continue de renvoyer `positions:[]` pour les agrégats sans ventilation qualifiée. Les allocations de #145 sont importées depuis les CSV dans la branche V2. Recette API QA à exécuter.
+Le handler `GET /budgets/{key}/positions` restitue désormais les postes ventilés pour les AGGREGATE possédant `documentary.claimedAllocations` ; il continue de renvoyer `positions:[]` pour les agrégats sans ventilation qualifiée. Les allocations issues de #145 ont été importées dans `v2.budgets.documentary` pour LFI 2027. Les accès PostgreSQL du rôle applicatif ont été accordés au schéma V2 sans autorisation d'import administratif.
 
 ## Erreurs, sécurité et limites
 
