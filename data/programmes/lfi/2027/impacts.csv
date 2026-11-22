@@ -1,1 +1,7 @@
 budget_key,proposal_key,side,category_id,delta_amount_bn
+lfi-2027,src-4,revenues,business,3.000
+lfi-2027,src-19,expenses,education,0.500
+lfi-2027,src-21,expenses,education,3.500
+lfi-2027,src-22,expenses,health,3.000
+lfi-2027,src-27,expenses,social,9.000
+lfi-2027,src-28,expenses,unemployment,3.000
