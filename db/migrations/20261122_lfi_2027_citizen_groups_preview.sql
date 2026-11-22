@@ -3,12 +3,12 @@
 BEGIN;
 INSERT INTO party_proposals (party_code,source_year,group_id,title,review_status,source_measure_count,description) VALUES
 ('LFI',2027,'citizen-01','Impôt sur le revenu','review_pending',1,'Propositions concernant Impôt sur le revenu.'),
-('LFI',2027,'citizen-02','Patrimoine et immobilier','review_pending',3,'Propositions concernant Patrimoine et immobilier.'),
-('LFI',2027,'citizen-03','Cotisations sociales et Autres impôts','review_pending',5,'Propositions concernant Cotisations sociales, Autres impôts.'),
+('LFI',2027,'citizen-02','Impôts sur les grandes fortunes','review_pending',3,'Propositions concernant Patrimoine et immobilier.'),
+('LFI',2027,'citizen-03','Taxes et cotisations','review_pending',5,'Propositions concernant Cotisations sociales, Autres impôts.'),
 ('LFI',2027,'citizen-04','Fiscalité des entreprises','review_pending',5,'Propositions concernant Fiscalité des entreprises.'),
 ('LFI',2027,'citizen-15','Services publics généraux','review_pending',2,'Propositions concernant Services publics généraux.'),
-('LFI',2027,'citizen-16','Famille et Logement et Sécurité et justice et Retraites','review_pending',5,'Propositions concernant Famille, Logement, Sécurité et justice, Retraites.'),
-('LFI',2027,'citizen-18','Solidarité','review_pending',1,'Propositions concernant Solidarité.'),
+('LFI',2027,'citizen-16','Famille, logement, sécurité et retraites','review_pending',5,'Propositions concernant Famille, Logement, Sécurité et justice, Retraites.'),
+('LFI',2027,'citizen-18','Solidarité et autonomie','review_pending',1,'Propositions concernant Solidarité.'),
 ('LFI',2027,'citizen-19','Éducation','review_pending',3,'Propositions concernant Éducation.'),
 ('LFI',2027,'citizen-22','Santé','review_pending',1,'Propositions concernant Santé.'),
 ('LFI',2027,'citizen-26','Environnement','review_pending',1,'Propositions concernant Environnement.'),
