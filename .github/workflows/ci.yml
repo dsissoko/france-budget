@@ -59,5 +59,8 @@ jobs:
       - name: Auditer les textes publiables V2 (rapport non destructif)
         run: npm run audit:editorial:v2
 
+      - name: Vérifier les liens et diagrammes de la documentation V2
+        run: npm run docs:check
+
       - name: Vérifier le build de production
         run: npm run build
