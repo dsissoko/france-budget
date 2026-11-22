@@ -217,7 +217,11 @@ export default function AppV2(){
      g.items.filter(c=>Math.abs((r[g.side][c.id]??c.amount)-c.amount)>.005).map(c=>
       <Gauge key={c.id} id={'view-'+b.id+'-'+c.id} item={c} value={r[g.side][c.id]} tone={g.tone}/>)
    }</div>)}</div><div className="card"><div className="card-title"><h3>Présentation et mesures</h3>
-    <span className="pill">{measuredSourceCount(b)} mesures chiffrées</span></div>
+    {!b.documentary?.citizenGroups?.length&&<span className="pill">{measuredSourceCount(b)} mesures chiffrées</span>}</div>
+    {!!b.documentary?.citizenGroups?.length&&<div style={{display:'flex',flexDirection:'column',alignItems:'flex-start',gap:4,marginBottom:12}}>
+      <span className="pill">{measuredProposals(b).length} propositions</span>
+      <span className="muted small">Issues de {measuredSourceCount(b)} mesures du programme</span>
+    </div>
     {b.description&&<p className="muted small">{b.description}</p>}
     {b.origin==='party'&&measuredProposals(b).length===0&&
      <p className="muted small" role="status">
