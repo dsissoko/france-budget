@@ -136,3 +136,7 @@ Metricool ne doit pas être présenté comme capable de parcourir l'ensemble des
 - Donner également aux PR un titre conforme à Conventional Commits. En cas de *squash merge*, vérifier que le titre du commit final respecte cette convention : c'est ce commit que Release Please analysera sur `main`.
 - Ne pas modifier manuellement les numéros de version, créer de tag Git, fusionner une PR de release ou déclencher une publication sans validation explicite. Les montées de version mineure restent conditionnées à la validation du jalon correspondant.
 - Le contrôle automatique des titres de PR relève de la CI GitHub Actions ; ces instructions seules ne constituent pas un contrôle technique.
+
+## Skill de qualification des impacts budgétaires V2
+
+Quand un utilisateur demande de **déduire les impacts des mesures politiques vers les postes du budget citoyen**, lire le skill local [`skills/budget-impact-qualification/SKILL.md`](skills/budget-impact-qualification/SKILL.md) et le pipeline [`docs/v2-qualification-pipeline.md`](docs/v2-qualification-pipeline.md). La chaîne est **déterministe**, seule la décision d'imputation est **agentique**. Aucune exécution IA à la consultation de l'UI ou dans le moteur de simulation. Ne jamais produire un impact non étayé pour satisfaire un compteur ; distinguer montant revendiqué, écriture qualifiée, résultat AGGREGATE. L'agent n'a pas l'autorité d'importer ou de publier sans accord explicite.
