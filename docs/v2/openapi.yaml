@@ -1,0 +1,355 @@
+openapi: 3.1.0
+info:
+  title: Mon Budget Citoyen - API V2
+  version: 0.1.0-draft
+  description: >
+    Contrat de la branche feat/backend-v2-isolated (PR 142).
+    Non encore publié en production. Les montants revendiqués ne sont
+    pas des impacts. Les programmes AGGREGATE ne renvoient actuellement
+    pas de positions calculées par l'endpoint /positions.
+servers:
+  - url: /api/v2
+tags:
+  - name: Référentiel
+  - name: Budgets
+  - name: Votes
+  - name: Partage
+paths:
+  /reference:
+    get:
+      tags: [Référentiel]
+      summary: Référentiel citoyen et paramètres de simulation
+      responses:
+        '200':
+          description: Postes, paramètres et version de référence
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [referenceYear, referenceVersion, simulation, revenues, expenses, offBudget, posts]
+                properties:
+                  referenceYear: {type: integer, example: 2025}
+                  referenceVersion: {type: string}
+                  simulation: {type: object}
+                  revenues: {type: array, items: {$ref: '#/components/schemas/ReferencePost'}}
+                  expenses: {type: array, items: {$ref: '#/components/schemas/ReferencePost'}}
+                  offBudget: {type: array, items: {$ref: '#/components/schemas/ReferencePost'}}
+                  posts: {type: array, items: {$ref: '#/components/schemas/ReferencePost'}}
+        '503': {$ref: '#/components/responses/Unavailable'}
+  /budgets:
+    get:
+      tags: [Budgets]
+      summary: Liste les budgets publiés
+      parameters:
+        - in: query
+          name: origin
+          schema: {type: string, enum: [citizen, party, educational]}
+          required: false
+      responses:
+        '200':
+          description: Au plus 500 budgets, sans pagination dans la version actuelle
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [budgets, version]
+                properties:
+                  version: {type: string, const: latest}
+                  budgets: {type: array, items: {$ref: '#/components/schemas/Budget'}}
+        '400': {$ref: '#/components/responses/BadRequest'}
+        '503': {$ref: '#/components/responses/Unavailable'}
+    post:
+      tags: [Budgets]
+      summary: Crée un budget citoyen brouillon ou publié
+      description: Le statut publié est définitif. Un editToken est renvoyé seulement à la création et doit être conservé par le client.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/CitizenWrite'}
+      responses:
+        '201':
+          description: Budget créé
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [budgetKey, id, revision, status, editToken]
+                properties:
+                  budgetKey: {type: string}
+                  id: {type: string, format: uuid}
+                  revision: {type: integer}
+                  status: {type: string, enum: [draft, published]}
+                  editToken: {type: string, description: Jeton de capacité à présenter comme Bearer}
+        '400': {$ref: '#/components/responses/BadRequest'}
+        '403': {$ref: '#/components/responses/Forbidden'}
+        '409': {$ref: '#/components/responses/Conflict'}
+        '422': {$ref: '#/components/responses/BadRequest'}
+        '429': {$ref: '#/components/responses/BadRequest'}
+        '503': {$ref: '#/components/responses/Unavailable'}
+  /budgets/{key}:
+    parameters:
+      - $ref: '#/components/parameters/BudgetKey'
+    get:
+      tags: [Budgets]
+      summary: Détail d'un budget publié
+      responses:
+        '200':
+          description: Budget et ses propositions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  budget: {$ref: '#/components/schemas/Budget'}
+        '400': {$ref: '#/components/responses/BadRequest'}
+        '404': {$ref: '#/components/responses/NotFound'}
+        '503': {$ref: '#/components/responses/Unavailable'}
+    patch:
+      tags: [Budgets]
+      summary: Modifie un brouillon citoyen
+      security: [{editToken: []}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/CitizenWrite'
+                - type: object
+                  required: [revision]
+                  properties:
+                    revision: {type: integer, minimum: 1}
+      responses:
+        '200': {$ref: '#/components/responses/BudgetChanged'}
+        '400': {$ref: '#/components/responses/BadRequest'}
+        '403': {$ref: '#/components/responses/Forbidden'}
+        '409': {$ref: '#/components/responses/Conflict'}
+        '422': {$ref: '#/components/responses/BadRequest'}
+        '503': {$ref: '#/components/responses/Unavailable'}
+    delete:
+      tags: [Budgets]
+      summary: Retire logiquement un budget citoyen
+      security: [{editToken: []}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [revision]
+              properties:
+                revision: {type: integer, minimum: 1}
+      responses:
+        '200': {$ref: '#/components/responses/BudgetChanged'}
+        '400': {$ref: '#/components/responses/BadRequest'}
+        '403': {$ref: '#/components/responses/Forbidden'}
+        '409': {$ref: '#/components/responses/Conflict'}
+        '503': {$ref: '#/components/responses/Unavailable'}
+  /budgets/{key}/positions:
+    parameters:
+      - $ref: '#/components/parameters/BudgetKey'
+    get:
+      tags: [Budgets]
+      summary: Positions par poste du budget
+      description: Pour AGGREGATE, retourne actuellement accountingStatus documentary_aggregate_only et positions vide.
+      responses:
+        '200':
+          description: Référence et effets explicites pour PARTIAL ou déclaration AGGREGATE
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [budgetKey, version, budgetMode, accountingStatus, positions]
+                properties:
+                  budgetKey: {type: string}
+                  version: {type: string}
+                  budgetMode: {type: string, enum: [PARTIAL, AGGREGATE]}
+                  accountingStatus: {type: string, enum: [pivot_positions_only, documentary_aggregate_only]}
+                  declaredAggregates: {type: array, items: {type: object}}
+                  positions:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        side: {type: string}
+                        categoryId: {type: string}
+                        label: {type: string}
+                        referenceAmountBn: {type: string}
+                        deltaAmountBn: {type: string}
+                        resultAmountBn: {type: string}
+        '400': {$ref: '#/components/responses/BadRequest'}
+        '404': {$ref: '#/components/responses/NotFound'}
+        '503': {$ref: '#/components/responses/Unavailable'}
+  /votes:
+    post:
+      tags: [Votes]
+      summary: Soutient un budget publié
+      description: Cookie fb_voter pseudonyme et déduplication par budget/navigateur.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [budgetId]
+              properties:
+                budgetId: {type: string, format: uuid}
+      responses:
+        '201':
+          description: Vote créé
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  voted: {type: boolean, const: true}
+        '400': {$ref: '#/components/responses/BadRequest'}
+        '403': {$ref: '#/components/responses/Forbidden'}
+        '409': {$ref: '#/components/responses/Conflict'}
+        '503': {$ref: '#/components/responses/Unavailable'}
+  /share/{id}:
+    get:
+      tags: [Partage]
+      summary: Page HTML avec métadonnées sociales et redirection
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: {type: string, format: uuid}
+      responses:
+        '200':
+          description: Page HTML
+          content:
+            text/html:
+              schema: {type: string}
+        '404':
+          description: Budget inconnu ou non publié
+components:
+  securitySchemes:
+    editToken:
+      type: http
+      scheme: bearer
+      description: Jeton de capacité de 64 caractères hexadécimaux
+  parameters:
+    BudgetKey:
+      in: path
+      name: key
+      required: true
+      schema: {type: string, minLength: 1, maxLength: 160}
+  responses:
+    BudgetChanged:
+      description: Budget mis à jour ou retiré
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              budgetKey: {type: string}
+              id: {type: string, format: uuid}
+              revision: {type: integer}
+              status: {type: string, enum: [draft, published, withdrawn]}
+    BadRequest:
+      description: Requête invalide
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/Error'}
+    Forbidden:
+      description: Accès refusé
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/Error'}
+    Conflict:
+      description: Conflit métier ou ressource déjà votée
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/Error'}
+    NotFound:
+      description: Ressource absente
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/Error'}
+    Unavailable:
+      description: Service V2 indisponible ou référentiel incomplet
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/Error'}
+  schemas:
+    Error:
+      type: object
+      required: [error]
+      properties:
+        error: {type: string}
+    ReferencePost:
+      type: object
+      required: [id, label, amount]
+      properties:
+        id: {type: string}
+        label: {type: string}
+        amount: {type: number}
+        canonical: {type: string}
+        description: {type: string}
+    Budget:
+      type: object
+      required: [budgetKey, title, origin, budgetMode]
+      properties:
+        id: {type: string, format: uuid}
+        budgetKey: {type: string}
+        version: {type: string}
+        origin: {type: string, enum: [citizen, party, educational]}
+        budgetMode: {type: string, enum: [PARTIAL, AGGREGATE]}
+        title: {type: string}
+        description: {type: string}
+        author: {type: string}
+        documentary: {type: object}
+        proposals:
+          type: array
+          items: {$ref: '#/components/schemas/Proposal'}
+    Proposal:
+      type: object
+      properties:
+        proposalKey: {type: string}
+        title: {type: string}
+        description: {type: string}
+        claimedAmountBn: {type: [string, 'null']}
+        sourceUrl: {type: [string, 'null']}
+        sourceStatus: {type: string}
+        impacts:
+          type: array
+          items: {$ref: '#/components/schemas/Impact'}
+    Impact:
+      type: object
+      required: [side, categoryId, deltaAmountBn]
+      properties:
+        side: {type: string, enum: [revenues, expenses, offBudget]}
+        categoryId: {type: string}
+        deltaAmountBn: {type: string, pattern: '^-?\\d+(\\.\\d{1,3})?$'}
+    CitizenWrite:
+      type: object
+      required: [title, author, referenceYear, proposals]
+      properties:
+        origin: {type: string, const: citizen}
+        title: {type: string, minLength: 3, maxLength: 100}
+        description: {type: string, maxLength: 500}
+        author: {type: string, minLength: 2, maxLength: 60}
+        referenceYear: {type: integer, const: 2025}
+        budgetMode: {type: string, enum: [PARTIAL, AGGREGATE], default: PARTIAL}
+        publish: {type: boolean, default: true}
+        sourceBudgetKey: {type: string, maxLength: 160}
+        proposals:
+          type: array
+          maxItems: 100
+          items:
+            type: object
+            required: [proposalKey, title, impacts]
+            properties:
+              proposalKey: {type: string, maxLength: 160}
+              title: {type: string, minLength: 3, maxLength: 160}
+              description: {type: string, maxLength: 2000}
+              claimedAmountBn: {type: [string, number, 'null']}
+              sourceUrl: {type: string, format: uri}
+              impacts:
+                type: array
+                maxItems: 100
+                items:
+                  $ref: '#/components/schemas/Impact'
