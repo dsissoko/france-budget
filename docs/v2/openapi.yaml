@@ -152,7 +152,7 @@ paths:
     get:
       tags: [Budgets]
       summary: Positions par poste du budget
-      description: Pour AGGREGATE, retourne actuellement accountingStatus documentary_aggregate_only et positions vide.
+      description: Pour AGGREGATE avec allocations validées, retourne accountingStatus aggregate_allocated et les positions ventilées. Sans allocations, retourne documentary_aggregate_only et positions vides.
       responses:
         '200':
           description: Référence et effets explicites pour PARTIAL ou déclaration AGGREGATE
@@ -165,7 +165,7 @@ paths:
                   budgetKey: {type: string}
                   version: {type: string}
                   budgetMode: {type: string, enum: [PARTIAL, AGGREGATE]}
-                  accountingStatus: {type: string, enum: [pivot_positions_only, documentary_aggregate_only]}
+                  accountingStatus: {type: string, enum: [pivot_positions_only, documentary_aggregate_only, aggregate_allocated]}
                   declaredAggregates: {type: array, items: {type: object}}
                   positions:
                     type: array
