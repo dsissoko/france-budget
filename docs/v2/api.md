@@ -23,7 +23,7 @@ Les endpoints ci-dessous reflètent les handlers actuels de [api/v2](../../api/v
 - `budgetMode` : `PARTIAL` ou `AGGREGATE`.
 - `documentary` : références, contexte et masses publiées ; ses chiffres ne sont pas ajoutés aux impacts.
 
-Le handler `GET /budgets/{key}/positions` renvoie **`positions:[]` pour AGGREGATE** dans le code #142. La migration des allocations de #145 n'est donc pas terminée.
+Le handler `GET /budgets/{key}/positions` restitue désormais les postes ventilés pour les AGGREGATE possédant `documentary.claimedAllocations` ; il continue de renvoyer `positions:[]` pour les agrégats sans ventilation qualifiée. Les allocations de #145 sont importées depuis les CSV dans la branche V2. Recette API QA à exécuter.
 
 ## Erreurs, sécurité et limites
 
