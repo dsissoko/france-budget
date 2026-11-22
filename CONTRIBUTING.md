@@ -4,6 +4,8 @@ Merci pour votre intérêt. Le projet est gratuit, open source et **non partisan
 
 La [roadmap à trois piliers](docs/roadmap.md) précise les priorités. L'interface grand public est stabilisée ; ne soumettez pas de refonte UX sans discussion préalable.
 
+> **Travaux V2 :** lire le [référentiel documentaire](docs/v2/README.md) et utiliser le [template V2](.github/PULL_REQUEST_TEMPLATE/v2-change.md). Les instructions historiques V1 sont conservées uniquement durant la transition.
+
 ## Choisir sa contribution
 
 | Profil / objectif | Premier pas | Pour proposer une modification |
