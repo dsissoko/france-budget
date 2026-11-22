@@ -58,7 +58,7 @@ const output=groups.map(g=>{
  const citizenImpacts=impacts.filter(i=>i.group_id===g.group_id).map(i=>({
   side:i.citizen_side,categoryId:i.citizen_post_id,label:i.citizen_post_label,
   claimedAmountBn:i.claimed_post_amount_bn===''?null:Number(i.claimed_post_amount_bn),
-  status:i.status,rationale:i.rationale,simulated:false
+  status:i.status,rationale:i.rationale,simulated:i.simulation_applied==='true'
  }));
  return {id:g.group_id,title:g.title,description:g.description,sourceCount:Number(g.source_count),
   sourceUrl:g.source_url,claimedRevenueBn:g.claimed_revenues_bn===''?null:Number(g.claimed_revenues_bn),
