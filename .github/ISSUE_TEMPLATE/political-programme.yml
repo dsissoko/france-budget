@@ -1,5 +1,5 @@
 name: "Programme politique — soumettre ou corriger une proposition"
-description: "Soumettre ou corriger une proposition de budget politique avec source, identifiant stable et décision APU."
+description: "Soumettre une proposition politique sourcée compatible avec les CSV et impacts de la V2."
 title: "[politique] "
 body:
   - type: markdown
@@ -46,15 +46,15 @@ body:
   - type: textarea
     id: ventilation
     attributes:
-      label: "Décision manuelle APU et ventilation proposée"
-      description: "Préciser calculate, non_chiffrable_apu (avec justification) ou review_pending. Pour les mesures calculables : recettes/dépenses, catégorie existante, montant signé, somme de contrôle ; ne pas inventer de catégories."
+      label: "Qualification comptable V2 et impacts proposés"
+      description: "Distinguer montant revendiqué et impact validé. Justifier la ventilation sur les postes citoyens, les reliquats et les risques de double compte, ou indiquer revue en attente. Format de référence : budget.csv, proposals.csv, impacts.csv."
     validations:
       required: true
   - type: textarea
     id: identity
     attributes:
       label: "Identifiants existants ou proposés (non obligatoires pour une première soumission)"
-      description: "Code de formation, source_year, group_id, source_row ou identifiant stable de mesure ; jamais le titre comme clé."
+      description: "Code de formation, source_year, budget_key, proposal_key et source_measure_id éventuels ; jamais le titre comme clé. Voir docs/v2/mcd.md."
   - type: textarea
     id: coverage
     attributes:
@@ -71,7 +71,7 @@ body:
     id: interactions
     attributes:
       label: "Interactions ou risques de double compte"
-      description: "Préciser les sous-totaux, les mesures liées et les risques de double compte. Un groupe est une vue : ne jamais l’ajouter au total de ses composantes."
+      description: "Préciser les sous-totaux et recouvrements. Pour AGGREGATE, toute ventilation est comprise dans les masses annoncées ; elle ne constitue pas une dépense ou recette supplémentaire."
   - type: checkboxes
     id: verifications
     attributes:
