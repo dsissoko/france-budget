@@ -44,6 +44,9 @@ export default async function handler(req:any,res:any){
     let payload:any={budget:{budget_key:key}};
     if(req.method==='PATCH'){
       payload=normalizeCitizenBody(body,key);
+      const existing=await sql`SELECT documentary FROM v2.budgets
+        WHERE budget_key=${key} AND version='latest' AND origin='citizen' LIMIT 1`;
+      if(existing.length)payload.budget.documentary=existing[0].documentary;
       const refs=await sql`SELECT side,category_id,reference_amount_bn::text
         FROM v2.reference_posts WHERE reference_year=2025`;
       validatePivotImpacts(payload.impacts,refs as any);

@@ -14,7 +14,7 @@ export type BudgetDocumentary={
  aggregates?:Array<{basis?:'delta'|'total';year?:number;revenues_bn?:string|number;expenses_bn?:string|number;balance_delta_bn?:string|number;source_url?:string;scope?:string}>;
  citizenSource?:{budgetKey:string;title:string;budgetMode?:BudgetMode;
    aggregate?:NonNullable<BudgetDocumentary['aggregates']>[number]|null;
-   proposals?:BudgetProposal[]};
+   proposals?:BudgetProposal[];nested?:BudgetDocumentary['citizenSource']|null};
 };
 export type PublishedBudget={
  id:string;budgetKey:string;version:string;origin:'party'|'citizen'|'educational';
@@ -54,8 +54,8 @@ export function proposalEntries(proposals:ReadonlyArray<BudgetProposal>):Sourced
 export function computeBudget(b:PublishedBudget,reference:ReferenceModel):Result{
  const source=b.documentary?.citizenSource;
  if(b.origin==='citizen'&&source){
-   const base:PublishedBudget={...b,origin:'party',budgetMode:source.budgetMode??'PARTIAL',
-      documentary:{aggregates:source.aggregate?[source.aggregate]:[]},
+   const base:PublishedBudget={...b,origin:source.nested?'citizen':'party',budgetMode:source.budgetMode??'PARTIAL',
+      documentary:{aggregates:source.aggregate?[source.aggregate]:[],citizenSource:source.nested??undefined},
       proposals:source.proposals??[]};
    const baseResult=computeBudget(base,reference);
    const baseline=calculateScenario([],emptyBudgetOverrides(),[],reference);
