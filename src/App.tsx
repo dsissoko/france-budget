@@ -1,4 +1,5 @@
 import './compact-measures.css';
+import lfiPreviewGroups from '../data/programmes/lfi/2027/preview-groups.json';
 import {useEffect,useMemo,useState} from 'react';
 import {Landmark,ChevronDown,RefreshCcw,SlidersHorizontal,ArrowRight,ArrowLeft,ExternalLink,BookOpen,Scale,Wallet,ChartNoAxesCombined,Check,Download,X,Heart,UserRound,CalendarDays,ListChecks,Trash2,Trophy} from 'lucide-react';
 import {sum,currency,type Category,type Party,type Measure} from './model';
@@ -25,7 +26,12 @@ type PartyDisplayMeasure=Measure & {sourceLines?:PartySourceLine[]};
 type PublishedBudget=BudgetMaturity & {documentaryProposals?:PartyDocumentaryGroup[];id:string;title:string;description:string;origin:'party'|'citizen';party_code?:string|null;featured:boolean;featured_order:number|null;published_at:string;votes:number;budgetMode?:'AGGREGATE'|'PARTIAL'|null;scenario:{budget:Custom;picked:string[];citizenMeasures?:CitizenMeasure[];author?:string;documentaryOnly?:boolean;claimedTotals?:PublishedAggregate;aggregateOrigin?:PublishedAggregate|null;aggregateIncludedIds?:string[];aggregateSourceId?:string|null}};
 const partyMeasuresFor=(b:PublishedBudget,measures:Measure[]):PartyDisplayMeasure[]=>{
  if(b.origin!=='party')return [];
- const documentary=(b.documentaryProposals||[]).filter(g=>g.sourceLines?.length>0);
+ // Preview branch: CSV-derived fixture while Neon production remains untouched.
+ // Once the relational import is approved, the database groups take precedence.
+ const fromDatabase=(b.documentaryProposals||[]).filter(g=>g.sourceLines?.length>0);
+ const documentary=fromDatabase.length?fromDatabase:
+   b.party_code==='LFI'&&Number(b.scenario?.claimedTotals?.year)===2027?
+   (lfiPreviewGroups as PartyDocumentaryGroup[]):[];
  if(documentary.length)return documentary.map(g=>({
   id:'group-'+b.id+'-'+g.id,party:b.party_code||'',theme:'',title:g.title,
   revenueDelta:0,expenseDelta:0,source:g.sourceUrl||g.sourceLines[0]?.sourceUrl||'',
@@ -36,7 +42,9 @@ const partyMeasuresFor=(b:PublishedBudget,measures:Measure[]):PartyDisplayMeasur
  return measures.filter(m=>(b.scenario?.picked||[]).includes(m.id));
 };
 const partySourceCount=(b:PublishedBudget,measures:Measure[])=>{
- const groups=(b.documentaryProposals||[]).filter(g=>g.sourceLines?.length>0);
+ const groups=((b.documentaryProposals||[]).filter(g=>g.sourceLines?.length>0).length?
+ (b.documentaryProposals||[]).filter(g=>g.sourceLines?.length>0):
+ b.party_code==='LFI'&&Number(b.scenario?.claimedTotals?.year)===2027?(lfiPreviewGroups as PartyDocumentaryGroup[]):[]);
  return groups.length?groups.reduce((n,g)=>n+g.sourceLines.length,0):partyMeasuresFor(b,measures).length;
 };
 const eligiblePartyBudget=(b:PublishedBudget,measures:Measure[])=>b.origin!=='party'||aggregateMode(b)||partyMeasuresFor(b,measures).length>0;
