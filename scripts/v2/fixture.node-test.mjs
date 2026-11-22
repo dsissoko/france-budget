@@ -31,3 +31,23 @@ test('single-directory dry run does not require any database credential',async()
  assert.match(result.stdout,/DRY RUN: no database writes/);
  assert.match(result.stdout,/"budget_key":"nopasaran-2025"/);
 });
+
+test('NoPasaran 8 accounting positions match the recorded V1 QA benchmark',()=>{
+ const x=loadBatch('data/programmes/nopasaran/2025');
+ const baseline={
+  'expenses:defense':55.4,'expenses:general':185.6,'expenses:social':443.5,
+  'offBudget:business-social-relief':69.1,'offBudget:business-tax-relief':49.7,
+  'revenues:business':86.6,'revenues:income':103.6,'revenues:property':71.5
+ };
+ const expected={
+  'expenses:defense':30.4,'expenses:general':173.6,'expenses:social':403.5,
+  'offBudget:business-social-relief':75.1,'offBudget:business-tax-relief':9.7,
+  'revenues:business':99.8,'revenues:income':138.6,'revenues:property':91.5
+ };
+ assert.equal(x.impacts.length,Object.keys(expected).length);
+ for(const i of x.impacts){
+  const k=i.side+':'+i.category_id;
+  assert.ok(Object.hasOwn(expected,k),'unexpected citizen pivot: '+k);
+  assert.ok(Math.abs(baseline[k]+Number(i.delta_amount_bn)-expected[k])<0.0001,k+' must conserve V1 values');
+ }
+});
