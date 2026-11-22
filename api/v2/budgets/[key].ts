@@ -9,7 +9,7 @@ export default async function handler(req:any,res:any){
     try{
       const sql=v2db();
       const rows=await sql`
-        SELECT id,budget_key AS "budgetKey",version,origin,party_code AS "partyCode",
+        SELECT id,legacy_budget_id AS "legacyBudgetId",budget_key AS "budgetKey",version,origin,party_code AS "partyCode",
           author,title,description,reference_year AS "referenceYear",source_year AS "sourceYear",
           budget_mode AS "budgetMode",documentary,revision
         FROM v2.latest_budgets WHERE budget_key=${key} LIMIT 1`;
@@ -27,7 +27,7 @@ export default async function handler(req:any,res:any){
            FROM v2.budget_proposal_impacts i WHERE i.proposal_id=p.id) AS impacts
         FROM v2.budget_proposals p WHERE p.budget_id=${budget.id}::uuid
         ORDER BY p.proposal_key`;
-      return respond(res,200,{budget:{...budget,proposals}});
+      return respond(res,200,{budget:{...budget,id:budget.legacyBudgetId||budget.id,proposals}});
     }catch(e){return safeError(res,e);}
   }
   if(req.method!=='PATCH'&&req.method!=='DELETE'){

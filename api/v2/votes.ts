@@ -29,7 +29,7 @@ export default async function handler(req:any,res:any){
     const result=await sql`
       INSERT INTO v2.votes(budget_id,voter_hash)
       SELECT id,${hash} FROM v2.latest_budgets
-      WHERE id=${budgetId}::uuid AND origin IN ('citizen','party')
+      WHERE (id=${budgetId}::uuid OR legacy_budget_id=${budgetId}::uuid) AND origin IN ('citizen','party')
       ON CONFLICT(budget_id,voter_hash) DO NOTHING
       RETURNING id
     `;
