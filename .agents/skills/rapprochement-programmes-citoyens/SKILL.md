@@ -1,7 +1,7 @@
 ---
 name: rapprochement-programmes-citoyens
 description: Collecter, préserver et regrouper les mesures de programmes politiques dans les CSV de Mon Budget Citoyen, avec classification agentique auditée et calcul comptable déterministe.
-version: 0.6.0
+version: 0.7.0
 ---
 
 # Skill — Rapprochement des programmes avec les postes citoyens
@@ -11,6 +11,10 @@ version: 0.6.0
 Restituer **toutes** les mesures identifiées dans un programme, au minimum à titre documentaire, et rapprocher les propositions des postes budgétaires citoyens sans double comptage ni invention de chiffrage. La qualification comptable **ne conditionne pas la visibilité documentaire**.
 
 Références du dépôt : `docs/methode.md`, `docs/schema.md`, `data/programmes/registre-programmes.csv`, `data/programmes/<code>/<année>/{sources,themes,mesures,agregats}.csv`, `.github/PULL_REQUEST_TEMPLATE/political-programme.md`.
+
+## Principe de sobriété des contraintes
+
+**Ne jamais inventer de contrainte technique, économique ou méthodologique.** Le programme politique fournit les engagements à restituer ; l'application impose uniquement les contraintes indispensables pour intégrer et afficher des données cohérentes, sans erreur de calcul ni double compte. Ne pas transformer les choix d'implémentation actuels, les pratiques proposées, les vérifications facultatives ou les préférences d'un agent en conditions supplémentaires imposées aux programmes. Lorsqu'une information manque, conserver le caractère documentaire et expliciter l'incertitude, plutôt que bloquer son intégration. Pour chaque condition bloquante, être capable d'indiquer sa source : **programme**, **contrainte effective UI/API/Neon** ou **nécessité d'intégration démontrée**. Sinon, la supprimer ou la traiter en recommandation non bloquante.
 
 ## Invariants non négociables
 
@@ -55,12 +59,12 @@ Le schéma existant impose l'appartenance de `party_source_lines` à un seul `gr
 
 ### 4. Calculer les impacts sur le budget citoyen (objectifs et exigences de résultat)
 
-**Mission : restituer aussi fidèlement que possible les conséquences financières des propositions sur le budget citoyen, en distinguant systématiquement ce que le programme annonce, ce que l'on peut raisonnablement traduire dans les postes de l'application et ce qui reste incertain.** Le skill fixe les résultats attendus, **pas la méthode de calcul ni un algorithme imposé**. L'agent choisit les moyens d'analyse adaptés aux sources disponibles ; seuls les résultats qualifiés sont utilisés par le moteur déterministe.
+**Mission : restituer aussi fidèlement que possible les conséquences financières des propositions sur le budget citoyen, en distinguant ce que le programme annonce, ce que l'on peut traduire dans les postes de l'application et ce qui reste incertain, sans imposer de critères supplémentaires non nécessaires.** Le skill fixe les résultats attendus, **pas la méthode de calcul ni un algorithme imposé**. L'agent choisit les moyens d'analyse adaptés aux sources disponibles ; seuls les résultats qualifiés sont utilisés par le moteur déterministe.
 
 **Résultats attendus pour chaque regroupement :**
 
 - **Couverture utile** : identifier les postes citoyens réellement susceptibles d'être affectés et le sens attendu de chaque effet (hausse, baisse ou effet non établi). Un groupe peut n'avoir aucun effet quantifiable ou affecter plusieurs postes.
-- **Chiffrage exploitable quand il est justifiable** : privilégier les montants explicitement annoncés dans le programme ; lorsqu'une traduction ou une estimation est nécessaire, l'expliciter, en indiquant sa base de comparaison, son périmètre, son année, ses hypothèses et sa source. Aucun montant inventé pour combler une lacune.
+- **Chiffrage exploitable quand il est justifiable** : privilégier les montants explicitement annoncés dans le programme ; lorsqu'une traduction ou une estimation est nécessaire, expliciter uniquement les hypothèses et sources utiles à la compréhension et à l'intégration. Ne pas exiger des données que le programme ne fournit pas si leur absence n'empêche ni l'affichage documentaire ni une imputation justifiée. Aucun montant inventé pour combler une lacune.
 - **Fidélité financière** : ne pas confondre coût d'une mesure, économies annoncées, recette fiscale, enveloppe d'investissement, financement, effet sur le solde et impact sur un poste du budget citoyen. Un montant publié n'est pas nécessairement un impact additionnel sur la référence INSEE/APU du simulateur.
 - **Cohérence globale** : chercher à rapprocher les impacts attribuables des montants et soldes annoncés, lorsqu'ils sont comparables, sans forcer artificiellement l'égalité. Expliquer les écarts, les montants hors périmètre, les effets indirects et les chevauchements.
 - **Pas de double compte** : un poste citoyen est réservé à son unique regroupement pour le budget. À l'intérieur du groupe, les montants retenus doivent couvrir les effets propres à chaque proposition **sans compter deux fois un même effet**, même lorsque plusieurs propositions partagent un poste ou qu'une proposition touche plusieurs postes. Un regroupement n'ajoute aucun impact en plus de ceux qu'il rassemble.
@@ -70,10 +74,10 @@ Le schéma existant impose l'appartenance de `party_source_lines` à un seul `gr
 
 **Critères d'activation dans le simulateur :**
 
-- Un impact n'est activable que si sa correspondance avec un poste existant, son sens, son montant et sa compatibilité avec le périmètre et le millésime de référence sont suffisamment justifiés.
-- Les états `calculate`, `non_chiffrable_apu` et `review_pending` distinguent respectivement les effets directs admis au calcul, les effets exclus avec motif, et les effets en attente. Un montant revendiqué ou estimé ne suffit pas à activer le calcul.
+- Un impact n'est activable que si les informations nécessaires au calcul sur un poste existant sont disponibles et cohérentes (poste, sens, montant et base de référence pertinente). Ne pas ajouter d'exigences de preuve ou de précision qui ne sont pas nécessaires à ce calcul.
+- Si l'intégration existante l'exige, utiliser les états `calculate`, `non_chiffrable_apu` et `review_pending` pour distinguer les impacts calculés, exclus ou incertains. Ces états ne constituent pas de nouvelles exigences de contenu pour les programmes. Une mesure insuffisamment chiffrée reste affichable.
 - En mode `AGGREGATE`, les regroupements et leurs impacts documentés expliquent le programme **sans modifier les masses globales revendiquées déjà utilisées** ; ils ne s'y ajoutent pas. En mode `PARTIAL`, seuls les impacts directs qualifiés alimentent la simulation.
-- **Livrable attendu : une proposition ou un regroupement intelligible, ses postes réservés, et pour chaque poste soit un impact chiffré traçable et validé, soit une absence d'impact chiffré clairement motivée.** Aucun résultat approximatif ne doit être présenté comme certifié.
+- **Livrable attendu : une proposition ou un regroupement intelligible, ses postes réservés et les impacts disponibles, chiffrés ou non.** Le niveau de justification est proportionné aux données du programme et aux seules nécessités de l'intégration. Aucun résultat approximatif ne doit être présenté comme certifié.
 
 ### 5. Rédiger les champs publics (agentique, puis contrôle éditorial)
 
@@ -156,3 +160,8 @@ Après chaque campagne, conserver dans la PR les nouvelles ambiguïtés rencontr
 - Deuxième volet du skill : objectifs de chiffrage et de qualification des impacts sur les postes citoyens.
 - Directives centrées sur les résultats attendus (fidélité, couverture, cohérence, traçabilité, absence de doubles comptes, incertitude), sans imposer d'algorithme de calcul.
 - Distinction explicite entre montant annoncé, estimation, impact activable et simple restitution documentaire.
+
+### v0.7.0 — 2026-11-22
+- Principe directeur : aucune contrainte inventée au-delà des engagements du programme politique et des seules nécessités démontrées de l'intégration.
+- Les exigences documentaires facultatives ne bloquent ni l'affichage des mesures ni le traitement d'impacts calculables.
+- Distinction entre contraintes effectives et recommandations méthodologiques non bloquantes.
