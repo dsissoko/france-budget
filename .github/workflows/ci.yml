@@ -50,9 +50,6 @@ jobs:
       - name: Exécuter tous les tests (Vitest)
         run: npm test
 
-      - name: Vérifier les CSV et les modes des programmes (sans écriture Neon)
-        run: npm run test:programmes
-
       - name: Vérifier V2 (tests unitaires + CSV intégral, sans Neon)
         run: npm run test:v2
 
