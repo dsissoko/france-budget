@@ -56,7 +56,7 @@ export function validateBatch(budget,proposals,impacts) {
   // contributions, and persist exactly one impact per citizen budget post.
   const groupedSources=new Set();
   for(const group of proposals.filter(p=>p.source_origin==='pivot_consolidation')){
-    const match=/^members=([a-zA-Z0-9_.-]+:-?\\d+(?:\\.\\d{1,3})?)(\\|[a-zA-Z0-9_.-]+:-?\\d+(?:\\.\\d{1,3})?)*$/.exec(group.notes??'');
+    const match=/^members=([a-zA-Z0-9_.-]+:-?\d+(?:\.\d{1,3})?)(\|[a-zA-Z0-9_.-]+:-?\d+(?:\.\d{1,3})?)*$/.exec(group.notes??'');
     if(!match)throw Error('Invalid pivot group members '+group.proposal_key);
     const members=group.notes.slice(8).split('|').map(part=>{
       const cut=part.lastIndexOf(':');
