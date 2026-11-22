@@ -1,324 +1,587 @@
 [
   {
     "id": "citizen-01",
-    "title": "Impôt sur le revenu",
-    "description": "Le programme propose plusieurs mesures dans ce domaine.",
+    "title": "Revenus du capital",
+    "description": "Le programme veut davantage taxer les revenus financiers.",
     "sourceCount": 1,
     "sourceUrl": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
+    "claimedRevenueBn": 9,
+    "claimedExpenseBn": null,
+    "citizenImpacts": [
+      {
+        "side": "revenues",
+        "categoryId": "income",
+        "label": "Impôt sur le revenu",
+        "claimedAmountBn": 9,
+        "status": "documentary_claimed",
+        "rationale": "Montant annoncé pour des mesures rattachées à ce poste ; aucune imputation au simulateur.",
+        "simulated": false
+      }
+    ],
     "sourceLines": [
       {
         "id": 1,
-        "title": "Suppression de la flat tax",
+        "title": "Supprimer la flat tax",
+        "originalTitle": "Suppression de la flat tax",
+        "description": "Le programme veut supprimer la taxe forfaitaire sur les revenus du capital pour les imposer davantage comme les revenus du travail.",
         "claimedAmountBn": 9,
         "direction": "revenue_increase",
         "sourceUrl": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
-        "impactDescription": ""
+        "sourcePage": 13,
+        "impactDescription": "Le programme veut supprimer la taxe forfaitaire sur les revenus du capital pour les imposer davantage comme les revenus du travail."
       }
     ]
   },
   {
     "id": "citizen-02",
     "title": "Impôts sur les grandes fortunes",
-    "description": "Le programme propose plusieurs mesures dans ce domaine.",
+    "description": "Plusieurs mesures visent les grands patrimoines et les successions.",
     "sourceCount": 3,
     "sourceUrl": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
+    "claimedRevenueBn": 45,
+    "claimedExpenseBn": null,
+    "citizenImpacts": [
+      {
+        "side": "revenues",
+        "categoryId": "property",
+        "label": "Patrimoine et immobilier",
+        "claimedAmountBn": 45,
+        "status": "documentary_claimed",
+        "rationale": "Montant annoncé pour des mesures rattachées à ce poste ; aucune imputation au simulateur.",
+        "simulated": false
+      }
+    ],
     "sourceLines": [
       {
         "id": 2,
-        "title": "Rétablissement de l'impôt sur la fortune renforcé",
+        "title": "Rétablir l'impôt sur la fortune",
+        "originalTitle": "Rétablissement de l'impôt sur la fortune renforcé",
+        "description": "Le programme propose de remettre en place un impôt renforcé sur les grandes fortunes.",
         "claimedAmountBn": 10,
         "direction": "revenue_increase",
         "sourceUrl": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
-        "impactDescription": ""
+        "sourcePage": 13,
+        "impactDescription": "Le programme propose de remettre en place un impôt renforcé sur les grandes fortunes."
       },
       {
         "id": 5,
-        "title": "Taxe Zucman sur les patrimoines de plus de 100 M€",
+        "title": "Taxer les patrimoines de plus de 100 M€",
+        "originalTitle": "Taxe Zucman sur les patrimoines de plus de 100 M€",
+        "description": "Le programme propose une taxe sur les patrimoines dépassant 100 millions d'euros.",
         "claimedAmountBn": 15,
         "direction": "revenue_increase",
         "sourceUrl": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
-        "impactDescription": ""
+        "sourcePage": 13,
+        "impactDescription": "Le programme propose une taxe sur les patrimoines dépassant 100 millions d'euros."
       },
       {
         "id": 6,
-        "title": "Réforme des droits de succession",
+        "title": "Réformer les droits de succession",
+        "originalTitle": "Réforme des droits de succession",
+        "description": "Le programme veut modifier l'impôt payé sur les héritages.",
         "claimedAmountBn": 20,
         "direction": "revenue_increase",
         "sourceUrl": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
-        "impactDescription": ""
+        "sourcePage": 14,
+        "impactDescription": "Le programme veut modifier l'impôt payé sur les héritages."
       }
     ]
   },
   {
     "id": "citizen-03",
-    "title": "Taxes et cotisations",
-    "description": "Le programme propose plusieurs mesures dans ce domaine.",
+    "title": "Taxes financières et avantages fiscaux",
+    "description": "Le programme propose de nouvelles taxes et de réduire certains avantages fiscaux et sociaux.",
     "sourceCount": 5,
     "sourceUrl": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
+    "claimedRevenueBn": 32.5,
+    "claimedExpenseBn": null,
+    "citizenImpacts": [
+      {
+        "side": "revenues",
+        "categoryId": "otherTax",
+        "label": "Autres impôts",
+        "claimedAmountBn": 10.5,
+        "status": "documentary_partial",
+        "rationale": "22 Md€ concernent plusieurs familles de recettes et ne sont pas ventilés entre postes.",
+        "simulated": false
+      },
+      {
+        "side": "revenues",
+        "categoryId": "contributions",
+        "label": "Cotisations sociales",
+        "claimedAmountBn": null,
+        "status": "documentary_partial",
+        "rationale": "22 Md€ concernent plusieurs familles de recettes et ne sont pas ventilés entre postes.",
+        "simulated": false
+      }
+    ],
     "sourceLines": [
       {
         "id": 3,
-        "title": "Réduction et suppression de niches fiscales et sociales",
+        "title": "Réduire les niches fiscales et sociales",
+        "originalTitle": "Réduction et suppression de niches fiscales et sociales",
+        "description": "Le programme veut supprimer ou réduire certains avantages fiscaux et allègements de cotisations.",
         "claimedAmountBn": 22,
         "direction": "revenue_increase",
         "sourceUrl": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
-        "impactDescription": ""
+        "sourcePage": 13,
+        "impactDescription": "Le programme veut supprimer ou réduire certains avantages fiscaux et allègements de cotisations."
       },
       {
         "id": 11,
-        "title": "Augmentation des taxes sur les transactions financières",
+        "title": "Augmenter les taxes sur les transactions financières",
+        "originalTitle": "Augmentation des taxes sur les transactions financières",
+        "description": "Le programme veut augmenter la taxation de certaines opérations sur les marchés financiers.",
         "claimedAmountBn": 5,
         "direction": "revenue_increase",
         "sourceUrl": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
-        "impactDescription": ""
+        "sourcePage": 14,
+        "impactDescription": "Le programme veut augmenter la taxation de certaines opérations sur les marchés financiers."
       },
       {
         "id": 12,
-        "title": "Taxation des rachats d'actions",
+        "title": "Taxer les rachats d'actions",
+        "originalTitle": "Taxation des rachats d'actions",
+        "description": "Le programme propose une taxe sur les opérations par lesquelles les entreprises rachètent leurs propres actions.",
         "claimedAmountBn": 2.5,
         "direction": "revenue_increase",
         "sourceUrl": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
-        "impactDescription": ""
+        "sourcePage": 14,
+        "impactDescription": "Le programme propose une taxe sur les opérations par lesquelles les entreprises rachètent leurs propres actions."
       },
       {
         "id": 13,
-        "title": "Taxation des crypto-actifs",
+        "title": "Taxer les crypto-actifs",
+        "originalTitle": "Taxation des crypto-actifs",
+        "description": "Le programme prévoit de renforcer la taxation des crypto-actifs.",
         "claimedAmountBn": 1,
         "direction": "revenue_increase",
         "sourceUrl": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
-        "impactDescription": ""
+        "sourcePage": 14,
+        "impactDescription": "Le programme prévoit de renforcer la taxation des crypto-actifs."
       },
       {
         "id": 14,
-        "title": "Renforcement de la lutte contre la fraude fiscale",
+        "title": "Renforcer la lutte contre la fraude fiscale",
+        "originalTitle": "Renforcement de la lutte contre la fraude fiscale",
+        "description": "Le programme veut recruter des agents et renforcer les contrôles contre la fraude fiscale.",
         "claimedAmountBn": 2,
         "direction": "revenue_increase",
         "sourceUrl": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
-        "impactDescription": ""
+        "sourcePage": 14,
+        "impactDescription": "Le programme veut recruter des agents et renforcer les contrôles contre la fraude fiscale."
       }
     ]
   },
   {
     "id": "citizen-04",
     "title": "Fiscalité des entreprises",
-    "description": "Le programme propose plusieurs mesures dans ce domaine.",
+    "description": "Le programme veut augmenter plusieurs impôts et taxes visant les grandes entreprises.",
     "sourceCount": 5,
     "sourceUrl": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
+    "claimedRevenueBn": 19.9,
+    "claimedExpenseBn": null,
+    "citizenImpacts": [
+      {
+        "side": "revenues",
+        "categoryId": "business",
+        "label": "Fiscalité des entreprises",
+        "claimedAmountBn": 19.9,
+        "status": "documentary_claimed",
+        "rationale": "Montant annoncé pour des mesures rattachées à ce poste ; aucune imputation au simulateur.",
+        "simulated": false
+      }
+    ],
     "sourceLines": [
       {
         "id": 4,
-        "title": "Rétablissement de la CVAE sur les plus grandes entreprises",
+        "title": "Rétablir la CVAE pour les grandes entreprises",
+        "originalTitle": "Rétablissement de la CVAE sur les plus grandes entreprises",
+        "description": "Le programme propose de rétablir cet impôt sur la valeur ajoutée des plus grandes entreprises.",
         "claimedAmountBn": 3,
         "direction": "revenue_increase",
         "sourceUrl": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
-        "impactDescription": ""
+        "sourcePage": 13,
+        "impactDescription": "Le programme propose de rétablir cet impôt sur la valeur ajoutée des plus grandes entreprises."
       },
       {
         "id": 7,
-        "title": "Réforme de l'impôt sur les sociétés",
+        "title": "Réformer l'impôt sur les sociétés",
+        "originalTitle": "Réforme de l'impôt sur les sociétés",
+        "description": "Le programme propose de modifier l'impôt payé sur les bénéfices des entreprises.",
         "claimedAmountBn": 3,
         "direction": "revenue_increase",
         "sourceUrl": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
-        "impactDescription": ""
+        "sourcePage": 14,
+        "impactDescription": "Le programme propose de modifier l'impôt payé sur les bénéfices des entreprises."
       },
       {
         "id": 8,
-        "title": "Taxe universelle sur les multinationales",
+        "title": "Taxer les multinationales selon leur activité en France",
+        "originalTitle": "Taxe universelle sur les multinationales",
+        "description": "Le programme veut taxer les multinationales selon leur activité réellement exercée en France.",
         "claimedAmountBn": 5,
         "direction": "revenue_increase",
         "sourceUrl": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
-        "impactDescription": ""
+        "sourcePage": 14,
+        "impactDescription": "Le programme veut taxer les multinationales selon leur activité réellement exercée en France."
       },
       {
         "id": 9,
-        "title": "Renforcement de la taxe GAFAM",
+        "title": "Renforcer la taxe sur les géants du numérique",
+        "originalTitle": "Renforcement de la taxe GAFAM",
+        "description": "Le programme propose d'augmenter la taxe qui vise les grandes entreprises du numérique.",
         "claimedAmountBn": 3.9,
         "direction": "revenue_increase",
         "sourceUrl": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
-        "impactDescription": ""
+        "sourcePage": 14,
+        "impactDescription": "Le programme propose d'augmenter la taxe qui vise les grandes entreprises du numérique."
       },
       {
         "id": 10,
-        "title": "Taxe sur les superprofits",
+        "title": "Taxer les superprofits",
+        "originalTitle": "Taxe sur les superprofits",
+        "description": "Le programme propose de taxer davantage les profits exceptionnels, notamment ceux liés à la guerre.",
         "claimedAmountBn": 5,
         "direction": "revenue_increase",
         "sourceUrl": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
-        "impactDescription": ""
+        "sourcePage": 14,
+        "impactDescription": "Le programme propose de taxer davantage les profits exceptionnels, notamment ceux liés à la guerre."
       }
     ]
   },
   {
     "id": "citizen-15",
-    "title": "Services publics généraux",
-    "description": "Le programme propose plusieurs mesures dans ce domaine.",
+    "title": "Moyens des services publics",
+    "description": "Le programme propose d'augmenter les salaires publics et de renforcer les moyens des services.",
     "sourceCount": 2,
     "sourceUrl": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
+    "claimedRevenueBn": null,
+    "claimedExpenseBn": 24,
+    "citizenImpacts": [
+      {
+        "side": "expenses",
+        "categoryId": "general",
+        "label": "Services publics généraux",
+        "claimedAmountBn": null,
+        "status": "documentary_partial",
+        "rationale": "Les dépenses annoncées concernent plusieurs services publics : aucune ventilation fiable sur ce seul poste.",
+        "simulated": false
+      }
+    ],
     "sourceLines": [
       {
         "id": 15,
-        "title": "Augmentation de 10 % des salaires des fonctionnaires",
+        "title": "Augmenter de 10 % les salaires des fonctionnaires",
+        "originalTitle": "Augmentation de 10 % des salaires des fonctionnaires",
+        "description": "Le programme propose d'augmenter de 10 % les salaires des agents publics.",
         "claimedAmountBn": 17,
         "direction": "expense_increase",
         "sourceUrl": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
-        "impactDescription": ""
+        "sourcePage": 8,
+        "impactDescription": "Le programme propose d'augmenter de 10 % les salaires des agents publics."
       },
       {
         "id": 25,
-        "title": "Rétablissement des budgets de services publics et indexation inflation",
+        "title": "Redonner des moyens aux services publics",
+        "originalTitle": "Rétablissement des budgets de services publics et indexation inflation",
+        "description": "Le programme propose de restaurer certains budgets de services publics et de tenir compte de l'inflation.",
         "claimedAmountBn": 7,
         "direction": "expense_increase",
         "sourceUrl": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
-        "impactDescription": ""
+        "sourcePage": 10,
+        "impactDescription": "Le programme propose de restaurer certains budgets de services publics et de tenir compte de l'inflation."
       }
     ]
   },
   {
     "id": "citizen-16",
     "title": "Famille, logement, sécurité et retraites",
-    "description": "Le programme propose plusieurs mesures dans ce domaine.",
+    "description": "Ces mesures portent sur les pensions, le logement et la protection des personnes.",
     "sourceCount": 5,
     "sourceUrl": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
+    "claimedRevenueBn": null,
+    "claimedExpenseBn": 24.6,
+    "citizenImpacts": [
+      {
+        "side": "expenses",
+        "categoryId": "social",
+        "label": "Retraites et pensions",
+        "claimedAmountBn": 9,
+        "status": "documentary_partial",
+        "rationale": "Deux mesures de 8 et 2 Md€ concernent plusieurs postes ; leurs montants ne sont pas arbitrairement répartis.",
+        "simulated": false
+      },
+      {
+        "side": "expenses",
+        "categoryId": "family",
+        "label": "Famille et enfance",
+        "claimedAmountBn": null,
+        "status": "documentary_partial",
+        "rationale": "Deux mesures de 8 et 2 Md€ concernent plusieurs postes ; leurs montants ne sont pas arbitrairement répartis.",
+        "simulated": false
+      },
+      {
+        "side": "expenses",
+        "categoryId": "housing",
+        "label": "Logement",
+        "claimedAmountBn": 3,
+        "status": "documentary_partial",
+        "rationale": "Deux mesures de 8 et 2 Md€ concernent plusieurs postes ; leurs montants ne sont pas arbitrairement répartis.",
+        "simulated": false
+      },
+      {
+        "side": "expenses",
+        "categoryId": "safety",
+        "label": "Sécurité et justice",
+        "claimedAmountBn": 2.6,
+        "status": "documentary_partial",
+        "rationale": "Deux mesures de 8 et 2 Md€ concernent plusieurs postes ; leurs montants ne sont pas arbitrairement répartis.",
+        "simulated": false
+      }
+    ],
     "sourceLines": [
       {
         "id": 16,
-        "title": "Revalorisation des pensions, allocations familiales et APL",
+        "title": "Augmenter les pensions et les aides aux familles",
+        "originalTitle": "Revalorisation des pensions, allocations familiales et APL",
+        "description": "Le programme prévoit de revaloriser de 10 % les pensions, les allocations familiales et les aides au logement.",
         "claimedAmountBn": 8,
         "direction": "expense_increase",
         "sourceUrl": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
-        "impactDescription": ""
+        "sourcePage": 8,
+        "impactDescription": "Le programme prévoit de revaloriser de 10 % les pensions, les allocations familiales et les aides au logement."
       },
       {
         "id": 17,
-        "title": "Logements d'urgence et réquisition de logements vacants",
+        "title": "Créer des logements d'urgence",
+        "originalTitle": "Logements d'urgence et réquisition de logements vacants",
+        "description": "Le programme prévoit de financer des logements d'urgence et de réquisitionner des logements vacants.",
         "claimedAmountBn": 3,
         "direction": "expense_increase",
         "sourceUrl": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
-        "impactDescription": ""
+        "sourcePage": 8,
+        "impactDescription": "Le programme prévoit de financer des logements d'urgence et de réquisitionner des logements vacants."
       },
       {
         "id": 23,
-        "title": "Plan d'urgence contre les violences sexistes et sexuelles",
+        "title": "Renforcer la lutte contre les violences sexuelles",
+        "originalTitle": "Plan d'urgence contre les violences sexistes et sexuelles",
+        "description": "Le programme propose plus de moyens pour prévenir et combattre les violences sexistes et sexuelles.",
         "claimedAmountBn": 2.6,
         "direction": "expense_increase",
         "sourceUrl": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
-        "impactDescription": ""
+        "sourcePage": 10,
+        "impactDescription": "Le programme propose plus de moyens pour prévenir et combattre les violences sexistes et sexuelles."
       },
       {
         "id": 24,
-        "title": "Lutte contre les violences faites aux enfants",
+        "title": "Renforcer la protection des enfants",
+        "originalTitle": "Lutte contre les violences faites aux enfants",
+        "description": "Le programme veut consacrer davantage de moyens à la lutte contre les violences faites aux enfants.",
         "claimedAmountBn": 2,
         "direction": "expense_increase",
         "sourceUrl": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
-        "impactDescription": ""
+        "sourcePage": 10,
+        "impactDescription": "Le programme veut consacrer davantage de moyens à la lutte contre les violences faites aux enfants."
       },
       {
         "id": 27,
-        "title": "Abrogation de la réforme des retraites à 64 ans",
+        "title": "Revenir sur la retraite à 64 ans",
+        "originalTitle": "Abrogation de la réforme des retraites à 64 ans",
+        "description": "Le programme veut supprimer la réforme qui a porté l'âge légal de départ à 64 ans.",
         "claimedAmountBn": 9,
         "direction": "expense_increase",
         "sourceUrl": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
-        "impactDescription": ""
+        "sourcePage": 11,
+        "impactDescription": "Le programme veut supprimer la réforme qui a porté l'âge légal de départ à 64 ans."
       }
     ]
   },
   {
     "id": "citizen-18",
-    "title": "Solidarité et autonomie",
-    "description": "Le programme propose plusieurs mesures dans ce domaine.",
+    "title": "Aide aux jeunes",
+    "description": "Le programme propose un revenu destiné aux jeunes en études ou en formation.",
     "sourceCount": 1,
     "sourceUrl": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
+    "claimedRevenueBn": null,
+    "claimedExpenseBn": 9.5,
+    "citizenImpacts": [
+      {
+        "side": "expenses",
+        "categoryId": "solidarity",
+        "label": "Solidarité et autonomie",
+        "claimedAmountBn": 9.5,
+        "status": "documentary_claimed",
+        "rationale": "Montant annoncé pour des mesures rattachées à ce poste ; aucune imputation au simulateur.",
+        "simulated": false
+      }
+    ],
     "sourceLines": [
       {
         "id": 18,
-        "title": "Garantie d'autonomie pour les jeunes",
+        "title": "Garantir un revenu aux jeunes",
+        "originalTitle": "Garantie d'autonomie pour les jeunes",
+        "description": "Le programme propose une aide pour permettre aux jeunes de poursuivre leurs études ou leur formation sans vivre sous le seuil de pauvreté.",
         "claimedAmountBn": 9.5,
         "direction": "expense_increase",
         "sourceUrl": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
-        "impactDescription": ""
+        "sourcePage": 8,
+        "impactDescription": "Le programme propose une aide pour permettre aux jeunes de poursuivre leurs études ou leur formation sans vivre sous le seuil de pauvreté."
       }
     ]
   },
   {
     "id": "citizen-19",
-    "title": "Éducation",
-    "description": "Le programme propose plusieurs mesures dans ce domaine.",
+    "title": "Écoles, cantines et universités",
+    "description": "Le programme veut ouvrir des postes, rendre les cantines gratuites et créer des places à l'université.",
     "sourceCount": 3,
     "sourceUrl": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
+    "claimedRevenueBn": null,
+    "claimedExpenseBn": 7.6,
+    "citizenImpacts": [
+      {
+        "side": "expenses",
+        "categoryId": "education",
+        "label": "Éducation",
+        "claimedAmountBn": 7.6,
+        "status": "documentary_claimed",
+        "rationale": "Montant annoncé pour des mesures rattachées à ce poste ; aucune imputation au simulateur.",
+        "simulated": false
+      }
+    ],
     "sourceLines": [
       {
         "id": 19,
-        "title": "Création de 10 000 postes dans l'enseignement",
+        "title": "Créer 10 000 postes d'enseignants",
+        "originalTitle": "Création de 10 000 postes dans l'enseignement",
+        "description": "Le programme propose d'ouvrir 10 000 postes supplémentaires dans l'enseignement.",
         "claimedAmountBn": 0.5,
         "direction": "expense_increase",
         "sourceUrl": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
-        "impactDescription": ""
+        "sourcePage": 9,
+        "impactDescription": "Le programme propose d'ouvrir 10 000 postes supplémentaires dans l'enseignement."
       },
       {
         "id": 20,
-        "title": "Gratuité de la cantine scolaire",
+        "title": "Rendre la cantine scolaire gratuite",
+        "originalTitle": "Gratuité de la cantine scolaire",
+        "description": "Le programme veut rendre les cantines scolaires gratuites.",
         "claimedAmountBn": 3.6,
         "direction": "expense_increase",
         "sourceUrl": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
-        "impactDescription": ""
+        "sourcePage": 9,
+        "impactDescription": "Le programme veut rendre les cantines scolaires gratuites."
       },
       {
         "id": 21,
-        "title": "Création de 250 000 places universitaires",
+        "title": "Créer 250 000 places à l'université",
+        "originalTitle": "Création de 250 000 places universitaires",
+        "description": "Le programme propose d'ouvrir 250 000 places supplémentaires à l'université.",
         "claimedAmountBn": 3.5,
         "direction": "expense_increase",
         "sourceUrl": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
-        "impactDescription": ""
+        "sourcePage": 10,
+        "impactDescription": "Le programme propose d'ouvrir 250 000 places supplémentaires à l'université."
       }
     ]
   },
   {
     "id": "citizen-22",
-    "title": "Santé",
-    "description": "Le programme propose plusieurs mesures dans ce domaine.",
+    "title": "Hôpitaux et soignants",
+    "description": "Le programme prévoit plus de moyens et de personnel pour les hôpitaux publics.",
     "sourceCount": 1,
     "sourceUrl": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
+    "claimedRevenueBn": null,
+    "claimedExpenseBn": 3,
+    "citizenImpacts": [
+      {
+        "side": "expenses",
+        "categoryId": "health",
+        "label": "Santé",
+        "claimedAmountBn": 3,
+        "status": "documentary_claimed",
+        "rationale": "Montant annoncé pour des mesures rattachées à ce poste ; aucune imputation au simulateur.",
+        "simulated": false
+      }
+    ],
     "sourceLines": [
       {
         "id": 22,
-        "title": "Hausse du budget hospitalier et créations de postes soignants",
+        "title": "Renforcer les hôpitaux publics",
+        "originalTitle": "Hausse du budget hospitalier et créations de postes soignants",
+        "description": "Le programme prévoit d'augmenter le budget des hôpitaux et de créer au moins 10 000 postes de soignants.",
         "claimedAmountBn": 3,
         "direction": "expense_increase",
         "sourceUrl": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
-        "impactDescription": ""
+        "sourcePage": 10,
+        "impactDescription": "Le programme prévoit d'augmenter le budget des hôpitaux et de créer au moins 10 000 postes de soignants."
       }
     ]
   },
   {
     "id": "citizen-26",
-    "title": "Environnement",
-    "description": "Le programme propose plusieurs mesures dans ce domaine.",
+    "title": "Adaptation au changement climatique",
+    "description": "Le programme veut financer des protections contre les effets du changement climatique.",
     "sourceCount": 1,
     "sourceUrl": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
+    "claimedRevenueBn": null,
+    "claimedExpenseBn": 10,
+    "citizenImpacts": [
+      {
+        "side": "expenses",
+        "categoryId": "environment",
+        "label": "Environnement",
+        "claimedAmountBn": 10,
+        "status": "documentary_year_review",
+        "rationale": "L'investissement climatique est annoncé dès 2026 : année d'imputation à préciser pour une simulation 2027.",
+        "simulated": false
+      }
+    ],
     "sourceLines": [
       {
         "id": 26,
-        "title": "Investissements d'adaptation aux effets du dérèglement climatique",
+        "title": "Adapter le pays aux effets du changement climatique",
+        "originalTitle": "Investissements d'adaptation aux effets du dérèglement climatique",
+        "description": "Le programme prévoit des investissements contre les canicules, les incendies et les sécheresses.",
         "claimedAmountBn": 10,
         "direction": "expense_increase",
         "sourceUrl": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
-        "impactDescription": ""
+        "sourcePage": 11,
+        "impactDescription": "Le programme prévoit des investissements contre les canicules, les incendies et les sécheresses."
       }
     ]
   },
   {
     "id": "citizen-28",
-    "title": "Chômage",
-    "description": "Le programme propose plusieurs mesures dans ce domaine.",
+    "title": "Assurance chômage",
+    "description": "Le programme veut revenir sur les réformes de l'assurance chômage.",
     "sourceCount": 1,
     "sourceUrl": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
+    "claimedRevenueBn": null,
+    "claimedExpenseBn": 3,
+    "citizenImpacts": [
+      {
+        "side": "expenses",
+        "categoryId": "unemployment",
+        "label": "Chômage et insertion",
+        "claimedAmountBn": 3,
+        "status": "documentary_claimed",
+        "rationale": "Montant annoncé pour des mesures rattachées à ce poste ; aucune imputation au simulateur.",
+        "simulated": false
+      }
+    ],
     "sourceLines": [
       {
         "id": 28,
-        "title": "Abrogation des réformes de l'assurance chômage",
+        "title": "Annuler les réformes de l'assurance chômage",
+        "originalTitle": "Abrogation des réformes de l'assurance chômage",
+        "description": "Le programme propose de revenir sur les réformes récentes de l'assurance chômage.",
         "claimedAmountBn": 3,
         "direction": "expense_increase",
         "sourceUrl": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
-        "impactDescription": ""
+        "sourcePage": 12,
+        "impactDescription": "Le programme propose de revenir sur les réformes récentes de l'assurance chômage."
       }
     ]
   }
