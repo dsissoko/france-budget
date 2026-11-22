@@ -1,6 +1,6 @@
 import type {ReferenceModel,Result,SourcedEntry} from './projection-core';
 import {calculateScenario} from './projection-core';
-import type {PublishedAggregate} from './party-budget';
+import {calculatePublishedBudget,type PublishedAggregate,type ClaimedAllocation} from './party-budget';
 
 export type BudgetSide='revenues'|'expenses'|'offBudget';
 export type BudgetImpact={side:BudgetSide;categoryId:string;deltaAmountBn:number};
@@ -12,10 +12,15 @@ export type BudgetProposal={
 };
 export type BudgetMode='PARTIAL'|'AGGREGATE';
 export type BudgetDocumentary={
+ claimedAllocations?:ClaimedAllocation[];
+ citizenGroups?:Array<{id:string;title:string;description:string;sourceUrl?:string;sourceCount:number;
+  sourceLines:Array<{id:string;title:string;description:string;claimedAmountBn:number;direction:string;sourceUrl:string;sourcePage:number|null;sourceStatus:string;impactDescription:string}>;
+  citizenImpacts:Array<{side:string;categoryId:string;label:string;claimedAmountBn:number|null;status:string;rationale:string;simulated:boolean}>}>;
  sources?:Array<{source_url?:string;sourceUrl?:string;title?:string}>;
  aggregates?:Array<{basis?:'delta'|'total';year?:number;revenues_bn?:string|number;expenses_bn?:string|number;balance_delta_bn?:string|number;source_url?:string;scope?:string}>;
  citizenSource?:{budgetKey:string;title:string;budgetMode?:BudgetMode;
    aggregate?:NonNullable<BudgetDocumentary['aggregates']>[number]|null;
+   claimedAllocations?:ClaimedAllocation[];
    proposals?:BudgetProposal[];nested?:BudgetDocumentary['citizenSource']|null};
 };
 export type PublishedBudget={
@@ -46,13 +51,30 @@ export const declaredAmountForDisplay=(p:BudgetProposal):number|null=>{
    qualifiedDeclaredStatuses.has(p.sourceStatus??'')&&
    (p.sourceUrl??'').startsWith('https://')?amount:null;
 };
-export const measuredProposals=(b:PublishedBudget)=>b.proposals.filter(p=>
- p.sourceStatus!=='grouped_into_pivot' && (p.impacts.some(i=>Number(i.deltaAmountBn)!==0)||declaredAmountForDisplay(p)!==null));
+export const measuredProposals=(b:PublishedBudget):BudgetProposal[]=>{
+ if(b.origin==='party'&&b.documentary?.citizenGroups?.length)
+  return b.documentary.citizenGroups.map(g=>({
+   proposalKey:'group-'+g.id,title:g.title,description:g.description,
+   sourceUrl:g.sourceUrl??null,sourceOrigin:'citizen_group',
+   sourceStatus:'validated',notes:'members='+g.sourceLines.map(l=>l.id).join('|'),
+   impacts:g.citizenImpacts.filter(i=>i.simulated&&i.claimedAmountBn!=null&&
+    (i.side==='revenues'||i.side==='expenses')).map(i=>({
+      side:i.side as BudgetSide,categoryId:i.categoryId,
+      deltaAmountBn:i.claimedAmountBn as number
+   }))
+  }));
+ return b.proposals.filter(p=>
+  p.sourceStatus!=='grouped_into_pivot' && (p.impacts.some(i=>Number(i.deltaAmountBn)!==0)||declaredAmountForDisplay(p)!==null));
+};
 /** Count real source measures, not pivot grouping containers. */
-export const measuredSourceCount=(b:PublishedBudget)=>measuredProposals(b).reduce((n,p)=>
+export const measuredSourceCount=(b:PublishedBudget)=>
+ b.origin==='party'&&b.documentary?.citizenGroups?.length?
+ b.documentary.citizenGroups.reduce((n,g)=>n+g.sourceCount,0):
+ measuredProposals(b).reduce((n,p)=>
  n+(p.sourceOrigin==='pivot_consolidation'?pivotGroupMembers(b,p).length:1),0);
 export const pivotGroupMembers=(b:PublishedBudget,p:BudgetProposal):BudgetProposal[]=>{
- if(p.sourceOrigin!=='pivot_consolidation'||!p.notes?.startsWith('members='))return [];
+ if(!['pivot_consolidation','citizen_group'].includes(p.sourceOrigin??'')||
+    !p.notes?.startsWith('members='))return [];
  const keys=p.notes.slice('members='.length).split('|').map(x=>x.split(':')[0]);
  return keys.map(key=>b.proposals.find(x=>x.proposalKey===key)).filter((x):x is BudgetProposal=>!!x);
 };
@@ -77,7 +99,8 @@ export function computeBudget(b:PublishedBudget,reference:ReferenceModel):Result
  const source=b.documentary?.citizenSource;
  if(b.origin==='citizen'&&source){
    const base:PublishedBudget={...b,origin:source.nested?'citizen':'party',budgetMode:source.budgetMode??'PARTIAL',
-      documentary:{aggregates:source.aggregate?[source.aggregate]:[],citizenSource:source.nested??undefined},
+      documentary:{aggregates:source.aggregate?[source.aggregate]:[],
+       claimedAllocations:source.claimedAllocations??[],citizenSource:source.nested??undefined},
       proposals:source.proposals??[]};
    const baseResult=computeBudget(base,reference);
    const baseline=calculateScenario([],emptyBudgetOverrides(),[],reference);
@@ -97,18 +120,12 @@ export function computeBudget(b:PublishedBudget,reference:ReferenceModel):Result
  }
  const aggregate=reportedAggregate(b);
  if(aggregate){
-   const baseRevenue=reference.revenues.reduce((n,r)=>n+r.amount,0);
-   const baseExpense=reference.expenses.reduce((n,r)=>n+r.amount,0);
-   const additions:SourcedEntry[]=[
-    {measureId:'aggregate:revenues',side:'revenues',categoryId:'other',
-      amount:aggregate.basis==='delta'?aggregate.revenuesBn:aggregate.revenuesBn-baseRevenue,
-      rationale:'Agrégat financier revendiqué, sans ventilation : '+aggregate.sourceUrl},
-    {measureId:'aggregate:expenses',side:'expenses',categoryId:'other-expenses',
-      amount:aggregate.basis==='delta'?aggregate.expensesBn:aggregate.expensesBn-baseExpense,
-      rationale:'Agrégat financier revendiqué, sans ventilation : '+aggregate.sourceUrl}
-   ];
-   const r=calculateScenario([],emptyBudgetOverrides(),additions,reference);
-   return {...r,warnings:[...r.warnings,'Agrégat déclaré : les propositions documentaires ne sont pas ajoutées aux masses.']};
+   // Reuse the proven allocation/remainder engine; allocations are internal
+   // to the published masses, never additive documentary proposal impacts.
+   return calculatePublishedBudget({origin:'party',scenario:{
+     picked:[],claimedTotals:aggregate,
+     claimedAllocations:b.documentary?.claimedAllocations??[]
+   }},reference);
  }
  return calculateScenario([],emptyBudgetOverrides(),proposalEntries(b.proposals),reference);
 }
