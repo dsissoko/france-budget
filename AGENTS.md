@@ -140,3 +140,8 @@ Metricool ne doit pas être présenté comme capable de parcourir l'ensemble des
 ## Skill de qualification des impacts budgétaires V2
 
 Quand un utilisateur demande de **déduire les impacts des mesures politiques vers les postes du budget citoyen**, lire le skill local [`skills/budget-impact-qualification/SKILL.md`](skills/budget-impact-qualification/SKILL.md) et le pipeline [`docs/v2-qualification-pipeline.md`](docs/v2-qualification-pipeline.md). La chaîne est **déterministe**, seule la décision d'imputation est **agentique**. Aucune exécution IA à la consultation de l'UI ou dans le moteur de simulation. Ne jamais produire un impact non étayé pour satisfaire un compteur ; distinguer montant revendiqué, écriture qualifiée, résultat AGGREGATE. L'agent n'a pas l'autorité d'importer ou de publier sans accord explicite.
+
+
+## Documentation de référence V2
+
+Pour les évolutions de la V2, partir du [corpus V2](docs/v2/README.md), de son [MCD](docs/v2/mcd.md) et de ses [contrats API](docs/v2/api.md). Les schémas et routes V1 sont historiques. Chaque changement de schéma, API, règles métier, CSV ou pipeline doit mettre à jour ses documents et diagrammes Mermaid dans la même PR. Les budgets et votes citoyens V1 actuels sont des données de test : ils ne sont pas à migrer.
