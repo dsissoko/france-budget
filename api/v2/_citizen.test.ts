@@ -43,5 +43,7 @@ describe('v2 citizen write contract',()=>{
    expect(parseRevision(2)).toBe(2);
    expect(writeErrorStatus(new Error('revision_conflict'))).toBe(409);
    expect(writeErrorStatus(new Error('edit_capability_denied'))).toBe(403);
+   expect(writeErrorStatus(new Error('publication_limit_reached'))).toBe(409);
+   expect(writeErrorStatus(new Error('publication_rate_limited'))).toBe(429);
  });
 });

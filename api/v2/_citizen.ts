@@ -95,7 +95,8 @@ export function writeErrorStatus(e:unknown):number{
   const msg=String((e as any)?.message??e);
   if(/edit_capability_denied|invalid_edit_capability|budget_withdrawn/.test(msg))return 403;
   if(/published_budget_immutable/.test(msg))return 409;
-  if(/revision_conflict|citizen_budget_already_exists/.test(msg))return 409;
+  if(/publication_rate_limited/.test(msg))return 429;
+  if(/revision_conflict|citizen_budget_already_exists|publication_limit_reached|published_budget_immutable/.test(msg))return 409;
   if(/foreign key|check constraint|invalid_|duplicate_|orphan_|null value|out_of_range/.test(msg))return 422;
   return 503;
 }
