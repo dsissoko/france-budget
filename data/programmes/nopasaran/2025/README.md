@@ -24,4 +24,30 @@ Jeu de données issu du budget citoyen réel `c2e1262e-e312-4f82-bf50-0dd63a7510
 4. Rejouer la même entrée sans doubler les propositions ni les impacts (idempotence).
 5. Aucun changement de l'UI validée. Aucune migration SQL ou changement de schéma à ce stade.
 
+## Résultats réels du test Neon QA (22 novembre 2026)
+
+Branche : `qa-nopasaran-unified-import-20261122` (`br-gentle-hill-b9gmz04u`). Un budget **masqué** indépendant a été créé à partir des CSV : `0a087765-0509-4aa3-9108-88fc3c53d65e`.
+
+| Vérification | Résultat |
+|---|---|
+| Chargement des fichiers `budget.csv`, `proposals.csv`, `impacts.csv` | **OK** (CSV lus et transformés en requêtes SQL génériques sur QA) |
+| Création du budget masqué | **OK** |
+| Écriture des propositions | **8** |
+| Écriture des impacts | **8** |
+| Deuxième passage des mêmes écritures en UPSERT | **8 / 8, aucun doublon** |
+| Contenu titres/descriptions comparé à NoPasaran normalisé | **8/8 identiques** |
+| Valeurs budgétaires calculées vs `expected-positions.csv` | **8/8 identiques** |
+| Égalité JSONB exacte du budget calculé avec le témoin normalisé | **OK** après traitement décimal exact |
+| Modification du schéma, de l'UI, ou des données Neon de production | **Aucune** |
+
+### Contraintes détectées pendant l'itération
+1. `budgets.budget_mode` est une **colonne générée** ; **ne jamais l'insérer**. Le champ CSV `budget_mode` est une intention/attente métier à rapprocher du mode déterminé en base, non une valeur SQL à écrire.
+2. La colonne `budgets.visibility` n'accepte que `public` et `hidden` : utiliser `hidden` pour les tests.
+3. Le poste `expenses/defense` doit être porté par **une seule proposition** (−25 Md€) à cause de la contrainte d'unicité.
+4. Les montants sont des nombres décimaux en **Md€** : calculer en `NUMERIC` PostgreSQL (ou arithmétique décimale exacte), **pas en nombres flottants JavaScript**. Une première addition flottante donnait `9.700000000000003`, corrigée en `9.7` avant comparaison stricte.
+5. L'import a utilisé des requêtes `INSERT ... ON CONFLICT` depuis le contenu des **CSV GitHub**, et non le script historique `scripts/import-programmes.mjs`. Ce dernier **n'est pas encore compatible** avec le format pivot. Le test valide **la capacité du schéma relationnel cible existant** à recevoir les données du témoin ; il ne vaut pas validation du pipeline historique des partis.
+6. Les champs documentaires facultatifs (`claimed_amount_bn`, `source_url`, `source_year`) sont vides pour NoPasaran. Le schéma courant `budget_proposals` ne les stocke pas encore : ne pas prétendre que le round-trip documentaire politique est validé.
+
+**Attention :** l'essai utilise une clé stable `budget_key` résolue côté importeur vers l'UUID de la nouvelle ligne `budgets`. Le modèle cible devra formaliser ce mapping/idempotence au niveau du budget avant l'import multi-programmes.
+
 Ce dossier constitue **un prototype de format commun** et ne remplace pas encore le contrat des CSV politiques existants. Voir #135, #136 et #137/#138.
