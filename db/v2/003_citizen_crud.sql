@@ -2,7 +2,8 @@
 ALTER TABLE v2.budgets
   ADD COLUMN IF NOT EXISTS publication_status text NOT NULL DEFAULT 'published'
     CHECK(publication_status IN ('draft','published','withdrawn')),
-  ADD COLUMN IF NOT EXISTS revision integer NOT NULL DEFAULT 1 CHECK(revision>0);
+  ADD COLUMN IF NOT EXISTS revision integer NOT NULL DEFAULT 1 CHECK(revision>0),
+  ADD COLUMN IF NOT EXISTS published_at timestamptz;
 
 CREATE TABLE IF NOT EXISTS v2.citizen_edit_grants (
   budget_id uuid PRIMARY KEY REFERENCES v2.budgets(id) ON DELETE CASCADE,
@@ -40,6 +41,14 @@ BEGIN
   IF key IS NULL OR key !~ '^citizen-[0-9a-f-]{36}$'
     THEN RAISE EXCEPTION 'invalid_citizen_budget_key'; END IF;
   IF operation = 'create' THEN
+    IF payload->>'publish'='true' THEN
+      PERFORM pg_advisory_xact_lock(hashtext('v2_citizen_publication_quota'));
+      IF (SELECT count(*) FROM v2.budgets WHERE origin='citizen' AND publication_status='published')>=100
+        THEN RAISE EXCEPTION 'publication_limit_reached'; END IF;
+      IF (SELECT count(*) FROM v2.budgets WHERE origin='citizen'
+          AND published_at > now()-interval '24 hours')>=100
+        THEN RAISE EXCEPTION 'publication_rate_limited'; END IF;
+    END IF;
     IF b->>'origin' IS DISTINCT FROM 'citizen' OR b->>'version' IS DISTINCT FROM 'latest'
       THEN RAISE EXCEPTION 'invalid_citizen_origin_or_version'; END IF;
     IF expected_revision IS NOT NULL THEN RAISE EXCEPTION 'unexpected_revision_on_create'; END IF;
@@ -47,7 +56,8 @@ BEGIN
       THEN RAISE EXCEPTION 'citizen_budget_already_exists'; END IF;
     saved_id := v2.import_budget(payload);
     proposed_status := CASE WHEN payload->>'publish'='true' THEN 'published' ELSE 'draft' END;
-    UPDATE v2.budgets SET publication_status=proposed_status
+    UPDATE v2.budgets SET publication_status=proposed_status,
+      published_at=CASE WHEN proposed_status='published' THEN now() ELSE NULL END
       WHERE id=saved_id;
     INSERT INTO v2.citizen_edit_grants(budget_id,token_hash) VALUES(saved_id,secret_hash);
     RETURN QUERY SELECT saved_id,1,proposed_status;
@@ -82,13 +92,23 @@ BEGIN
   IF (b->>'reference_year')::integer IS DISTINCT FROM
     (SELECT reference_year FROM v2.budgets WHERE id=current_id)
     THEN RAISE EXCEPTION 'reference_year_immutable'; END IF;
+  IF payload->>'publish'='true' THEN
+    PERFORM pg_advisory_xact_lock(hashtext('v2_citizen_publication_quota'));
+    IF (SELECT count(*) FROM v2.budgets WHERE origin='citizen' AND publication_status='published')>=100
+      THEN RAISE EXCEPTION 'publication_limit_reached'; END IF;
+    IF (SELECT count(*) FROM v2.budgets WHERE origin='citizen'
+        AND published_at > now()-interval '24 hours')>=100
+      THEN RAISE EXCEPTION 'publication_rate_limited'; END IF;
+  END IF;
   saved_id := v2.import_budget(payload);
   IF saved_id<>current_id THEN RAISE EXCEPTION 'unexpected_identity_change'; END IF;
   proposed_status := CASE
     WHEN payload->>'publish'='true' THEN 'published'
     ELSE current_status END;
   UPDATE v2.budgets SET revision=revision+1,
-    publication_status=proposed_status,updated_at=now()
+    publication_status=proposed_status,
+    published_at=CASE WHEN proposed_status='published' THEN now() ELSE published_at END,
+    updated_at=now()
     WHERE id=current_id RETURNING revision,publication_status INTO current_revision,current_status;
   RETURN QUERY SELECT current_id,current_revision,current_status;
 END $$;
