@@ -99,11 +99,96 @@ export function validateBatch(budget,proposals,impacts) {
   }
   return {budget:{...budget,documentary},proposals,impacts};
 }
+
+/** Optional richer citizen grouping inventory, produced upstream by the qualification skill.
+ * Applies to both party and citizen CSV contracts as documentary metadata, never as
+ * standalone additive proposal impacts. All relationships are checked deterministically.
+ */
+export function enrichCitizenGroups(directory,batch){
+ const names=['groupes-citoyens.csv','rattachements-citoyens.csv','impacts-citoyens.csv'];
+ const files=names.map(n=>join(directory,n));
+ if(files.every(p=>!existsSync(p)))return batch;
+ if(files.some(p=>!existsSync(p)))throw Error('Incomplete citizen grouping CSVs: '+directory);
+ const [groups,links,impacts]=files.map(p=>readCsv(readFileSync(p,'utf8')));
+ const bySource=new Map(batch.proposals.filter(p=>p.source_origin==='documentary')
+   .map(p=>[p.proposal_key,p]));
+ const ids=new Set(),reserved=new Map(),mapped=new Set();
+ const split=s=>String(s??'').split(';').filter(Boolean);
+ for(const g of groups){
+  if(ids.has(g.group_id))throw Error('Duplicate citizen group '+g.group_id);
+  ids.add(g.group_id);
+  for(const post of split(g.citizen_post_ids)){
+   if(reserved.has(post))throw Error('Citizen post reserved by multiple groups: '+post);
+   reserved.set(post,g.group_id);
+  }
+ }
+ for(const l of links){
+  if(!ids.has(l.group_id)||!bySource.has(l.source_measure_id)||
+     mapped.has(l.source_measure_id))throw Error('Unmatched or duplicate source link '+l.source_measure_id);
+  mapped.add(l.source_measure_id);
+  for(const post of split(l.citizen_post_ids))
+   if(reserved.get(post)!==l.group_id)throw Error('Source links wrong post '+post);
+ }
+ if(mapped.size!==bySource.size)throw Error('Citizen groups do not cover every source proposal');
+ const impactPosts=new Set(),claimedAllocations=[];
+ for(const i of impacts){
+  if(!ids.has(i.group_id)||reserved.get(i.citizen_post_id)!==i.group_id)
+   throw Error('Invalid impact group or post '+i.citizen_post_id);
+  if(impactPosts.has(i.citizen_post_id))throw Error('Repeated citizen impact post '+i.citizen_post_id);
+  impactPosts.add(i.citizen_post_id);
+  const on=i.simulation_applied==='true';
+  if(!['true','false'].includes(i.simulation_applied)||
+      !['revenues','expenses'].includes(i.citizen_side)||
+      (on&&(!decimal.test(i.claimed_post_amount_bn)||Number(i.claimed_post_amount_bn)<=0)))
+   throw Error('Invalid grouped citizen impact '+i.citizen_post_id);
+  if(on)claimedAllocations.push({side:i.citizen_side,categoryId:i.citizen_post_id,
+    amount:Number(i.claimed_post_amount_bn)});
+ }
+ if(impactPosts.size!==reserved.size)throw Error('Missing citizen post impact');
+ const citizenGroups=groups.map(g=>{
+  const linked=links.filter(l=>l.group_id===g.group_id);
+  const sourceIds=split(g.source_measure_ids);
+  if(linked.length!==Number(g.source_count)||sourceIds.length!==linked.length||
+     linked.some(l=>!sourceIds.includes(l.source_measure_id)))
+    throw Error('Incorrect source links/count '+g.group_id);
+  const sourceLines=linked.map(l=>{
+   const p=bySource.get(l.source_measure_id);
+   return {id:l.source_measure_id,title:p.title,description:p.description||'',
+    claimedAmountBn:Number(p.claimed_amount_bn),direction:p.direction,
+    sourceUrl:p.source_url,sourcePage:Number(l.source_page)||null,
+    sourceStatus:p.source_status,impactDescription:l.rationale};
+  });
+  return {id:g.group_id,title:g.title,description:g.description,
+   sourceUrl:g.source_url,sourceCount:Number(g.source_count),sourceLines,
+   citizenImpacts:impacts.filter(i=>i.group_id===g.group_id).map(i=>({
+    side:i.citizen_side,categoryId:i.citizen_post_id,label:i.citizen_post_label,
+    claimedAmountBn:i.claimed_post_amount_bn===''?null:Number(i.claimed_post_amount_bn),
+    status:i.status,rationale:i.rationale,simulated:i.simulation_applied==='true'
+   }))};
+ });
+ const aggregate=batch.budget.documentary?.aggregates?.[0];
+ if(!aggregate||batch.budget.budget_mode!=='AGGREGATE')
+  throw Error('Grouped citizen allocations require declared AGGREGATE');
+ const sum=side=>claimedAllocations.filter(a=>a.side===side).reduce((n,a)=>n+a.amount,0);
+ if(sum('revenues')>Number(aggregate.revenues_bn)+.011||
+    sum('expenses')>Number(aggregate.expenses_bn)+.011)
+  throw Error('Citizen allocations exceed declared aggregates');
+ const presentationFile=join(directory,'presentation.csv');
+ if(existsSync(presentationFile)){
+  const p=readCsv(readFileSync(presentationFile,'utf8'));
+  if(p.length!==1||p[0].party_code!==batch.budget.party_code)
+   throw Error('Invalid citizen presentation CSV');
+  batch.budget.description=p[0].description;
+ }
+ batch.budget.documentary={...batch.budget.documentary,citizenGroups,claimedAllocations};
+ return batch;
+}
+
 export function loadBatch(directory){
   const read=name=>readCsv(readFileSync(join(directory,name),'utf8'));
   const budgets=read('budget.csv');
   if(budgets.length!==1)throw Error(directory+': exactly one budget required');
-  return validateBatch(budgets[0],read('proposals.csv'),read('impacts.csv'));
+  return enrichCitizenGroups(directory,validateBatch(budgets[0],read('proposals.csv'),read('impacts.csv')));
 }
 function discover(base) {
   const found=[];

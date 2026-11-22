@@ -13,9 +13,10 @@ export type PublishedAggregate = {
   reportedOverallBalanceDeltaBn?:number;
   overallExplanation?:string;
 };
+export type ClaimedAllocation = {side:'revenues'|'expenses';categoryId:string;amount:number};
 export type PartyBudgetInput = {
   origin:'party'|'citizen';
-  scenario:{picked:string[];budget?:Override;claimedTotals?:PublishedAggregate};
+  scenario:{picked:string[];budget?:Override;claimedTotals?:PublishedAggregate;claimedAllocations?:ClaimedAllocation[]};
 };
 
 const sum=(a:readonly {amount:number}[])=>a.reduce((n,x)=>n+x.amount,0);
@@ -50,19 +51,42 @@ export function calculatePublishedBudget(b:PartyBudgetInput,reference:ReferenceM
   const deltaExpense=basis==='delta'?expensesBn:expensesBn-baseExpense;
   if(balanceDeltaBn!==undefined && (!Number.isFinite(balanceDeltaBn)||!close(deltaRevenue-deltaExpense,balanceDeltaBn)))
     throw Error('Agrégats politiques non réconciliés : recettes - dépenses != solde');
-  const entries:SourcedEntry[]=[
-    {measureId:'aggregate:'+year+':revenues',side:'revenues',categoryId:adjustment('revenues',reference),
-      amount:deltaRevenue,rationale:'Agrégat revendiqué par la formation, non ventilé : '+sourceUrl},
-    {measureId:'aggregate:'+year+':expenses',side:'expenses',categoryId:adjustment('expenses',reference),
-      amount:deltaExpense,rationale:'Agrégat revendiqué par la formation, non ventilé : '+sourceUrl},
-  ];
+  // CSV-based allocations redistribute the announced masses across citizen posts.
+  // The remaining, unallocatable part stays on the existing adjustment categories.
+  // This never adds amounts to the party's published totals.
+  const allocations=b.scenario.claimedAllocations??[];
+  const seen=new Set<string>();
+  const allocationSums={revenues:0,expenses:0};
+  const entries:SourcedEntry[]=[];
+  for(const allocation of allocations){
+    const {side,categoryId,amount}=allocation;
+    const categories=side==='revenues'?reference.revenues:side==='expenses'?reference.expenses:null;
+    const key=side+':'+categoryId;
+    if(!categories?.some(c=>c.id===categoryId)||categoryId===adjustment(side,reference)||
+       !Number.isFinite(amount)||Math.sign(amount)!==Math.sign(side==='revenues'?deltaRevenue:deltaExpense)||
+       seen.has(key))throw Error('Ventilation politique invalide : '+key);
+    seen.add(key);
+    allocationSums[side]+=amount;
+    entries.push({measureId:'aggregate:'+year+':post:'+key,side,categoryId,amount,
+      rationale:'Ventilation de l’agrégat revendiqué par la formation, non ajoutée au total : '+sourceUrl});
+  }
+  const remainder={revenues:deltaRevenue-allocationSums.revenues,expenses:deltaExpense-allocationSums.expenses};
+  if((deltaRevenue>=0&&remainder.revenues < -0.011)||(deltaRevenue<0&&remainder.revenues>0.011)||
+     (deltaExpense>=0&&remainder.expenses < -0.011)||(deltaExpense<0&&remainder.expenses>0.011))
+    throw Error('Ventilation politique supérieure aux agrégats revendiqués');
+  for(const side of ['revenues','expenses'] as const){
+    if(Math.abs(remainder[side])<0.001)continue;
+    entries.push({measureId:'aggregate:'+year+':reliquat:'+side,side,
+      categoryId:adjustment(side,reference),amount:remainder[side],
+      rationale:'Part non ventilée de l’agrégat revendiqué : '+sourceUrl});
+  }
   // The third number is optional: the resulting balance is inferred from the two sourced masses.
   // Never sum individual selections on top of the complete announced totals.
   const result=calculateScenario([],{revenues:{},expenses:{}},entries,reference);
   return {...result,warnings:[...result.warnings,
     'Résultat global revendiqué par la formation ('+year+'), source : '+sourceUrl+
     '. Les mesures détaillées sont documentaires et ne sont pas additionnées aux agrégats.',
-    'Ventilation des agrégats dans les catégories techniques de rapprochement : ce ne sont pas des postes de dépense ou recette supplémentaires.']};
+    'Les montants attribuables sont répartis dans les postes citoyens ; seul le reliquat non ventilé reste en ajustement. Aucun montant supplémentaire n’est créé.']};
 }
 
 export const aggregateMode=(b:PartyBudgetInput)=>b.origin==='party'&&Number.isFinite(b.scenario.claimedTotals?.revenuesBn)&&Number.isFinite(b.scenario.claimedTotals?.expensesBn);
