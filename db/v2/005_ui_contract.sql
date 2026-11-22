@@ -72,3 +72,7 @@ WHERE t.origin='party' AND t.party_code=s.party_code;
 UPDATE v2.budgets
 SET featured=true,featured_order=1,maturity_status='non_verifie'
 WHERE budget_key='nopasaran-2025' AND origin='citizen';
+
+-- Refresh public read view after adding presentation metadata.
+CREATE OR REPLACE VIEW v2.latest_budgets AS
+SELECT * FROM v2.budgets WHERE version='latest' AND publication_status='published';
