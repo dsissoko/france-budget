@@ -1,6 +1,6 @@
 # MCD et schéma logique V2
 
-**Référence physique :** [SQL 001](../../db/v2/001_schema.sql), [003](../../db/v2/003_citizen_crud.sql), [004](../../db/v2/004_votes.sql), [005](../../db/v2/005_ui_contract.sql).
+**Référence physique :** [SQL 001](../../db/v2/001_schema.sql), [003](../../db/v2/003_citizen_crud.sql), [004](../../db/v2/004_votes.sql), [005](../../db/v2/initial_ui.sql).
 
 ```mermaid
 erDiagram

@@ -99,7 +99,7 @@ Une proposition mieux sourcée, un chiffre corrigé, une explication plus claire
 
 ## Référence documentaire V2
 
-> **Transition en cours :** la cible V2 est portée par la PR #142. Le schéma PostgreSQL `v2` existe, mais le trafic de production n'est pas encore basculé. Les apports LFI de #145 restent à intégrer au contrat V2.
+> **V2 en production depuis le 22 novembre 2026 :** la PR #142 a été fusionnée dans `main` (commit `bd8452a`). L'application utilise les routes `/api/v2/*` et le schéma Neon `v2`. NoPasaran et 15 programmes politiques sont importés depuis les CSV ; les 11 regroupements LFI sont inclus. Le schéma V1 `public` demeure conservé pour un rollback contrôlé.
 
 Le [corpus documentaire V2](docs/v2/README.md) est le point d'entrée pour [les règles métier](docs/v2/metier.md), [les parcours fonctionnels](docs/v2/fonctionnel.md), [l'architecture Mermaid](docs/v2/architecture.md), [le MCD](docs/v2/mcd.md), [le pipeline d'intégration](docs/v2/integration.md), [les API](docs/v2/api.md) et [l'exploitation](docs/v2/exploitation.md).
 

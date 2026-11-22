@@ -4,7 +4,7 @@
 
 # Schéma de données Neon — état réel au 20 novembre 2026
 
-**Document de référence technique.** Établi à partir de l'introspection de la base Neon de production du projet `calm-rain-58562193`, et rapproché du code `main`. Les migrations SQL versionnées expliquent les changements ; `db/schema.sql` est un **bootstrap historique**, pas un dump exact de production ni un outil de mise à niveau à rejouer tel quel.
+**Document de référence technique.** Établi à partir de l'introspection de la base Neon de production du projet `calm-rain-58562193`, et rapproché du code `main`. Les migrations SQL versionnées expliquent les changements ; `db/archive/v1/schema.sql` est un **bootstrap historique**, pas un dump exact de production ni un outil de mise à niveau à rejouer tel quel.
 
 ## Périmètres et statuts
 
@@ -116,7 +116,7 @@ political_parties.code
 
 **Raccordement structurel réalisé** par les deux tables de liaison décrites ci-dessous, avec FK composites et unicité. Les données de liaison et les décisions APU sont encore vides : aucune activation des groupes préparatoires.
 
-Migration reproductible : [`db/migrations/20261120_party_proposals_relational.sql`](../db/migrations/20261120_party_proposals_relational.sql).
+Migration reproductible : [`db/archive/v1/migrations/20261120_party_proposals_relational.sql`](../db/archive/v1/migrations/20261120_party_proposals_relational.sql).
 
 Modèle de contribution synchronisé : [PR programme politique](../.github/PULL_REQUEST_TEMPLATE/political-programme.md) et [issue de soumission](../.github/ISSUE_TEMPLATE/political-programme.yml). Ils exigent désormais identifiants stables, validation APU, contrôle des doublons et mise à jour du schéma.
 
@@ -143,7 +143,7 @@ political_parties (code)
 - **Porte de publication pour les nouvelles mesures** (`legacy_id IS NULL`) : `GET /api/reference` utilise `m.id::text` comme identifiant stable, exige un groupe `validated`, une ligne source `calculate` et `validated` liée à la mesure, et **toutes les lignes du groupe** explicitement revues ; toutes les lignes calculables doivent être liées. Il vérifie aussi que les montants des écritures équilibrent les deltas des mesures. En cas d'incohérence, l'API échoue plutôt que de renvoyer un résultat partiel.
 - Le fait qu'une ligne soit rattachée ne certifie pas son effet économique. La revue documentaire, la décision APU et la revue des doubles comptes restent des étapes humaines distinctes.
 
-Migrations : [`20261120_party_source_accounting_links.sql`](../db/migrations/20261120_party_source_accounting_links.sql) et [`20261120_party_source_apu_decisions.sql`](../db/migrations/20261120_party_source_apu_decisions.sql).
+Migrations : [`20261120_party_source_accounting_links.sql`](../db/archive/v1/migrations/20261120_party_source_accounting_links.sql) et [`20261120_party_source_apu_decisions.sql`](../db/archive/v1/migrations/20261120_party_source_apu_decisions.sql).
 
 ## Maturité éditoriale du budget (20/11/2026)
 
@@ -162,7 +162,7 @@ Le champ `budgets.maturity_status` est **générique** et commun aux budgets cit
 
 **Affichage :** `GET /api/budgets` fournit les champs de maturité et de preuve. Dans **Comparer**, le badge figure sur les choix de budgets politiques. Dans **Voter**, il remplace le badge de qualification budgétaire sur les cartes politiques pour éviter de cumuler les badges ; les citoyens conservent leur badge de qualification. La fiche détaillée affiche le sens du statut et un lien vers la preuve pour `confirme`. La visibilité du budget **n'est jamais modifiée par le statut**.
 
-Migration versionnée : [`db/migrations/20261120_budget_maturity.sql`](../db/migrations/20261120_budget_maturity.sql). Tests de présentation : [`src/budget-maturity.test.ts`](../src/budget-maturity.test.ts).
+Migration versionnée : [`db/archive/v1/migrations/20261120_budget_maturity.sql`](../db/archive/v1/migrations/20261120_budget_maturity.sql). Tests de présentation : [`src/budget-maturity.test.ts`](../src/budget-maturity.test.ts).
 
 **Publication des nouveaux budgets politiques :** reste un chantier distinct, qui doit distinguer catalogue documentaire et impacts effectivement calculables. Ne pas promouvoir silencieusement les groupes encore `review_pending` dans les calculs ni fabriquer de confirmations pour accélérer la publication.
 
@@ -234,10 +234,10 @@ Mesures ponctuelles `EXPLAIN (ANALYZE,BUFFERS)` : lectures de budgets/mesures pu
 
 ## Migrations, non-régression, nettoyage
 
-1. Bootstrap historique : [`db/schema.sql`](../db/schema.sql). Ne pas l'exécuter sur une production existante ; il contient des DDL et des `INSERT/UPDATE` de référence historiques.
-2. Préparation : [`db/migrations/20261120_party_documentary_groups.sql`](../db/migrations/20261120_party_documentary_groups.sql).
-3. Identification stable et écritures : [`db/migrations/20261120_party_ids_apu_entries.sql`](../db/migrations/20261120_party_ids_apu_entries.sql). **Script de traçabilité, non intégralement idempotent**, et import initial des montants documenté mais non automatisé dans ce fichier.
-4. Index : [`db/migrations/20261120_api_indexes.sql`](../db/migrations/20261120_api_indexes.sql).
+1. Bootstrap historique : [`db/archive/v1/schema.sql`](../db/archive/v1/schema.sql). Ne pas l'exécuter sur une production existante ; il contient des DDL et des `INSERT/UPDATE` de référence historiques.
+2. Préparation : [`db/archive/v1/migrations/20261120_party_documentary_groups.sql`](../db/archive/v1/migrations/20261120_party_documentary_groups.sql).
+3. Identification stable et écritures : [`db/archive/v1/migrations/20261120_party_ids_apu_entries.sql`](../db/archive/v1/migrations/20261120_party_ids_apu_entries.sql). **Script de traçabilité, non intégralement idempotent**, et import initial des montants documenté mais non automatisé dans ce fichier.
+4. Index : [`db/archive/v1/migrations/20261120_api_indexes.sql`](../db/archive/v1/migrations/20261120_api_indexes.sql).
 5. Audit de cohérence : [`db/audits/party-source-grouping-readonly.sql`](../db/audits/party-source-grouping-readonly.sql).
 6. CI : [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) — `npm run check`, `npm test`, `npm run build` à chaque push sur `main` et chaque PR. Vérifier le résultat de la **dernière** exécution avant bascule.
 7. Après validation de production et test de restauration : nettoyer les snapshots temporaires, pas les inventaires sources. Les historiques contenant empreintes ou votes ne doivent **jamais** être exportés publiquement sur GitHub.
@@ -257,7 +257,7 @@ Mesures ponctuelles `EXPLAIN (ANALYZE,BUFFERS)` : lectures de budgets/mesures pu
 Deux budgets citoyens restent publics et inchangés.
 
 - `GET /api/budgets` expose désormais `documentaryProposals` depuis `party_proposals` avec les libellés, millésimes, compte de sources et URL officielle provenant de `party_source_lines`. **Le catalogue n'est pas injecté dans le moteur comptable**.
-- Équinoxe a été créé par [`db/migrations/20261120_publish_equinoxe_documentary.sql`](../db/migrations/20261120_publish_equinoxe_documentary.sql), **d'abord masqué** ; puis rendu public seulement après disponibilité du déploiement compatible. `scenario.documentaryOnly=true`, `picked=[]`, et aucun montant de scénario n'a été inventé.
+- Équinoxe a été créé par [`db/archive/v1/migrations/20261120_publish_equinoxe_documentary.sql`](../db/archive/v1/migrations/20261120_publish_equinoxe_documentary.sql), **d'abord masqué** ; puis rendu public seulement après disponibilité du déploiement compatible. `scenario.documentaryOnly=true`, `picked=[]`, et aucun montant de scénario n'a été inventé.
 - Dans **Voter**, les fiches documentaires présentent les groupes et sources, sans synthèse du déficit ni courbe financière. Les tris par équilibre les placent après les budgets chiffrables.
 - Dans **Comparer** et comme point de départ de **Mon budget**, les scénarios exclusivement documentaires sont exclus afin de ne jamais simuler leur déficit sur la simple référence INSEE.
 - Pour RN/LFI, la fiche présente séparément les lignes déjà calculées et les groupes documentaires non revus ; une ligne source n'est jamais additionnée deux fois.

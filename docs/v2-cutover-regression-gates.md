@@ -1,6 +1,6 @@
 # Gate de bascule V1 → V2 — recette fonctionnelle et absence de régression
 
-**État : V2 en Preview/QA, pas de bascule production.** La PR #142 n'a pas vocation à modifier le frontend V1 tant que la parité ci-dessous n'est pas prouvée. Le code V1 doit rester disponible pour rollback.
+**ARCHIVE DE RECETTE ET GATES PRÉ-BASCULE.** La V2 a été fusionnée le 22 novembre 2026 via #142 et déployée sur Vercel production. Le tableau ci-dessous conserve les écarts historiques et ne décrit plus l'état du runtime. Pour le référentiel actif, voir [docs/v2](v2/README.md) et [le runbook](v2/exploitation.md). Le schéma `public` est conservé pour rollback.
 
 ## Contrats UI V1 réellement consommés
 

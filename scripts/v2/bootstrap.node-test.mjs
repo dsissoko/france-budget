@@ -26,5 +26,9 @@ describe('Bootstrap V2 indépendant de public',()=>{
   assert.match(sql,/COMMIT;\s*$/);
   assert.match(sql,/db:init refuses nonempty v2.budgets/);
   assert.doesNotMatch(sql.replace(/^--.*$/gm,''),/(?:FROM|INTO|UPDATE|JOIN|ALTER TABLE)\s+public\./i);
+  assert.match(sql,/REVOKE ALL ON FUNCTION v2\.import_budget\(jsonb\) FROM PUBLIC/);
+  assert.match(sql,/SECURITY DEFINER/);
+  assert.match(bootstrapSql(d,'france_budget_app'),/SET LOCAL v2\.application_role = 'france_budget_app'/);
+  assert.throws(()=>bootstrapSql(d,'unsafe;role'),/Unsafe V2_APP_ROLE/);
  });
 });

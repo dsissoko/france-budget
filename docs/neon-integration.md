@@ -9,7 +9,7 @@
 - Fonctions Vercel `/api/reference` (GET), `/api/budgets` (GET, POST) et `/api/votes` (POST).
 - PostgreSQL Neon à Francfort, avec un rôle applicatif `france_budget_app` à droits limités.
 - `DATABASE_URL` est configuré comme secret serveur dans Vercel (production + preview). **Ne jamais utiliser le préfixe `VITE_` pour ce secret.**
-- **Schéma réel et contrats** : [schema.md](schema.md). `db/schema.sql` est un bootstrap historique ; les migrations incrémentales sont dans `db/migrations/`.
+- **Schéma réel et contrats** : [schema.md](schema.md). `db/archive/v1/schema.sql` est un bootstrap historique ; les migrations incrémentales sont dans `db/archive/v1/migrations/`.
 
 ## Fonctionnement
 - Le citoyen peut créer des mesures de recettes/dépenses, voir l'effet sur le déficit, enregistrer localement ou publier.
@@ -31,7 +31,7 @@
 
 - `reference_categories` : catégories de recettes et dépenses, libellés, montants de référence, descriptions, codes canoniques, millésime et ordre d'affichage.
 - `reference_measures` : ancienne table conservée temporairement pour migration/retour arrière ; elle n'est plus interrogée par l'API.
-- `budgets` : **même modèle** pour les budgets politiques (`origin='party'`) et les publications citoyennes (`origin='citizen'`). `scenario` contient les identifiants des mesures et les ajustements catégoriels. `featured BOOLEAN NOT NULL DEFAULT false` pilote la mise en avant dans Comparer ; `featured_order INTEGER` règle l'ordre. **Pour les budgets citoyens publics**, ces colonnes sont gérées automatiquement côté Neon : un seul budget citoyen (le plus voté, puis le plus récemment publié en cas d'égalité) reçoit `featured=true` et `featured_order=40`. Les triggers sur `votes` et `budgets` actualisent ce choix dès qu'il change. Les budgets politiques conservent leur sélection éditoriale indépendante ; leurs valeurs ne sont jamais modifiées par cette règle. Le budget citoyen ainsi sélectionné porte le badge **« Champion citoyen »** (coupe), visible dans **Voter**, **Comparer** et le détail de Voter. Ce badge atteste uniquement du rang dans les votes, indépendamment de la qualité documentaire et de la qualification financière. Migration : [`20261122_featured_top_voted_citizen.sql`](../db/migrations/20261122_featured_top_voted_citizen.sql).
+- `budgets` : **même modèle** pour les budgets politiques (`origin='party'`) et les publications citoyennes (`origin='citizen'`). `scenario` contient les identifiants des mesures et les ajustements catégoriels. `featured BOOLEAN NOT NULL DEFAULT false` pilote la mise en avant dans Comparer ; `featured_order INTEGER` règle l'ordre. **Pour les budgets citoyens publics**, ces colonnes sont gérées automatiquement côté Neon : un seul budget citoyen (le plus voté, puis le plus récemment publié en cas d'égalité) reçoit `featured=true` et `featured_order=40`. Les triggers sur `votes` et `budgets` actualisent ce choix dès qu'il change. Les budgets politiques conservent leur sélection éditoriale indépendante ; leurs valeurs ne sont jamais modifiées par cette règle. Le budget citoyen ainsi sélectionné porte le badge **« Champion citoyen »** (coupe), visible dans **Voter**, **Comparer** et le détail de Voter. Ce badge atteste uniquement du rang dans les votes, indépendamment de la qualité documentaire et de la qualification financière. Migration : [`20261122_featured_top_voted_citizen.sql`](../db/archive/v1/migrations/20261122_featured_top_voted_citizen.sql).
 - `measures` : **table commune des propositions des partis et des citoyens**, liées à `budgets.id` ; les propositions politiques conservent `legacy_id`, `theme`, `source`, `reference_year`, `status`, `revenue_delta`, `expense_delta`. Les mesures citoyennes utilisent les champs communs `category_code`, `kind`, `delta_amount`, `reference_amount`, `title`, `description`. Les écritures APU des mesures actives sont désormais normalisées dans `measure_accounting_entries` ; `src/projection.ts` conserve des règles historiques de repli.
 - `votes` : suffrages de popularité sur les scénarios publiés ; ne constituent pas un scrutin électoral.
 - `political_parties` : identifiants `code` de partis et noms d'affichage ; `budgets.party_code` est une FK validée, sans interprétation du titre.
@@ -79,7 +79,7 @@ En v1.0.0, **Comparer** utilise les budgets `featured` issus de Neon : premier c
 
 Le moteur `src/projection.ts` préfère maintenant les écritures normalisées envoyées par l'API ; l'élimination complète des règles de repli et l'intégration des groupes politiques sont **inachevées** ([issue #22](https://github.com/dsissoko/france-budget/issues/22)). Le moteur de calcul TypeScript peut rester côté navigateur. Les budgets personnels sauvegardés dans `localStorage` ne font volontairement pas partie de cette migration.
 
-Pour la vue complète des tables, contraintes, flux et limites, voir [schema.md](schema.md), [architecture.md](architecture.md) et [../db/schema.sql](../db/schema.sql) (bootstrap historique).
+Pour la vue complète des tables, contraintes, flux et limites, voir [schema.md](schema.md), [architecture.md](architecture.md) et [../db/archive/v1/schema.sql](../db/archive/v1/schema.sql) (bootstrap historique).
 
 ## État de migration des partis — 20/11/2026
 
