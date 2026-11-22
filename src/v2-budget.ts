@@ -32,8 +32,9 @@ export type CitizenBudgetDraft={
 };
 export const emptyBudgetOverrides=()=>({revenues:{},expenses:{},offBudget:{}});
 
-export const eligibleForDisplay=(b:PublishedBudget)=>b.origin==='citizen'||b.budgetMode==='AGGREGATE'||b.proposals.some(p=>p.impacts.length>0);
+export const eligibleForDisplay=(b:PublishedBudget)=>b.origin==='citizen'||b.origin==='party';
 export const measuredProposals=(b:PublishedBudget)=>b.proposals.filter(p=>p.impacts.some(i=>Number(i.deltaAmountBn)!==0));
+export const hasQualifiedBudgetImpact=(b:PublishedBudget)=>measuredProposals(b).length>0||!!reportedAggregate(b)||!!b.documentary?.citizenSource;
 
 export function reportedAggregate(b:Pick<PublishedBudget,'documentary'|'budgetMode'>):PublishedAggregate|null{
  if(b.budgetMode!=='AGGREGATE')return null;

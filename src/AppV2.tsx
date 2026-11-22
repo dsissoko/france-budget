@@ -7,7 +7,7 @@ import {voteQualification} from './engine/vote-qualification';
 import {budgetMaturity} from './budget-maturity';
 import {
  computeBudget,computeCitizenDraft,readDraftProposals,eligibleForDisplay,measuredProposals,
- reportedAggregate,availablePost,updateImpact,validExclusiveProposals,
+ reportedAggregate,hasQualifiedBudgetImpact,availablePost,updateImpact,validExclusiveProposals,
  type PublishedBudget,type BudgetProposal,type BudgetImpact,type BudgetSide
 } from './v2-budget';
 import DeficitTrajectory from './components/DeficitTrajectory';
@@ -234,7 +234,7 @@ export default function AppV2(){
        })}</div>:null})}
       {p.sourceUrl?.startsWith('https://')&&<a href={p.sourceUrl} target="_blank" rel="noreferrer">Source officielle <ExternalLink size={13}/></a>}
      </div>}</div>)}</div></div>
-   <div className="card"><DeficitTrajectory primary={project(r.balanceDelta)}/></div></>;
+   <div className="card">{hasQualifiedBudgetImpact(b)?<DeficitTrajectory primary={project(r.balanceDelta)}/>:<><p className="muted small">Aucun impact chiffré qualifié : les montants de référence ne doivent pas être attribués à ce programme.</p><DeficitTrajectory primary={project(0)} referenceOnly/></>}</div></>;
  };
  if(!reference||!simulationParams)return <div className="app"><main className="page"><div className="card">
   <h2>Mon Budget Citoyen</h2><p role="status">{referenceError||'Chargement des données budgétaires…'}</p>
@@ -368,7 +368,7 @@ export default function AppV2(){
      voteSort==='recent'?new Date(b.budget.published_at??0).getTime()-new Date(a.budget.published_at??0).getTime():
      Math.abs(a.result.deficit)-Math.abs(b.result.deficit))
     .map(({budget:b,result:r})=>{
-     const q=voteQualification(baseDeficit,r.balanceDelta,years,simulationParams);
+     const q=hasQualifiedBudgetImpact(b)?voteQualification(baseDeficit,r.balanceDelta,years,simulationParams):{label:'Non qualifié',tone:'neutral',title:'Aucun impact chiffré qualifié'};
      return <article className="vote-card" key={b.id}><button className="vote-card-main" onClick={()=>{setVoteDetail(b.id);setOpenedProposal(null)}} aria-label={'Voir le détail de '+b.title}>
       <div className="vote-card-top"><div className="vote-author-icon">{b.origin==='party'?<Landmark size={18}/>:<UserRound size={18}/>}</div>
        <div className="vote-author"><strong>{b.origin==='party'?b.title:b.author||'Auteur anonyme'}</strong>
