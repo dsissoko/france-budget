@@ -94,13 +94,20 @@ for(const p of plans){
   scope:p.a.scope,sourceSection:p.a.source_section,description:p.a.notes,
   ...(party==='EQX'?{reportedOverallBalanceDeltaBn:78,overallExplanation:'The party also claims 6.1 Md EUR activity effect and -1.5 Md EUR technical correction; direct aggregate pair gives 73.4 Md EUR.'}:{})
  }:null;
- const scenario={budget:{revenues:{},expenses:{}},picked:[],...(claim?{claimedTotals:claim}:{documentaryOnly:true})};
+ // Distribute amounts *within* the claimed aggregates, never on top of them.
+ // The residual is automatically kept in the accounting adjustment posts by the engine.
+ const claimedAllocations=claim?p.impacts.filter(i=>i.simulation_applied==='true').map(i=>({
+   side:i.citizen_side,categoryId:i.citizen_post_id,amount:Number(i.claimed_post_amount_bn)
+ })):[];
+ if(claimedAllocations.some(i=>!['revenues','expenses'].includes(i.side)||!i.categoryId||!Number.isFinite(i.amount)))
+   throw Error('Invalid aggregate allocations '+r.programme_id);
+ const scenario={budget:{revenues:{},expenses:{}},picked:[],...(claim?{claimedTotals:claim,claimedAllocations}:{documentaryOnly:true})};
  const title=r.name+' — '+(claim?'contre-budget':'propositions')+' '+year;
  const desc=p.presentation[0]?.description||(claim?'Deux masses financières déclarées et sourcées.':'Thèmes sourcés, mesures en cours de qualification.');
  const b=await query("SELECT id FROM budgets WHERE origin='party' AND party_code=$1 ORDER BY published_at DESC LIMIT 1",[party]);
  if(b.length) {
-   await query("UPDATE budgets SET scenario=(scenario-'claimedTotals'-'documentaryOnly') || $1::jsonb,visibility='public',featured=$2,description=$3 WHERE id=$4",
-   [JSON.stringify(claim?{picked:[],claimedTotals:claim}:{picked:[],documentaryOnly:true}),Boolean(claim),desc,b[0].id]);
+   await query("UPDATE budgets SET scenario=(scenario-'claimedTotals'-'documentaryOnly'-'claimedAllocations') || $1::jsonb,visibility='public',featured=$2,description=$3 WHERE id=$4",
+   [JSON.stringify(claim?{picked:[],claimedTotals:claim,claimedAllocations}:{picked:[],documentaryOnly:true}),Boolean(claim),desc,b[0].id]);
  } else await query("INSERT INTO budgets(title,description,origin,party_code,reference_year,scenario,visibility,featured,maturity_status) VALUES($1,$2,'party',$3,2025,$4::jsonb,'public',$5,'en_preparation')",
    [title,desc,party,JSON.stringify(scenario),Boolean(claim)]);
  for(const t of p.themes)await query("INSERT INTO party_proposals(party_code,source_year,group_id,title,source_measure_count,review_status,source_url,description) VALUES($1,$2,$3,$4,0,'review_pending',$5,$6) ON CONFLICT(party_code,source_year,group_id) DO UPDATE SET title=EXCLUDED.title,source_measure_count=0,source_url=EXCLUDED.source_url,description=EXCLUDED.description",
