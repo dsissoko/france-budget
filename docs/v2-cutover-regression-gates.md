@@ -39,13 +39,17 @@ Audit du code `src/App.tsx`, `api/budgets/index.ts`, `api/reference.ts`, `api/vo
 - V1 NoPasaran : mapping explicite de l'identifiant `c2e1262e-e312-4f82-bf50-0dd63a751083` sur le budget V2 QA, copie de ses **3 votes existants** en V2 ; comparaison `votes_v1=3`, `votes_v2=3`. **Cet essai ne constitue pas une migration exhaustive des budgets et votes V1.**
 - CI de la branche : tests V1 et V2 + audit éditorial ; aucun WAF actif.
 
+## Arbitrage ultérieur — données citoyennes V1 jetables
+
+Le responsable du projet a confirmé que tous les budgets citoyens et votes V1 actuellement stockés sont des **données de test jetables** : leur migration exhaustive n'est donc **plus** un critère de bascule. NoPasaran est réinitialisé depuis ses CSV. Les nouvelles contributions V2 après publication doivent, en revanche, être conservées, y compris en cas de rollback. Voir [runbook V2](v2/exploitation.md).
+
 ## Critères de mise en production — TOUS obligatoires
 
 - [ ] Qualifier et sourcer les impacts politiques nécessaires à chaque budget PARTIAL (les sources insuffisantes restent explicitement documentaires) ; aucune invention.
 - [ ] Corriger les descriptions politiques absentes, actuellement 260 alertes de description manquante, relecture accessible au non-initié.
 - [ ] Finaliser la compatibilité entre les payloads V2 et tous les traitements UI, y compris la simulation, badges, featured et paramètres.
 - [ ] Rejouer toutes les parités de calculs, projections et statuts avec NoPasaran, programmes PARTIAL et AGGREGATE, cas de réutilisation de budget politique par un citoyen.
-- [ ] Migrer **tous** les citoyens et leurs votes, contrôler les liens UUID historiques, prévoir écritures concurrentes et rollback.
+- [ ] Recréer NoPasaran depuis ses CSV, exclure les données citoyennes V1 de test, préserver les nouvelles écritures et votes V2 après cutover.
 - [ ] Tester E2E (GET, création, brouillon, publication, tentative tierce, vote, partage, comparaison, affichage).
 - [ ] Adapter l'UI **sans `citizenMeasures` en V2** ; retirer uniquement « Exporter » et sa fonction obsolète, conserver « Enregistrer » et « Publier ».
 - [ ] Vérifier sur Vercel Preview, Neon QA ; WAF V2 non activé en production sans test ciblé, **aucun impact V1**.
