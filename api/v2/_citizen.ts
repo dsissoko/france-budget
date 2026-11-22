@@ -93,7 +93,8 @@ export function parseJsonBody(req:any):any{
 export function writeErrorStatus(e:unknown):number{
   if(e instanceof CitizenInputError||e instanceof SyntaxError)return 400;
   const msg=String((e as any)?.message??e);
-  if(/edit_capability_denied|invalid_edit_capability|budget_withdrawn/.test(msg))return 403;\n  if(/published_budget_immutable/.test(msg))return 409;
+  if(/edit_capability_denied|invalid_edit_capability|budget_withdrawn/.test(msg))return 403;
+  if(/published_budget_immutable/.test(msg))return 409;
   if(/revision_conflict|citizen_budget_already_exists/.test(msg))return 409;
   if(/foreign key|check constraint|invalid_|duplicate_|orphan_|null value|out_of_range/.test(msg))return 422;
   return 503;
