@@ -78,7 +78,7 @@ function discover(base) {
 }
 async function main(){
   const args=process.argv.slice(2),apply=args.includes('--apply');
-  const dirs=args.includes('--all')?discover(resolve('data/programmes')):args.filter(x=>!x.startsWith('--')).map(resolve);
+  const dirs=args.includes('--all')?discover(resolve('data/programmes')):args.filter(x=>!x.startsWith('--')).map(x=>resolve(x));
   if(!dirs.length)throw Error('Usage: node scripts/v2/import.mjs --all [--apply] OR <directory> [--apply]');
   const batches=dirs.map(loadBatch);
   const seen=new Set();
