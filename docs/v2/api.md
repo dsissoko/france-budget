@@ -1,5 +1,7 @@
 # Contrats API V2
 
+[Spécification OpenAPI 3.1 versionnée](openapi.yaml) — contrats de la branche #142 ; la validation automatique contre les handlers reste à compléter.
+
 Les endpoints ci-dessous reflètent les handlers actuels de [api/v2](../../api/v2/), **et non une API V2 déjà publiée sur le domaine de production**.
 
 | Méthode | Endpoint | Réponse normale |
