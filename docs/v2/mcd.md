@@ -71,4 +71,4 @@ erDiagram
 
 La vue `v2.latest_budgets` filtre la version `latest` et l'état `published`.
 
-**Extension #145 non encore modélisée physiquement** : conserver chaque ligne documentaire source et sa provenance, ainsi que les allocations internes aux agrégats, sans les transformer en impacts additionnels. Une migration et un ADR explicites seront nécessaires.
+**Intégration #145 dans la V2 :** les groupes documentaires, lignes sources et allocations internes sont actuellement conservés en `v2.budgets.documentary` (JSONB structuré, validé à l'import), **pas** dans `v2.budget_proposal_impacts`. Ce choix évite les impacts additionnels, mais pourra être normalisé en tables relationnelles lorsque les besoins de requêtage le justifient.
