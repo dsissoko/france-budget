@@ -8,7 +8,7 @@ export default async function handler(req: any, res: any) {
      CASE WHEN b.origin='party' THEN
        (SELECT COALESCE(jsonb_agg(jsonb_build_object(
           'id',p.group_id,'title',p.title,'year',p.source_year,
-          'sourceCount',p.source_measure_count,'reviewStatus',p.review_status,
+          'sourceCount',p.source_measure_count,'description',p.description,'reviewStatus',p.review_status,
           'sourceLines',(SELECT COALESCE(jsonb_agg(jsonb_build_object(
              'id',l.source_row,'title',l.title,'direction',l.direction,
              'claimedAmountBn',l.claimed_amount_bn,'impactDescription',l.impact_description,'sourceUrl',l.source_url,
@@ -22,6 +22,7 @@ export default async function handler(req: any, res: any) {
                        WHERE (l.party_code,l.source_year,l.group_id)=(p.party_code,p.source_year,p.group_id)))
         ) ORDER BY p.source_year DESC,p.group_id),'[]'::jsonb)
         FROM party_proposals p WHERE p.party_code=b.party_code
+         AND EXISTS(SELECT 1 FROM party_source_lines l WHERE l.party_code=p.party_code AND l.source_year=p.source_year AND l.group_id=p.group_id)
          AND p.source_year=COALESCE((b.scenario->'claimedTotals'->>'year')::int,(SELECT MAX(q.source_year) FROM party_proposals q WHERE q.party_code=b.party_code)))
      ELSE '[]'::jsonb END AS "documentaryProposals",
      count(v.id)::int AS votes FROM budgets b LEFT JOIN votes v ON v.budget_id=b.id
