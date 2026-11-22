@@ -43,7 +43,7 @@ flowchart TD
     G --> H["Solde +24,7, sans double comptage"]
 ```
 
-L'importeur V2 ne sait pas encore recevoir les fichiers `groupes-citoyens.csv` / `rattachements-citoyens.csv` / `impacts-citoyens.csv` de #145 dans une représentation canonique conservant toutes les sources **et** l'effet AGGREGATE. Il faut adapter le pipeline et tester le calcul avant le cutover. Les revendications ne doivent jamais être dupliquées dans `budget_proposal_impacts` comme deltas additionnels.
+L'importeur V2 lit désormais les fichiers `groupes-citoyens.csv`, `rattachements-citoyens.csv` et `impacts-citoyens.csv` de #145 ; il conserve les sources, 11 regroupements et allocations internes aux agrégats dans `documentary`. La CI vérifie les montants et les compteurs ; la parité Neon QA → API → UI reste à démontrer avant le cutover. Les revendications ne doivent jamais être dupliquées dans `budget_proposal_impacts` comme deltas additionnels.
 
 ## Vérification d'un import
 
