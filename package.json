@@ -14,7 +14,8 @@
     "audit:editorial:v2": "node scripts/v2/audit-editorial.mjs",
     "db:init": "node scripts/v2/db-init.mjs",
     "db:import": "node scripts/v2/import.mjs --all",
-    "db:check": "node scripts/v2/db-check.mjs"
+    "db:check": "node scripts/v2/db-check.mjs",
+    "docs:check": "node scripts/v2/check-docs.mjs"
   },
   "dependencies": {
     "@vitejs/plugin-react": "^4.7.0",
