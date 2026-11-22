@@ -74,6 +74,7 @@ export function normalizeCitizenBody(body:any,key:string){
         delta_amount_bn:amount(impact.deltaAmountBn,true,'impact')});
     }
   }
+  demand(impacts.length<=100,'Trop d’impacts');
   return {budget:{budget_key:key,version:'latest',origin:'citizen',party_code:'',
     author,title,description,reference_year:'2025',source_year:'',
     budget_mode:mode,documentary:{}},proposals,impacts,publish};
@@ -92,8 +93,23 @@ export function parseJsonBody(req:any):any{
 export function writeErrorStatus(e:unknown):number{
   if(e instanceof CitizenInputError||e instanceof SyntaxError)return 400;
   const msg=String((e as any)?.message??e);
-  if(/edit_capability_denied|invalid_edit_capability|budget_withdrawn/.test(msg))return 403;
+  if(/edit_capability_denied|invalid_edit_capability|budget_withdrawn/.test(msg))return 403;\n  if(/published_budget_immutable/.test(msg))return 409;
   if(/revision_conflict|citizen_budget_already_exists/.test(msg))return 409;
   if(/foreign key|check constraint|invalid_|duplicate_|orphan_|null value|out_of_range/.test(msg))return 422;
   return 503;
+}
+
+/** Checks delta bounds against the frozen citizen pivot; no invented accounting. */
+export function validatePivotImpacts(
+  impacts:ReadonlyArray<{side:string;category_id:string;delta_amount_bn:string}>,
+  refs:ReadonlyArray<{side:string;category_id:string;reference_amount_bn:string|number}>
+):void {
+  const byPost=new Map(refs.map(r=>[r.side+':'+r.category_id,Number(r.reference_amount_bn)]));
+  for(const i of impacts){
+    const base=byPost.get(i.side+':'+i.category_id);
+    demand(base!==undefined,'Poste inconnu dans le référentiel citoyen');
+    const delta=Number(i.delta_amount_bn);
+    demand(Number.isFinite(delta)&&Number.isFinite(base),'Montant invalide');
+    demand(base+delta>=0&&base+delta<=base*2,'Variation hors plage autorisée');
+  }
 }
