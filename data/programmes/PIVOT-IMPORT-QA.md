@@ -28,3 +28,16 @@ Les 2 anciennes illustrations Horizons sont exclues du jeu actif, conservées en
 - `reference_year=2025` : référentiel comptable de l'application. `source_year` : année du programme.
 
 Le stockage complet de `claimed_amount_bn` et des métadonnées exige des **colonnes communes supplémentaires dans `budget_proposals`**. Ces colonnes ont été ajoutées seulement à la branche QA Neon `br-gentle-hill-b9gmz04u`, sans aucun effet sur la production. L'import SQL expérimental et ses résultats doivent être vérifiés séparément. Aucun code UI modifié.
+
+## Recette Neon QA réalisée (22/11/2026)
+
+- Base : branche isolée `qa-nopasaran-unified-import-20261122` (`br-gentle-hill-b9gmz04u`), **jamais la production**.
+- Ajustement additif **sur QA uniquement** de `budget_proposals` : `claimed_amount_bn`, `source_url`, `source_year`, `source_status`, `direction`, `amount_unit`, `source_section`, `source_origin`, `notes`. Ces champs sont **communs** aux citoyens et partis ; aucune table spécifique.
+- Import depuis les `budget.csv` et `proposals.csv` de cette branche GitHub, via `INSERT ... ON CONFLICT` ; budgets de QA en visibilité `hidden`. Aucun script de production modifié.
+- **15 budgets QA**, **285 propositions**, dont **283 montants revendiqués**, **285 sources URL**, **285 statuts de qualification**, **0 titre vide**, **0 impact comptable inventé**.
+- Par programme : ECO 4 ; EQX 14 ; HOR 0 (2 anciennes illustrations exclues) ; LFI 2026 145 ; LFI 2027 34 ; LR 10 ; RN 78 ; autres programmes 0.
+- Un premier export avait produit des lignes sans titres/identifiants : **corrigé et contrôlé avant l'import réussi**.
+- Les `source_status` initiaux demeurent inchangés, sans promotion artificielle en données validées. Les propositions AGGREGATE ne sont pas additionnées aux résultats.
+- **À industrialiser** : importeur CSV partagé, transactions, tests automatiques d'idempotence, résolution stable de `budget_key`, stratégie de publication/versioning. La recette ne prouve pas encore l'affichage via l'API existante, qui lit l'ancien modèle.
+
+**Limite de périmètre** : le rattachement aux postes du budget citoyen est effectué en amont, lors de l'extraction et qualification des programmes. Ce chantier n'effectue aucune ventilation ; seules d'éventuelles anomalies constatées dans les CSV seront remontées.
