@@ -23,3 +23,11 @@ test('same structure for all political budgets; documentary sources survive pars
  assert.equal(rn.proposals.length,78);
  assert.equal(rn.impacts.length,0,'no invented impacts in political CSV');
 });
+
+test('single-directory dry run does not require any database credential',async()=>{
+ const {spawnSync}=await import('node:child_process');
+ const result=spawnSync(process.execPath,['scripts/v2/import.mjs','data/programmes/nopasaran/2025'],{encoding:'utf8'});
+ assert.equal(result.status,0,result.stderr);
+ assert.match(result.stdout,/DRY RUN: no database writes/);
+ assert.match(result.stdout,/"budget_key":"nopasaran-2025"/);
+});
