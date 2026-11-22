@@ -1,3 +1,7 @@
+> **Fondements méthodologiques conservés.** Les références au moteur et aux tables V1 sont historiques ; la spécification technique V2 et les règles AGGREGATE/PARTIAL sont dans [le référentiel V2](v2/README.md).
+
+---
+
 # Moteur de projection — principes et validation
 
 ## Positionnement

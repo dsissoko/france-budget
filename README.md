@@ -97,6 +97,14 @@ Une proposition mieux sourcée, un chiffre corrigé, une explication plus claire
 
 ---
 
+## Référence documentaire V2
+
+> **Transition en cours :** la cible V2 est portée par la PR #142. Le schéma PostgreSQL `v2` existe, mais le trafic de production n'est pas encore basculé. Les apports LFI de #145 restent à intégrer au contrat V2.
+
+Le [corpus documentaire V2](docs/v2/README.md) est le point d'entrée pour [les règles métier](docs/v2/metier.md), [les parcours fonctionnels](docs/v2/fonctionnel.md), [l'architecture Mermaid](docs/v2/architecture.md), [le MCD](docs/v2/mcd.md), [le pipeline d'intégration](docs/v2/integration.md), [les API](docs/v2/api.md) et [l'exploitation](docs/v2/exploitation.md).
+
+Les anciens documents décrivant `public` sont conservés à titre **historique V1**, pas comme spécification de la cible.
+
 ## Pour aller plus loin
 
 Le README présente la démarche. Les explications méthodologiques, détails techniques et modalités de contribution sont réunis dans les documents dédiés :

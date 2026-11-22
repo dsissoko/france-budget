@@ -1,0 +1,9 @@
+budget_key,proposal_key,side,category_id,delta_amount_bn
+"nopasaran-2025","retraite-annuites","expenses","social","-40"
+"nopasaran-2025","paix-ukraine","expenses","defense","-25"
+"nopasaran-2025","europe-contribution","expenses","general","-12"
+"nopasaran-2025","niches-entreprises","offBudget","business-tax-relief","-40"
+"nopasaran-2025","cout-travail","offBudget","business-social-relief","6"
+"nopasaran-2025","justice-revenus","revenues","income","35"
+"nopasaran-2025","justice-patrimoine","revenues","property","20"
+"nopasaran-2025","justice-entreprises","revenues","business","13.2"

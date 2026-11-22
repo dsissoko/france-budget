@@ -1,3 +1,7 @@
+> **Vision produit conservée ; cible technique V2.** Les libellés de version V1 dans ce document décrivent l'historique UX, pas un contrat backend. Les parcours et états applicatifs de référence sont dans [docs/v2/fonctionnel.md](v2/fonctionnel.md).
+
+---
+
 # Mon Budget Citoyen — Vision produit (v1.0.0 / v1.1.0)
 
 ## Positionnement

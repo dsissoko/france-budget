@@ -1,0 +1,9 @@
+budget_key,side,category_id,expected_amount_bn
+"nopasaran-2025","expenses","social","403.5"
+"nopasaran-2025","expenses","defense","30.4"
+"nopasaran-2025","expenses","general","173.6"
+"nopasaran-2025","revenues","income","138.6"
+"nopasaran-2025","revenues","business","99.8"
+"nopasaran-2025","revenues","property","91.5"
+"nopasaran-2025","offBudget","business-tax-relief","9.7"
+"nopasaran-2025","offBudget","business-social-relief","75.1"

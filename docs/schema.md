@@ -1,3 +1,7 @@
+> **ARCHIVE V1 — documentation historique.** Les tableaux, routes et flux `public` décrits ci-dessous ne sont pas la cible de la V2. Pour toute évolution, lire le [référentiel V2](v2/README.md), le [MCD](v2/mcd.md) et les [contrats API](v2/api.md). Aucun usage comme runbook de déploiement V2.
+
+---
+
 # Schéma de données Neon — état réel au 20 novembre 2026
 
 **Document de référence technique.** Établi à partir de l'introspection de la base Neon de production du projet `calm-rain-58562193`, et rapproché du code `main`. Les migrations SQL versionnées expliquent les changements ; `db/schema.sql` est un **bootstrap historique**, pas un dump exact de production ni un outil de mise à niveau à rejouer tel quel.
