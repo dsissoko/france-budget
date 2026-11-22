@@ -1,7 +1,7 @@
 ---
 name: rapprochement-programmes-citoyens
 description: Collecter, préserver et regrouper les mesures de programmes politiques dans les CSV de Mon Budget Citoyen, avec classification agentique auditée et calcul comptable déterministe.
-version: 0.1.0
+version: 0.2.0
 ---
 
 # Skill — Rapprochement des programmes avec les postes citoyens
@@ -18,7 +18,7 @@ Références du dépôt : `docs/methode.md`, `docs/schema.md`, `data/programmes/
 2. Séparer **mesure originale**, **regroupement documentaire**, **correspondance avec un poste citoyen** et **impact comptable**. Conserver les thèmes et les sources.
 3. **Toute mesure sourcée** est affichable en mode documentaire, y compris sans montant individuel, sans classification certaine ou sans impact comptable qualifié. Les sous-totaux éditoriaux restent distincts des mesures élémentaires.
 4. Le rapprochement agentique produit une **proposition**, une justification, une confiance et des éventuelles alternatives. Il ne crée jamais d'écriture comptable par lui-même.
-5. Le même budget ne doit disposer que d'**un impact effectif par couple (côté comptable, catégorie citoyenne)** ; si plusieurs lignes concernent le même poste, fusionner les écritures **après** examen des recouvrements. Une mesure multi-postes demande une ventilation explicite, sans duplication de montant.
+5. **Exclusivité des postes par regroupement : pour un budget donné, chaque poste citoyen impacté appartient à un seul groupe de propositions.** Un groupe peut toucher zéro, un ou plusieurs postes. Une mesure multi-postes n'est jamais dupliquée. L'unicité porte sur le poste citoyen (et non simplement sur le couple poste/sens) ; les écritures éventuelles de recettes et dépenses restent détaillées à l'intérieur du groupe, puis consolidées et contrôlées.
 6. Les regroupements documentaires peuvent être thématiques, mais une correspondance comptable n'est pas une preuve de causalité, d'additionnalité ou de compatibilité APU. Ne jamais agréger aveuglément les montants annoncés.
 7. En mode `AGGREGATE`, préserver le solde revendiqué fondé sur les masses globales : les mesures et leurs regroupements **n'ajoutent aucun montant au moteur**. En mode `PARTIAL`, seuls les effets directs qualifiés et réconciliés sont calculés.
 8. Année, périmètre, unité, signe, source et éventuel chevauchement doivent être contrôlés ; ne jamais cumuler automatiquement deux millésimes, un agrégat avec ses sous-mesures, un financement avec une dépense APU, ni des variations avec des totaux.
@@ -37,17 +37,27 @@ Pour **chaque ligne source**, produire une hypothèse de correspondance vers une
 
 Ne pas créer de catégorie inconnue. En cas d'ambiguïté, conserver la ligne en documentaire avec les alternatives ; une correspondance incertaine n'autorise aucune imputation.
 
-### 3. Grouper (déterministe à partir des propositions validées)
+### 3. Regrouper par exclusivité des postes (déterministe)
 
-Former les groupes d'affichage par budget, millésime, poste citoyen et sens de variation compatible ; identifier les groupes par clé stable, jamais par titre. Préserver l'appartenance d'origine de chaque mesure et les liens `group_id`/`source_row`. Si une mesure touche plusieurs postes, conserver **une seule ligne source** et plusieurs liens de rattachement, avec une répartition chiffrée uniquement si elle est justifiée.
+Construire, pour **un même budget**, un graphe biparti : nœuds « propositions sources » d'un côté et « postes citoyens impactés » de l'autre ; créer une arête pour chaque correspondance agentique **retenue**. Calculer les **composantes connexes**, sans séparation par thème ni par sens de variation :
 
-Attention : si le schéma existant impose une appartenance unique `party_source_lines.group_id`, garder le groupe documentaire primaire unique et représenter les correspondances multi-postes dans une relation séparée, plutôt que dupliquer la ligne.
+- Deux propositions partageant au moins un poste appartiennent au même groupe.
+- La fusion est **transitive** : A touche Éducation et Santé ; B touche Santé et Retraites => un seul groupe {A,B} réserve Éducation, Santé et Retraites.
+- Une proposition sans poste identifié demeure visible dans un groupe documentaire sans impact, sans réservation.
+- Chaque poste identifié appartient à **un seul groupe du budget**, et devient indisponible pour tous les autres groupes. Ne jamais créer un second groupe sur un poste déjà réservé ; fusionner les groupes concernés à la place.
+- Un groupe peut donc porter **zéro à plusieurs postes** et contenir une à plusieurs propositions ; ses postes peuvent inclure des recettes, des dépenses et des manques à gagner.
+- Les groupes sont des résultats **déterministes** de la relation proposition↔poste. Utiliser des IDs stables et ordonner les lignes, ne jamais déduire l'appartenance de titres ou de thèmes.
+- Ne pas dupliquer les lignes sources si une proposition touche plusieurs postes. Préserver la source et les liens vers chaque poste.
+
+Exemple séparé : A touche Éducation et Santé ; B touche Santé ; C touche Retraites => groupes {A,B} avec {Éducation,Santé} et {C} avec {Retraites}. Si B touche aussi Retraites, **les trois propositions** forment un groupe unique.
+
+Le schéma existant impose l'appartenance de `party_source_lines` à un seul `group_id`. Conserver cette propriété et modéliser les correspondances proposition↔postes séparément ; aucune proposition ne doit apparaître comme nouvelle ligne source à cause d'un rattachement multiple.
 
 ### 4. Qualifier l'imputation (contrôles déterministes + décision explicitée)
 
 Pour chaque candidat à impact : vérifier la direction, la catégorie existante, le périmètre APU, l'année, le caractère annuel/ponctuel, la source, l'additionnalité et les doubles comptes. Séparer `calculate`, `non_chiffrable_apu` et `review_pending`. Une décision `review_pending` ou un simple montant revendiqué ne modifie jamais la simulation.
 
-Lorsqu'au moins deux mesures qualifiées alimentent le même poste, produire une **écriture consolidée unique**, traçable vers toutes les composantes, *après* élimination des recouvrements. Rejeter les incohérences de sens, d'unité et de millésime ; ne pas additionner une enveloppe et ses sous-mesures.
+Lorsqu'au moins deux mesures qualifiées alimentent le même poste **à l'intérieur de son groupe exclusif**, produire un impact consolidé unique par poste, traçable vers toutes les composantes, *après* élimination des recouvrements. Rejeter les incohérences de sens, d'unité et de millésime ; ne pas additionner une enveloppe et ses sous-mesures.
 
 ### 5. Exporter puis importer (déterministe)
 
@@ -60,7 +70,7 @@ Le code de l'interface/API doit lire les mesures documentaires pour les budgets 
 Contrôles obligatoires avant fusion :
 - inventaire sources = lignes CSV distinctes = lignes importées visibles (à exclusions explicites et documentées près) ;
 - chaque mesure source apparaît une seule fois dans l'inventaire documentaire et ses liens de groupes sont retraçables ;
-- aucun groupe ne crée une écriture supplémentaire ; aucun poste n'a deux impacts effectifs de même côté dans un budget ;
+- aucun groupe ne crée une écriture supplémentaire ; **aucun poste citoyen n'est réservé à deux groupes du même budget** ; tout chevauchement impose leur fusion transitive ;
 - les montants consolidés sont réconciliés, sans chevauchement ni duplication multi-postes ;
 - `AGGREGATE` : trajectoire et bilan identiques avant/après ajout des détails documentaires ;
 - `PARTIAL` : seules les écritures validées changent les résultats ;
@@ -82,3 +92,8 @@ Après chaque campagne, conserver dans la PR les nouvelles ambiguïtés rencontr
 - Rattachement agentique aux postes citoyens, suivi de regroupements déterministes.
 - Un seul impact comptable effectif par poste et côté, avec rapprochement des mesures d'origine.
 - Pas de recalcul des agrégats revendiqués à partir des mesures affichées.
+
+### v0.2.0 — 2026-11-22
+- Regroupement défini précisément par les composantes connexes du graphe propositions ↔ postes citoyens.
+- Exclusivité de **chaque poste au niveau du budget**, et non uniquement des écritures ou couples poste/sens.
+- Groupes autorisés à toucher zéro, un ou plusieurs postes ; fusion transitive obligatoire ; propositions sans poste conservées.
