@@ -1,3 +1,7 @@
+> **Roadmap produit transversale.** La cible backend/applicative courante est V2. Le classement historique des piliers et versions n'implique pas une dépendance technique aux routes ou tables V1. Voir le [corpus V2](v2/README.md).
+
+---
+
 # Roadmap — Mon Budget Citoyen
 
 > Roadmap produit et scientifique. Les piliers sont **parallèles**, non trois versions successives. Les échéances et numéros au-delà des versions déjà documentées sont indicatifs. L'interface publique est volontairement stabilisée.
