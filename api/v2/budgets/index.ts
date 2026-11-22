@@ -53,6 +53,7 @@ export default async function handler(req:any,res:any){
       payload.budget.documentary={citizenSource:{budgetKey:source[0].budget_key,
        title:source[0].title,budgetMode:source[0].budget_mode,
        aggregate:source[0].documentary?.aggregates?.[0]??null,
+       claimedAllocations:source[0].documentary?.claimedAllocations??[],
        nested:source[0].documentary?.citizenSource??null,
        proposals:p}};
     }
