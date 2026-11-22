@@ -1,7 +1,7 @@
 ---
 name: rapprochement-programmes-citoyens
 description: Collecter, préserver et regrouper les mesures de programmes politiques dans les CSV de Mon Budget Citoyen, avec classification agentique auditée et calcul comptable déterministe.
-version: 0.5.0
+version: 0.6.0
 ---
 
 # Skill — Rapprochement des programmes avec les postes citoyens
@@ -53,11 +53,27 @@ Exemple séparé : A touche Éducation et Santé ; B touche Santé ; C touche Re
 
 Le schéma existant impose l'appartenance de `party_source_lines` à un seul `group_id`. Conserver cette propriété et modéliser les correspondances proposition↔postes séparément ; aucune proposition ne doit apparaître comme nouvelle ligne source à cause d'un rattachement multiple.
 
-### 4. Qualifier l'imputation (contrôles déterministes + décision explicitée)
+### 4. Calculer les impacts sur le budget citoyen (objectifs et exigences de résultat)
 
-Pour chaque candidat à impact : vérifier la direction, la catégorie existante, le périmètre APU, l'année, le caractère annuel/ponctuel, la source, l'additionnalité et les doubles comptes. Séparer `calculate`, `non_chiffrable_apu` et `review_pending`. Une décision `review_pending` ou un simple montant revendiqué ne modifie jamais la simulation.
+**Mission : restituer aussi fidèlement que possible les conséquences financières des propositions sur le budget citoyen, en distinguant systématiquement ce que le programme annonce, ce que l'on peut raisonnablement traduire dans les postes de l'application et ce qui reste incertain.** Le skill fixe les résultats attendus, **pas la méthode de calcul ni un algorithme imposé**. L'agent choisit les moyens d'analyse adaptés aux sources disponibles ; seuls les résultats qualifiés sont utilisés par le moteur déterministe.
 
-Lorsqu'au moins deux mesures qualifiées alimentent le même poste **à l'intérieur de son groupe exclusif**, produire un impact consolidé unique par poste, traçable vers toutes les composantes, *après* élimination des recouvrements. Rejeter les incohérences de sens, d'unité et de millésime ; ne pas additionner une enveloppe et ses sous-mesures.
+**Résultats attendus pour chaque regroupement :**
+
+- **Couverture utile** : identifier les postes citoyens réellement susceptibles d'être affectés et le sens attendu de chaque effet (hausse, baisse ou effet non établi). Un groupe peut n'avoir aucun effet quantifiable ou affecter plusieurs postes.
+- **Chiffrage exploitable quand il est justifiable** : privilégier les montants explicitement annoncés dans le programme ; lorsqu'une traduction ou une estimation est nécessaire, l'expliciter, en indiquant sa base de comparaison, son périmètre, son année, ses hypothèses et sa source. Aucun montant inventé pour combler une lacune.
+- **Fidélité financière** : ne pas confondre coût d'une mesure, économies annoncées, recette fiscale, enveloppe d'investissement, financement, effet sur le solde et impact sur un poste du budget citoyen. Un montant publié n'est pas nécessairement un impact additionnel sur la référence INSEE/APU du simulateur.
+- **Cohérence globale** : chercher à rapprocher les impacts attribuables des montants et soldes annoncés, lorsqu'ils sont comparables, sans forcer artificiellement l'égalité. Expliquer les écarts, les montants hors périmètre, les effets indirects et les chevauchements.
+- **Pas de double compte** : un poste citoyen est réservé à son unique regroupement pour le budget. À l'intérieur du groupe, les montants retenus doivent couvrir les effets propres à chaque proposition **sans compter deux fois un même effet**, même lorsque plusieurs propositions partagent un poste ou qu'une proposition touche plusieurs postes. Un regroupement n'ajoute aucun impact en plus de ceux qu'il rassemble.
+- **Traçabilité et transparence** : fournir pour chaque impact son poste, son sens, son montant éventuel, son statut, son origine (chiffrage revendiqué / estimation argumentée / absence de chiffrage), la référence documentaire et une justification courte compréhensible. Préserver les détails et réserves techniques hors du texte éditorial.
+- **Incertitude explicite** : une proposition demeure visible même si l'impact n'est pas chiffrable, si sa ventilation est ambiguë ou si des hypothèses nécessaires ne sont pas vérifiables. Mieux vaut un impact non calculé et correctement expliqué qu'un chiffre faussement précis.
+- **Neutralité et reproductibilité** : mêmes exigences de preuve pour toutes les formations ; conserver dans les CSV les hypothèses, décisions et résultats validés, afin de ne pas réanalyser les PDF à chaque import.
+
+**Critères d'activation dans le simulateur :**
+
+- Un impact n'est activable que si sa correspondance avec un poste existant, son sens, son montant et sa compatibilité avec le périmètre et le millésime de référence sont suffisamment justifiés.
+- Les états `calculate`, `non_chiffrable_apu` et `review_pending` distinguent respectivement les effets directs admis au calcul, les effets exclus avec motif, et les effets en attente. Un montant revendiqué ou estimé ne suffit pas à activer le calcul.
+- En mode `AGGREGATE`, les regroupements et leurs impacts documentés expliquent le programme **sans modifier les masses globales revendiquées déjà utilisées** ; ils ne s'y ajoutent pas. En mode `PARTIAL`, seuls les impacts directs qualifiés alimentent la simulation.
+- **Livrable attendu : une proposition ou un regroupement intelligible, ses postes réservés, et pour chaque poste soit un impact chiffré traçable et validé, soit une absence d'impact chiffré clairement motivée.** Aucun résultat approximatif ne doit être présenté comme certifié.
 
 ### 5. Rédiger les champs publics (agentique, puis contrôle éditorial)
 
@@ -135,3 +151,8 @@ Après chaque campagne, conserver dans la PR les nouvelles ambiguïtés rencontr
 ### v0.5.0 — 2026-11-22
 - Recherche des limites dans l'UI, les validations API **et** Neon, avec priorité à la contrainte effective la plus restrictive.
 - À défaut, déduction d'un plafond éditorial justifié par le contexte d'affichage, documenté et testé, sans le présenter comme une limite technique préexistante.
+
+### v0.6.0 — 2026-11-22
+- Deuxième volet du skill : objectifs de chiffrage et de qualification des impacts sur les postes citoyens.
+- Directives centrées sur les résultats attendus (fidélité, couverture, cohérence, traçabilité, absence de doubles comptes, incertitude), sans imposer d'algorithme de calcul.
+- Distinction explicite entre montant annoncé, estimation, impact activable et simple restitution documentaire.
