@@ -23,7 +23,7 @@ const errors = [];
 for (const path of docs) {
   if (!existsSync(path)) { errors.push(path + ': missing document'); continue; }
   const raw = readFileSync(path, 'utf8');
-  const fences = [...raw.matchAll(/^\s*(?:`{3}|~{3})(?:mermaid)?\s*$/gm)];
+  const fences = [...raw.matchAll(/^\s*(?:`{3}|~{3})[^\n]*$/gm)];
   const mermaidStarts = [...raw.matchAll(/^\s*(?:`{3}|~{3})mermaid\s*$/gm)];
   if (fences.length % 2 !== 0) errors.push(path + ': unbalanced mermaid/code fences');
   for (const start of mermaidStarts) {
