@@ -1,7 +1,7 @@
 ---
 name: rapprochement-programmes-citoyens
 description: Collecter, préserver et regrouper les mesures de programmes politiques dans les CSV de Mon Budget Citoyen, avec classification agentique auditée et calcul comptable déterministe.
-version: 0.7.0
+version: 1.0.0
 ---
 
 # Skill — Rapprochement des programmes avec les postes citoyens
@@ -10,7 +10,7 @@ version: 0.7.0
 
 Restituer **toutes** les mesures identifiées dans un programme, au minimum à titre documentaire, et rapprocher les propositions des postes budgétaires citoyens sans double comptage ni invention de chiffrage. La qualification comptable **ne conditionne pas la visibilité documentaire**.
 
-Références du dépôt : `docs/methode.md`, `docs/schema.md`, `data/programmes/registre-programmes.csv`, `data/programmes/<code>/<année>/{sources,themes,mesures,agregats}.csv`, `.github/PULL_REQUEST_TEMPLATE/political-programme.md`.
+**Source durable : les CSV versionnés.** Les PDF servent à renseigner et vérifier les CSV ; Neon et l’UI consomment leur contenu. Corriger dans les CSV puis réimporter, jamais masquer les défauts éditoriaux par une correction isolée en base. Toute génération de JSON de preview ou de données de base doit être reproductible depuis les CSV.\n\nRéférences du dépôt : `docs/methode.md`, `docs/schema.md`, `data/programmes/registre-programmes.csv`, `data/programmes/<code>/<année>/{sources,themes,mesures,agregats}.csv`, `.github/PULL_REQUEST_TEMPLATE/political-programme.md`.
 
 ## Principe de sobriété des contraintes
 
@@ -105,9 +105,9 @@ Le schéma existant impose l'appartenance de `party_source_lines` à un seul `gr
 
 ### 6. Exporter puis importer (déterministe)
 
-Les CSV versionnés sont le référentiel réutilisable de provenance et d'enrichissement. Conserver dans des fichiers adjacents ou colonnes versionnées (selon le schéma adopté) les rattachements proposés, preuves, décisions et groupes ; ne pas écraser les lignes originales. Générer ensuite une migration/import idempotent vers Neon. Importer **toutes les mesures documentaires** en tant que contenu visible, indépendamment de leur activation comptable. Les seules écritures calculées proviennent du flux qualifié.
+Les CSV versionnés sont le référentiel réutilisable de provenance et d'enrichissement. Pour les programmes enrichis, les fichiers `presentation.csv`, `groupes-citoyens.csv`, `rattachements-citoyens.csv`, `impacts-citoyens.csv` complètent `mesures.csv` et les quatre fichiers historiques. `presentation.csv` fournit le texte de présentation du budget, distinct de l’URL de la source ; `groupes-citoyens.csv` fournit les titres et descriptions publics ; `rattachements-citoyens.csv` porte les liens sources↔postes et la justification ; `impacts-citoyens.csv` décrit par poste les montants attribuables et les réserves. Aucun fichier de preview n'est une deuxième source de vérité. Conserver dans des fichiers adjacents ou colonnes versionnées (selon le schéma adopté) les rattachements proposés, preuves, décisions et groupes ; ne pas écraser les lignes originales. Générer ensuite une migration/import idempotent vers Neon. Importer **toutes les mesures documentaires** en tant que contenu visible, indépendamment de leur activation comptable. Les seules écritures calculées proviennent du flux qualifié.
 
-Le code de l'interface/API doit lire les mesures documentaires pour les budgets `AGGREGATE` **et** `PARTIAL`. Le nombre affiché doit provenir du même ensemble dédupliqué que la liste effectivement consultable ; le label « chiffrées » est réservé aux lignes réellement dotées d'un montant, sans suggérer qu'elles ont un impact calculé.
+En mode `AGGREGATE`, **l'import doit intégrer les lignes documentaires même si elles ne sont pas activées dans la simulation** ; ne jamais les écarter au prétexte que le couple de masses financières est déjà connu. L'import ne doit pas remplacer une présentation éditoriale issue des CSV par une accumulation de titres et d'URL, ni par un texte générique. Les URL ne figurent que dans les champs source et sont rendues cliquables par l'UI, avec un libellé humain. Une migration de schéma, si nécessaire, fait partie du contrat d'intégration et ne doit pas déclencher de recalcul implicite.\n\nLe code de l'interface/API doit lire les mesures documentaires pour les budgets `AGGREGATE` **et** `PARTIAL`. Le nombre affiché doit provenir du même ensemble dédupliqué que la liste effectivement consultable ; le label « chiffrées » est réservé aux lignes réellement dotées d'un montant, sans suggérer qu'elles ont un impact calculé.
 
 ### 7. Vérifier le résultat (déterministe)
 
@@ -115,7 +115,7 @@ Contrôles obligatoires avant fusion :
 - inventaire sources = lignes CSV distinctes = lignes importées visibles (à exclusions explicites et documentées près) ;
 - chaque mesure source apparaît une seule fois dans l'inventaire documentaire et ses liens de groupes sont retraçables ;
 - aucun groupe ne crée une écriture supplémentaire ; **aucun poste citoyen n'est réservé à deux groupes du même budget** ; tout chevauchement impose leur fusion transitive ;
-- les montants consolidés sont réconciliés, sans chevauchement ni duplication multi-postes ;
+- les montants consolidés sont réconciliés, sans chevauchement ni duplication multi-postes ; lorsqu'une mesure concerne plusieurs postes et que sa ventilation manque, laisser les impacts par poste non chiffrés plutôt que répartir arbitrairement le montant ;\n- pour chaque poste, distinguer `montant revendiqué et attribuable à ce poste`, `montant revendiqué non ventilé`, et `impact effectivement appliqué à la simulation` ;
 - `AGGREGATE` : trajectoire et bilan identiques avant/après ajout des détails documentaires ;
 - `PARTIAL` : seules les écritures validées changent les résultats ;
 - interface mobile et desktop : liste, dépliants, compteurs et sources concordent ; titres et descriptions compréhensibles par un non-initié et fidèles aux sources, et **tous les champs générés respectent leur plafond UI** ;
@@ -165,3 +165,10 @@ Après chaque campagne, conserver dans la PR les nouvelles ambiguïtés rencontr
 - Principe directeur : aucune contrainte inventée au-delà des engagements du programme politique et des seules nécessités démontrées de l'intégration.
 - Les exigences documentaires facultatives ne bloquent ni l'affichage des mesures ni le traitement d'impacts calculables.
 - Distinction entre contraintes effectives et recommandations méthodologiques non bloquantes.
+
+### v1.0.0 — 2026-11-22
+- Chaîne stabilisée : PDF et sources primaires → CSV documentaires enrichis → import Neon → restitution API/UI.
+- Schéma d'échange public : présentation, groupes, liens propositions↔postes, impacts avec réserves et source.
+- Import documentaire obligatoire également en mode agrégat ; aucune URL brute dans les champs éditoriaux.
+- Impact financier annoncé distingué de l'effet calculé, avec ventilation non forcée en cas de mesure multi-postes.
+- Règles orientées résultats et seules contraintes d'intégration justifiées.
