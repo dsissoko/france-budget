@@ -1,6 +1,6 @@
 # Référentiel documentaire V2
 
-> **Cible architecturale, bascule production non encore effectuée.** La PR #142 porte l'application V2 ; la PR #145 contient des enrichissements LFI encore à intégrer au modèle V2. Le schéma `v2` a été créé sur Neon production, mais le trafic n'a pas basculé.
+> **Architecture de production depuis le 22 novembre 2026.** Les PR #142 et #145 ont été consolidées dans `main`. L'application Vercel utilise `/api/v2/*` sur le schéma Neon `v2`. Le schéma V1 `public` est conservé pour rollback. L'initialisation des budgets initiaux repose sur les CSV, non sur la reprise des tests V1.
 
 ## Navigation
 
@@ -30,7 +30,7 @@ Toute évolution de modèle, contrat API, règle métier, import, UX ou exploita
 
 ## Points ouverts vérifiés
 
-- Les migrations 002 et 005 utilisent encore des données de `public` : le bootstrap V2 totalement autonome reste à réaliser après la recette.
+- Les migrations historiques 002 et 005, qui lisent encore `public`, sont marquées héritage et ne doivent pas être utilisées pour de nouvelles installations. Le bootstrap autonome actuel est `npm run db:init` avec `data/reference/2025-v2.json` et `db/v2/initial_ui.sql`.
 - Le handler `GET /api/v2/budgets/{key}/positions` restitue les positions AGGREGATE **si des allocations qualifiées sont présentes** ; les autres programmes sans allocations restent documentaires.
-- Les 28 lignes sources, 11 regroupements et 11 allocations LFI de #145 sont repris dans la branche V2 (CI validée) ; la parité avec Neon QA et le rendu Preview restent à tester.
-- Le nouveau `db:init` indépendant du schéma V1 et le contrôle `db:check` sont présents et testés en CI, mais pas encore validés en base vierge. Le nettoyage des migrations V1 reste **postérieur à la recette**.
+- Les 28 mesures sources, 11 regroupements et 11 allocations LFI ont été intégrés dans la V2 et importés en production ; la parité Neon des allocations est contrôlée (84,4 Md€ recettes, 37,7 Md€ dépenses).
+- `db:init`, `db:import`, `db:check` et `docs:check` sont versionnés. L'installation sur base vierge et les tests HTTP externes de production nécessitent encore une validation de bout en bout. Les scripts V1 restent archivés jusqu'à validation de tous les contrôles post-bascule.
