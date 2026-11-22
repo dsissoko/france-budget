@@ -219,6 +219,13 @@ export default function AppV2(){
    }</div>)}</div><div className="card"><div className="card-title"><h3>Présentation et mesures</h3>
     <span className="pill">{measuredProposals(b).length} mesures chiffrées</span></div>
     {b.description&&<p className="muted small">{b.description}</p>}
+    {b.origin==='party'&&measuredProposals(b).length===0&&
+     <p className="muted small" role="status">
+      {b.proposals.length>0?
+       b.proposals.length+' propositions sont recensées dans les sources, mais aucun chiffrage individuel n’est encore suffisamment qualifié pour être affiché comme mesure.':
+       'Aucune mesure chiffrée individuelle n’est encore disponible pour ce programme.'}
+      {' '}Les agrégats du programme, lorsqu’ils sont documentés, sont présentés séparément.
+     </p>}
     {measuredProposals(b).some(p=>p.impacts.length===0)&&<p className="muted small">Les montants annoncés des propositions sont présentés à titre documentaire ; ils ne sont pas ajoutés aux agrégats ni à la simulation.</p>}
     <div className="compact-measure-list" aria-label="Propositions en lecture seule">
     {measuredProposals(b).map(p=><div key={p.proposalKey} className="compact-measure-item">
