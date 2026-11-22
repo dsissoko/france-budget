@@ -14,9 +14,21 @@ export default async function handler(req:any,res:any){
           b.title,b.description,b.author,b.reference_year AS "referenceYear",
           b.source_year AS "sourceYear",b.budget_mode AS "budgetMode",
           b.documentary,b.revision,b.published_at AS "published_at",
+          b.featured,b.featured_order,b.maturity_status,
+          b.confirmation_organization,b.confirmation_evidence_url,b.confirmed_at,
           (SELECT count(*)::int FROM v2.votes v WHERE v.budget_id=b.id) AS votes,
           (SELECT count(*)::int FROM v2.budget_proposals p WHERE p.budget_id=b.id) AS "proposalCount",
-          (SELECT count(*)::int FROM v2.budget_proposal_impacts i WHERE i.budget_id=b.id) AS "impactCount"
+          (SELECT count(*)::int FROM v2.budget_proposal_impacts i WHERE i.budget_id=b.id) AS "impactCount",
+          (SELECT COALESCE(jsonb_agg(jsonb_build_object(
+            'proposalKey',p.proposal_key,'title',p.title,'description',p.description,
+            'claimedAmountBn',p.claimed_amount_bn::text,'sourceUrl',p.source_url,
+            'sourceStatus',p.source_status,
+            'impacts',(SELECT COALESCE(jsonb_agg(jsonb_build_object(
+              'side',i.side,'categoryId',i.category_id,'deltaAmountBn',i.delta_amount_bn::text)
+              ORDER BY i.side,i.category_id),'[]'::jsonb)
+              FROM v2.budget_proposal_impacts i WHERE i.proposal_id=p.id)
+          ) ORDER BY p.proposal_key),'[]'::jsonb)
+          FROM v2.budget_proposals p WHERE p.budget_id=b.id) AS proposals
         FROM v2.latest_budgets b WHERE (${origin}='' OR b.origin=${origin})
         ORDER BY b.origin,b.budget_key LIMIT 500
       `;

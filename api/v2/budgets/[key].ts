@@ -11,7 +11,7 @@ export default async function handler(req:any,res:any){
       const rows=await sql`
         SELECT id,legacy_budget_id AS "legacyBudgetId",budget_key AS "budgetKey",version,origin,party_code AS "partyCode",
           author,title,description,reference_year AS "referenceYear",source_year AS "sourceYear",
-          budget_mode AS "budgetMode",documentary,revision
+          budget_mode AS "budgetMode",documentary,revision,featured,featured_order,maturity_status,confirmation_organization,confirmation_evidence_url,confirmed_at,published_at
         FROM v2.latest_budgets WHERE budget_key=${key} LIMIT 1`;
       if(!rows.length)return respond(res,404,{error:'Budget introuvable'});
       const budget=rows[0];
