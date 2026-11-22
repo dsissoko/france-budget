@@ -118,3 +118,52 @@ describe('V2 pivot-consolidation display and source-count',()=>{
   expect(pivotGroupMembers(grouped,grouped.proposals[2]).map(x=>x.proposalKey)).toEqual(['src-19','src-21']);
  });
 });
+
+
+describe('PR 145 grouped allocation inside V2 published AGGREGATE',()=>{
+ const group={id:'citizen-04',title:'Fiscalité des entreprises',
+  description:'Un programme annoncé',sourceUrl:'https://example.org/source.pdf',
+  sourceCount:2,
+  sourceLines:[
+   {id:'src-1',title:'Mesure A',description:'',claimedAmountBn:10,direction:'revenue_increase',sourceUrl:'https://example.org/source.pdf',sourcePage:13,sourceStatus:'validated',impactDescription:''},
+   {id:'src-2',title:'Mesure B',description:'',claimedAmountBn:9.9,direction:'revenue_increase',sourceUrl:'https://example.org/source.pdf',sourcePage:14,sourceStatus:'validated',impactDescription:''}
+  ],
+  citizenImpacts:[{side:'revenues',categoryId:'business',label:'Fiscalité des entreprises',
+   claimedAmountBn:19.9,status:'claimed_allocated_in_aggregate',rationale:'Justifié',simulated:true}]
+ };
+ const aggregate=makeBudget([
+  {proposalKey:'src-1',title:'Mesure A',description:'',claimedAmountBn:'10',sourceUrl:'https://example.org/source.pdf',impacts:[]},
+  {proposalKey:'src-2',title:'Mesure B',description:'',claimedAmountBn:'9.9',sourceUrl:'https://example.org/source.pdf',impacts:[]}
+ ],'AGGREGATE',{
+  aggregates:[{year:2027,basis:'delta',revenues_bn:106.4,expenses_bn:81.7,
+   balance_delta_bn:24.7,source_url:'https://example.org/source.pdf'}],
+  claimedAllocations:[{side:'revenues',categoryId:'business',amount:19.9}],
+  citizenGroups:[group]
+ });
+ aggregate.origin='party';
+ it('displays one citizen group sourced by two measures',async()=>{
+  const {pivotGroupMembers,measuredSourceCount}=await import('./v2-budget');
+  const shown=measuredProposals(aggregate);
+  expect(shown).toHaveLength(1);
+  expect(measuredSourceCount(aggregate)).toBe(2);
+  expect(pivotGroupMembers(aggregate,shown[0]).map(p=>p.proposalKey)).toEqual(['src-1','src-2']);
+  expect(shown[0].impacts).toEqual([{side:'revenues',categoryId:'business',deltaAmountBn:19.9}]);
+ });
+ it('allocates claim internally without creating extra revenue',()=>{
+  const r=computeBudget(aggregate,reference);
+  expect(r.revenues.business).toBeCloseTo(106.5,5);
+  expect(r.revenues.other).toBeCloseTo(810.7+86.5,5);
+  expect(r.balanceDelta).toBeCloseTo(24.7,5);
+  expect(r.entries).toHaveLength(3);
+ });
+ it('preserves the same allocation when a citizen copies the aggregate',()=>{
+  const copied=makeBudget([],'PARTIAL',{citizenSource:{
+   budgetKey:aggregate.budgetKey,title:aggregate.title,budgetMode:'AGGREGATE',
+   aggregate:aggregate.documentary.aggregates![0],
+   claimedAllocations:aggregate.documentary.claimedAllocations,
+   proposals:aggregate.proposals
+  }});
+  expect(computeBudget(copied,reference).revenues.business).toBeCloseTo(106.5,5);
+  expect(computeBudget(copied,reference).balanceDelta).toBeCloseTo(24.7,5);
+ });
+});
