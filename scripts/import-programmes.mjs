@@ -56,7 +56,9 @@ const plans=[...latest.values()].map(r=>{
     throw Error('Unknown citizen impact '+impact.citizen_post_id);
    if(impactPosts.has(impact.citizen_post_id))throw Error('Duplicate post impact '+impact.citizen_post_id);
    impactPosts.add(impact.citizen_post_id);
-   if(impact.simulation_applied!=='false')throw Error('AGGREGATE documentary impact must not apply simulation');
+   if(!['true','false'].includes(impact.simulation_applied)||
+      (impact.simulation_applied==='true'&&!Number.isFinite(Number(impact.claimed_post_amount_bn))))
+     throw Error('Invalid aggregate allocation state or amount '+r.programme_id);
   }
   if(impactPosts.size!==posts.size)throw Error('Missing citizen impact rows '+r.programme_id);
   for(const g of groups)if(Number(g.source_count)!==links.filter(l=>l.group_id===g.group_id).length)
