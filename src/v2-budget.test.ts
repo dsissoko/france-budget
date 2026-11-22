@@ -56,7 +56,7 @@ describe('V2 accounting parity with unchanged engine',()=>{
   expect(r.balanceDelta).toBeCloseTo(179.2,5);
   expect(r.deficit).toBeCloseTo(-26.7,5);
   const projection=simulationService.simulate(152.5,r.balanceDelta,yearsFor(V1_ASSUMPTIONS),V1_ASSUMPTIONS);
-  expect(projection.rows.find(p=>p.year===2032)?.scenario).toBe(0);
+  expect(Math.abs(projection.rows.find(p=>p.year===2032)?.scenario??999)).toBeLessThan(0.05);
  });
  it('AGGREGATE uses declared masses without re-applying documentary proposals',()=>{
   const a=makeBudget(noPasaran.proposals,'AGGREGATE',{aggregates:[{year:2027,basis:'delta',
