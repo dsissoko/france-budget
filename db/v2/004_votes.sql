@@ -3,6 +3,11 @@
 ALTER TABLE v2.budgets
   ADD COLUMN IF NOT EXISTS legacy_budget_id uuid UNIQUE;
 
+-- Refresh the view's exposed columns after adding legacy_budget_id / published_at.
+CREATE OR REPLACE VIEW v2.latest_budgets AS
+SELECT * FROM v2.budgets
+WHERE version='latest' AND publication_status='published';
+
 CREATE TABLE IF NOT EXISTS v2.votes (
   id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
   budget_id uuid NOT NULL REFERENCES v2.budgets(id) ON DELETE RESTRICT,
