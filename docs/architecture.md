@@ -1,3 +1,7 @@
+> **ARCHIVE V1 — documentation historique.** Les tableaux, routes et flux `public` décrits ci-dessous ne sont pas la cible de la V2. Pour toute évolution, lire le [référentiel V2](v2/README.md), le [MCD](v2/mcd.md) et les [contrats API](v2/api.md). Aucun usage comme runbook de déploiement V2.
+
+---
+
 # Architecture technique et modèle de données — Mon Budget Citoyen
 
 ## Vue d'ensemble (code main et modèle Neon, 20/11/2026)
