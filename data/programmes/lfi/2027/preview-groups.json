@@ -1,0 +1,325 @@
+[
+  {
+    "id": "citizen-01",
+    "title": "Impôt sur le revenu",
+    "description": "Le programme propose plusieurs mesures dans ce domaine.",
+    "sourceCount": 1,
+    "sourceUrl": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
+    "sourceLines": [
+      {
+        "id": 1,
+        "title": "Suppression de la flat tax",
+        "claimedAmountBn": 9,
+        "direction": "revenue_increase",
+        "sourceUrl": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
+        "impactDescription": ""
+      }
+    ]
+  },
+  {
+    "id": "citizen-02",
+    "title": "Impôts sur les grandes fortunes",
+    "description": "Le programme propose plusieurs mesures dans ce domaine.",
+    "sourceCount": 3,
+    "sourceUrl": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
+    "sourceLines": [
+      {
+        "id": 2,
+        "title": "Rétablissement de l'impôt sur la fortune renforcé",
+        "claimedAmountBn": 10,
+        "direction": "revenue_increase",
+        "sourceUrl": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
+        "impactDescription": ""
+      },
+      {
+        "id": 5,
+        "title": "Taxe Zucman sur les patrimoines de plus de 100 M€",
+        "claimedAmountBn": 15,
+        "direction": "revenue_increase",
+        "sourceUrl": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
+        "impactDescription": ""
+      },
+      {
+        "id": 6,
+        "title": "Réforme des droits de succession",
+        "claimedAmountBn": 20,
+        "direction": "revenue_increase",
+        "sourceUrl": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
+        "impactDescription": ""
+      }
+    ]
+  },
+  {
+    "id": "citizen-03",
+    "title": "Taxes et cotisations",
+    "description": "Le programme propose plusieurs mesures dans ce domaine.",
+    "sourceCount": 5,
+    "sourceUrl": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
+    "sourceLines": [
+      {
+        "id": 3,
+        "title": "Réduction et suppression de niches fiscales et sociales",
+        "claimedAmountBn": 22,
+        "direction": "revenue_increase",
+        "sourceUrl": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
+        "impactDescription": ""
+      },
+      {
+        "id": 11,
+        "title": "Augmentation des taxes sur les transactions financières",
+        "claimedAmountBn": 5,
+        "direction": "revenue_increase",
+        "sourceUrl": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
+        "impactDescription": ""
+      },
+      {
+        "id": 12,
+        "title": "Taxation des rachats d'actions",
+        "claimedAmountBn": 2.5,
+        "direction": "revenue_increase",
+        "sourceUrl": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
+        "impactDescription": ""
+      },
+      {
+        "id": 13,
+        "title": "Taxation des crypto-actifs",
+        "claimedAmountBn": 1,
+        "direction": "revenue_increase",
+        "sourceUrl": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
+        "impactDescription": ""
+      },
+      {
+        "id": 14,
+        "title": "Renforcement de la lutte contre la fraude fiscale",
+        "claimedAmountBn": 2,
+        "direction": "revenue_increase",
+        "sourceUrl": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
+        "impactDescription": ""
+      }
+    ]
+  },
+  {
+    "id": "citizen-04",
+    "title": "Fiscalité des entreprises",
+    "description": "Le programme propose plusieurs mesures dans ce domaine.",
+    "sourceCount": 5,
+    "sourceUrl": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
+    "sourceLines": [
+      {
+        "id": 4,
+        "title": "Rétablissement de la CVAE sur les plus grandes entreprises",
+        "claimedAmountBn": 3,
+        "direction": "revenue_increase",
+        "sourceUrl": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
+        "impactDescription": ""
+      },
+      {
+        "id": 7,
+        "title": "Réforme de l'impôt sur les sociétés",
+        "claimedAmountBn": 3,
+        "direction": "revenue_increase",
+        "sourceUrl": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
+        "impactDescription": ""
+      },
+      {
+        "id": 8,
+        "title": "Taxe universelle sur les multinationales",
+        "claimedAmountBn": 5,
+        "direction": "revenue_increase",
+        "sourceUrl": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
+        "impactDescription": ""
+      },
+      {
+        "id": 9,
+        "title": "Renforcement de la taxe GAFAM",
+        "claimedAmountBn": 3.9,
+        "direction": "revenue_increase",
+        "sourceUrl": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
+        "impactDescription": ""
+      },
+      {
+        "id": 10,
+        "title": "Taxe sur les superprofits",
+        "claimedAmountBn": 5,
+        "direction": "revenue_increase",
+        "sourceUrl": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
+        "impactDescription": ""
+      }
+    ]
+  },
+  {
+    "id": "citizen-15",
+    "title": "Services publics généraux",
+    "description": "Le programme propose plusieurs mesures dans ce domaine.",
+    "sourceCount": 2,
+    "sourceUrl": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
+    "sourceLines": [
+      {
+        "id": 15,
+        "title": "Augmentation de 10 % des salaires des fonctionnaires",
+        "claimedAmountBn": 17,
+        "direction": "expense_increase",
+        "sourceUrl": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
+        "impactDescription": ""
+      },
+      {
+        "id": 25,
+        "title": "Rétablissement des budgets de services publics et indexation inflation",
+        "claimedAmountBn": 7,
+        "direction": "expense_increase",
+        "sourceUrl": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
+        "impactDescription": ""
+      }
+    ]
+  },
+  {
+    "id": "citizen-16",
+    "title": "Famille, logement, sécurité et retraites",
+    "description": "Le programme propose plusieurs mesures dans ce domaine.",
+    "sourceCount": 5,
+    "sourceUrl": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
+    "sourceLines": [
+      {
+        "id": 16,
+        "title": "Revalorisation des pensions, allocations familiales et APL",
+        "claimedAmountBn": 8,
+        "direction": "expense_increase",
+        "sourceUrl": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
+        "impactDescription": ""
+      },
+      {
+        "id": 17,
+        "title": "Logements d'urgence et réquisition de logements vacants",
+        "claimedAmountBn": 3,
+        "direction": "expense_increase",
+        "sourceUrl": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
+        "impactDescription": ""
+      },
+      {
+        "id": 23,
+        "title": "Plan d'urgence contre les violences sexistes et sexuelles",
+        "claimedAmountBn": 2.6,
+        "direction": "expense_increase",
+        "sourceUrl": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
+        "impactDescription": ""
+      },
+      {
+        "id": 24,
+        "title": "Lutte contre les violences faites aux enfants",
+        "claimedAmountBn": 2,
+        "direction": "expense_increase",
+        "sourceUrl": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
+        "impactDescription": ""
+      },
+      {
+        "id": 27,
+        "title": "Abrogation de la réforme des retraites à 64 ans",
+        "claimedAmountBn": 9,
+        "direction": "expense_increase",
+        "sourceUrl": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
+        "impactDescription": ""
+      }
+    ]
+  },
+  {
+    "id": "citizen-18",
+    "title": "Solidarité et autonomie",
+    "description": "Le programme propose plusieurs mesures dans ce domaine.",
+    "sourceCount": 1,
+    "sourceUrl": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
+    "sourceLines": [
+      {
+        "id": 18,
+        "title": "Garantie d'autonomie pour les jeunes",
+        "claimedAmountBn": 9.5,
+        "direction": "expense_increase",
+        "sourceUrl": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
+        "impactDescription": ""
+      }
+    ]
+  },
+  {
+    "id": "citizen-19",
+    "title": "Éducation",
+    "description": "Le programme propose plusieurs mesures dans ce domaine.",
+    "sourceCount": 3,
+    "sourceUrl": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
+    "sourceLines": [
+      {
+        "id": 19,
+        "title": "Création de 10 000 postes dans l'enseignement",
+        "claimedAmountBn": 0.5,
+        "direction": "expense_increase",
+        "sourceUrl": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
+        "impactDescription": ""
+      },
+      {
+        "id": 20,
+        "title": "Gratuité de la cantine scolaire",
+        "claimedAmountBn": 3.6,
+        "direction": "expense_increase",
+        "sourceUrl": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
+        "impactDescription": ""
+      },
+      {
+        "id": 21,
+        "title": "Création de 250 000 places universitaires",
+        "claimedAmountBn": 3.5,
+        "direction": "expense_increase",
+        "sourceUrl": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
+        "impactDescription": ""
+      }
+    ]
+  },
+  {
+    "id": "citizen-22",
+    "title": "Santé",
+    "description": "Le programme propose plusieurs mesures dans ce domaine.",
+    "sourceCount": 1,
+    "sourceUrl": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
+    "sourceLines": [
+      {
+        "id": 22,
+        "title": "Hausse du budget hospitalier et créations de postes soignants",
+        "claimedAmountBn": 3,
+        "direction": "expense_increase",
+        "sourceUrl": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
+        "impactDescription": ""
+      }
+    ]
+  },
+  {
+    "id": "citizen-26",
+    "title": "Environnement",
+    "description": "Le programme propose plusieurs mesures dans ce domaine.",
+    "sourceCount": 1,
+    "sourceUrl": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
+    "sourceLines": [
+      {
+        "id": 26,
+        "title": "Investissements d'adaptation aux effets du dérèglement climatique",
+        "claimedAmountBn": 10,
+        "direction": "expense_increase",
+        "sourceUrl": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
+        "impactDescription": ""
+      }
+    ]
+  },
+  {
+    "id": "citizen-28",
+    "title": "Chômage",
+    "description": "Le programme propose plusieurs mesures dans ce domaine.",
+    "sourceCount": 1,
+    "sourceUrl": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
+    "sourceLines": [
+      {
+        "id": 28,
+        "title": "Abrogation des réformes de l'assurance chômage",
+        "claimedAmountBn": 3,
+        "direction": "expense_increase",
+        "sourceUrl": "https://melenchon2027.fr/wp-content/uploads/2026/10/Comment-nous-allons-remettre-de-l-ordre-dans-les-comptes-publics.pdf",
+        "impactDescription": ""
+      }
+    ]
+  }
+]
