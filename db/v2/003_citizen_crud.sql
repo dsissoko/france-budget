@@ -71,9 +71,7 @@ BEGIN
     RETURN QUERY SELECT current_id,current_revision,current_status;
     RETURN;
   END IF;
-  IF b->>'origin' IS DISTINCT FROM 'citizen' OR b->>'version' IS DISTINCT FROM 'latest'
-    THEN RAISE EXCEPTION 'invalid_citizen_origin_or_version'; END IF;
-  IF b->>'budget_mode' IS DISTINCT FROM
+  -- Published citizen budgets are immutable, as promised by the V1 UI.\n  -- Withdrawal preserves the data and its voting history.\n  IF current_status='published' THEN RAISE EXCEPTION 'published_budget_immutable'; END IF;\n  IF b->>'origin' IS DISTINCT FROM 'citizen' OR b->>'version' IS DISTINCT FROM 'latest'\n    THEN RAISE EXCEPTION 'invalid_citizen_origin_or_version'; END IF;\n  IF b->>'budget_mode' IS DISTINCT FROM
     (SELECT budget_mode FROM v2.budgets WHERE id=current_id)
     THEN RAISE EXCEPTION 'budget_mode_immutable'; END IF;
   IF (b->>'reference_year')::integer IS DISTINCT FROM
