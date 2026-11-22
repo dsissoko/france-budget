@@ -13,8 +13,8 @@
         "categoryId": "income",
         "label": "Impôt sur le revenu",
         "claimedAmountBn": 9,
-        "status": "documentary_claimed",
-        "rationale": "Montant annoncé pour des mesures rattachées à ce poste ; aucune imputation au simulateur.",
+        "status": "claimed_allocated_in_aggregate",
+        "rationale": "Ventilation revendiquée, comprise dans l’agrégat du programme. ",
         "simulated": true
       }
     ],
@@ -46,8 +46,8 @@
         "categoryId": "property",
         "label": "Patrimoine et immobilier",
         "claimedAmountBn": 45,
-        "status": "documentary_claimed",
-        "rationale": "Montant annoncé pour des mesures rattachées à ce poste ; aucune imputation au simulateur.",
+        "status": "claimed_allocated_in_aggregate",
+        "rationale": "Ventilation revendiquée, comprise dans l’agrégat du programme. ",
         "simulated": true
       }
     ],
@@ -101,8 +101,8 @@
         "categoryId": "otherTax",
         "label": "Autres impôts",
         "claimedAmountBn": 10.5,
-        "status": "documentary_partial",
-        "rationale": "22 Md€ concernent plusieurs familles de recettes et ne sont pas ventilés entre postes.",
+        "status": "claimed_allocated_in_aggregate",
+        "rationale": "Ventilation revendiquée, comprise dans l’agrégat du programme. 22 Md€ concernent plusieurs familles de recettes et ne sont pas ventilés entre postes.",
         "simulated": true
       },
       {
@@ -187,8 +187,8 @@
         "categoryId": "business",
         "label": "Fiscalité des entreprises",
         "claimedAmountBn": 19.9,
-        "status": "documentary_claimed",
-        "rationale": "Montant annoncé pour des mesures rattachées à ce poste ; aucune imputation au simulateur.",
+        "status": "claimed_allocated_in_aggregate",
+        "rationale": "Ventilation revendiquée, comprise dans l’agrégat du programme. ",
         "simulated": true
       }
     ],
@@ -308,8 +308,8 @@
         "categoryId": "social",
         "label": "Retraites et pensions",
         "claimedAmountBn": 9,
-        "status": "documentary_partial",
-        "rationale": "Deux mesures de 8 et 2 Md€ concernent plusieurs postes ; leurs montants ne sont pas arbitrairement répartis.",
+        "status": "claimed_allocated_in_aggregate",
+        "rationale": "Ventilation revendiquée, comprise dans l’agrégat du programme. Deux mesures de 8 et 2 Md€ concernent plusieurs postes ; leurs montants ne sont pas arbitrairement répartis.",
         "simulated": true
       },
       {
@@ -326,8 +326,8 @@
         "categoryId": "housing",
         "label": "Logement",
         "claimedAmountBn": 3,
-        "status": "documentary_partial",
-        "rationale": "Deux mesures de 8 et 2 Md€ concernent plusieurs postes ; leurs montants ne sont pas arbitrairement répartis.",
+        "status": "claimed_allocated_in_aggregate",
+        "rationale": "Ventilation revendiquée, comprise dans l’agrégat du programme. Deux mesures de 8 et 2 Md€ concernent plusieurs postes ; leurs montants ne sont pas arbitrairement répartis.",
         "simulated": true
       },
       {
@@ -335,8 +335,8 @@
         "categoryId": "safety",
         "label": "Sécurité et justice",
         "claimedAmountBn": 2.6,
-        "status": "documentary_partial",
-        "rationale": "Deux mesures de 8 et 2 Md€ concernent plusieurs postes ; leurs montants ne sont pas arbitrairement répartis.",
+        "status": "claimed_allocated_in_aggregate",
+        "rationale": "Ventilation revendiquée, comprise dans l’agrégat du programme. Deux mesures de 8 et 2 Md€ concernent plusieurs postes ; leurs montants ne sont pas arbitrairement répartis.",
         "simulated": true
       }
     ],
@@ -412,8 +412,8 @@
         "categoryId": "solidarity",
         "label": "Solidarité et autonomie",
         "claimedAmountBn": 9.5,
-        "status": "documentary_claimed",
-        "rationale": "Montant annoncé pour des mesures rattachées à ce poste ; aucune imputation au simulateur.",
+        "status": "claimed_allocated_in_aggregate",
+        "rationale": "Ventilation revendiquée, comprise dans l’agrégat du programme. ",
         "simulated": true
       }
     ],
@@ -445,8 +445,8 @@
         "categoryId": "education",
         "label": "Éducation",
         "claimedAmountBn": 7.6,
-        "status": "documentary_claimed",
-        "rationale": "Montant annoncé pour des mesures rattachées à ce poste ; aucune imputation au simulateur.",
+        "status": "claimed_allocated_in_aggregate",
+        "rationale": "Ventilation revendiquée, comprise dans l’agrégat du programme. ",
         "simulated": true
       }
     ],
@@ -500,8 +500,8 @@
         "categoryId": "health",
         "label": "Santé",
         "claimedAmountBn": 3,
-        "status": "documentary_claimed",
-        "rationale": "Montant annoncé pour des mesures rattachées à ce poste ; aucune imputation au simulateur.",
+        "status": "claimed_allocated_in_aggregate",
+        "rationale": "Ventilation revendiquée, comprise dans l’agrégat du programme. ",
         "simulated": true
       }
     ],
@@ -566,8 +566,8 @@
         "categoryId": "unemployment",
         "label": "Chômage et insertion",
         "claimedAmountBn": 3,
-        "status": "documentary_claimed",
-        "rationale": "Montant annoncé pour des mesures rattachées à ce poste ; aucune imputation au simulateur.",
+        "status": "claimed_allocated_in_aggregate",
+        "rationale": "Ventilation revendiquée, comprise dans l’agrégat du programme. ",
         "simulated": true
       }
     ],
