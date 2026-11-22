@@ -30,21 +30,19 @@ Aucune suggestion d'agent n'est convertie automatiquement en `validated` ni ajou
 
 En `AGGREGATE`, les impacts individuels peuvent documenter la ventilation *sans modifier le résultat agrégé*, ce qui évite de compter deux fois une annonce. Prévoir un rapport de couverture et les écarts aux totaux sourcés ; un résidu n'est pas une mesure à imputer au poste « autres » par défaut.
 
-## Point de correction du modèle avant réimport LFI
+## Consolidation déterministe par poste — choix retenu
 
-**Constat vérifié dans le dépôt :**
-- `db/v2/001_schema.sql` impose `UNIQUE(budget_id,side,category_id)` sur les impacts.
-- `scripts/v2/import.mjs` rejette une seconde écriture sur le même `side/category_id`.
-- `v2.import_budget` considère également plusieurs lignes du même poste comme des doublons et utilise `ON CONFLICT(budget_id,side,category_id)`.
-- LFI 2027 a deux imputations légitimes sur `expenses/education` (`src-19` et `src-21`).
+**Le modèle conserve l'unicité `(budget_id,side,category_id)`.** Une étape déterministe succède à la qualification agentique : elle additionne les contributions validées partageant un poste et produit une proposition technique `pivot-<side>-<category_id>` ainsi qu'une seule ligne `impacts.csv`. Toutes les mesures originales restent dans `proposals.csv` avec leur montant revendiqué, leur source et un statut de regroupement ; le groupe les relie via `source_origin=pivot_consolidation` et `notes=members=...`.
 
-**Évolution requise** (dans la PR V2, avant réimport) : unicité par `(proposal_id,side,category_id)`, autoriser plusieurs propositions sur le même poste, et agréger leurs deltas pour le calcul et les positions. Préserver l'idempotence et empêcher les doublons *au sein d'une même proposition*. S'assurer que les écrans d'édition citoyenne conservent leur propre règle de prévention des doubles affectations si souhaitée, sans la faire porter par la base partagée.
+LFI : `src-19` (+0,5) et `src-21` (+3,5) restent deux mesures primaires distinctes, regroupées en `pivot-expenses-education` (+4,000) ; le calcul ne reçoit qu'une écriture. L'UI affiche un groupe Éducation avec les deux mesures constitutives, sans masquer leur identité, et le compteur source reste **28 mesures**. Le jeu physique CSV contient 29 propositions (28 mesures primaires et un groupe technique), 5 écritures sur 5 postes (six contributions qualifiées).
+
+La consolidation doit vérifier l'égalité exacte de la somme de ses membres, la validité de chaque clé, la même direction et année, l'absence de doublon, et la conservation des propositions initiales. Ne jamais regrouper des mesures non qualifiées pour inventer une ventilation.
 
 ## Contrôles de recette
 
 1. LFI 2027 : 28 propositions source distinctes, 14 recettes + 14 dépenses, sans doubles issues du V1.
-2. Deux lignes `expenses/education` conservées, total **+4,000 Md€**, chacune reliée à sa proposition.
-3. Six mesures actuellement qualifiées : +3,000 Md€ recettes et +19,000 Md€ dépenses, sans extrapoler les 22 restantes.
+2. Deux mesures originales `src-19` et `src-21` conservées et liées à **une seule écriture `expenses/education` de +4,000 Md€**.
+3. Six contributions actuellement qualifiées, consolidées en cinq écritures : +3,000 Md€ recettes et +19,000 Md€ dépenses ; les 22 autres restent sans imputation artificielle.
 4. Mode `AGGREGATE` LFI : +106,4 Md€ de recettes, +81,7 Md€ de dépenses, amélioration revendiquée +24,7 Md€ **inchangés par l'ajout des écritures individuelles**.
 5. NoPasaran : 8 propositions, 8 impacts, mêmes catégories, signes, déficit et trajectoire 2032.
 6. Prévenir toute publication d'un export certifié INSEE ou d'une ventilation non sourcée.
@@ -52,6 +50,6 @@ En `AGGREGATE`, les impacts individuels peuvent documenter la ventilation *sans 
 
 ## Démarche de déploiement
 
-Évoluer le validateur CSV et le schéma V2, tester les jeux locaux, puis appliquer la migration **uniquement sur branche Neon QA isolée** ; réimporter LFI 2027 et vérifier `proposal_count`, `impact_count`, détails API et calculs. La Preview est alors mise à jour pour revue humaine. La livraison V2 reste séparée de la production.
+Valider la consolidation dans les CSV sans changer la contrainte SQL, tester les jeux locaux, puis appliquer l'import **uniquement sur branche Neon QA isolée** ; réimporter LFI 2027 et vérifier `proposal_count`, `impact_count`, détails API et calculs. La Preview est alors mise à jour pour revue humaine. La livraison V2 reste séparée de la production.
 
 **La compétence agentique est réutilisable pour n'importe quel parti : aucune règle spéciale « LFI » dans le moteur, l'API ou les tables.**

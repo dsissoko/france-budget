@@ -104,3 +104,17 @@ describe('Party declared quantified proposals - display without accounting',()=>
   expect(hasQualifiedBudgetImpact(base)).toBe(false);
  });
 });
+
+describe('V2 pivot-consolidation display and source-count',()=>{
+ const grouped={...makeBudget([]),origin:'party' as const,proposals:[
+  {proposalKey:'src-19',title:'Enseignants',description:'',claimedAmountBn:'0.500',sourceStatus:'grouped_into_pivot',sourceUrl:'https://example.org',impacts:[]},
+  {proposalKey:'src-21',title:'Universités',description:'',claimedAmountBn:'3.500',sourceStatus:'grouped_into_pivot',sourceUrl:'https://example.org',impacts:[]},
+  {proposalKey:'pivot-expenses-education',title:'Éducation',description:'Consolidation',sourceOrigin:'pivot_consolidation',notes:'members=src-19:0.500|src-21:3.500',impacts:[{side:'expenses' as const,categoryId:'education',deltaAmountBn:4}]}
+ ]};
+ it('renders one grouped row and counts both source measures',async()=>{
+  const {pivotGroupMembers,measuredSourceCount}=await import('./v2-budget');
+  expect(measuredProposals(grouped).map(p=>p.proposalKey)).toEqual(['pivot-expenses-education']);
+  expect(measuredSourceCount(grouped)).toBe(2);
+  expect(pivotGroupMembers(grouped,grouped.proposals[2]).map(x=>x.proposalKey)).toEqual(['src-19','src-21']);
+ });
+});

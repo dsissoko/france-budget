@@ -56,7 +56,7 @@ Produire une décision structurée dans un **registre de travail** séparé (ex.
 
 - **Registre de qualification** exhaustif, incluant aussi les décisions de non-imputation et leurs raisons, avec identifiants stables et preuves.
 - **Proposition de patch** sur `proposals.csv` : descriptions compréhensibles, provenance et statut correctement établis.
-- **Proposition de patch** sur `impacts.csv` : uniquement les décisions d'imputation approuvées, chaque ligne `budget_key,proposal_key,side,category_id,delta_amount_bn`; conserver 3 décimales et le signe.
+- **Proposition de patch** sur `impacts.csv` : uniquement les décisions d'imputation approuvées **et regroupées mécaniquement par poste**, chaque ligne `budget_key,proposal_key,side,category_id,delta_amount_bn` ; conserver 3 décimales et le signe. Le groupe est une proposition technique distincte, pas une nouvelle mesure annoncée.
 - **Rapport de réconciliation** : nombre de mesures, nombre de mesures imputées, nombre d'écritures, sommes recettes/dépenses proposées, couverture, résidus, risques d'additionnalité, divergences avec les agrégats et raisons des blocages.
 - **Aucun import et aucune déclaration de conformité INSEE/Eurostat**. Le mapping vers des formats normalisés appartient à l'issue #143 et ne peut être inféré du seul pivot citoyen.
 
@@ -64,7 +64,7 @@ Produire une décision structurée dans un **registre de travail** séparé (ex.
 
 Arrêter le lot si source principale manquante, décalage d'année, contradiction comptable, montant non additif, ventilation sans preuve, catégorie inexistante, ou calcul du moteur différent du scénario approuvé. Signaler exactement les propositions en cause ; ne jamais « compléter » à 100 % par estimation.
 
-**Bloquant actuel identifié :** la validation de `scripts/v2/import.mjs` et la contrainte unique `v2.budget_proposal_impacts(budget_id,side,category_id)` interdisent deux mesures sur le même poste. LFI 2027 possède déjà `src-19` et `src-21` sur `expenses/education`. **Ne pas fusionner ces mesures ni déplacer artificiellement une imputation** pour satisfaire l'outil. Faire évoluer la validation et la contrainte SQL avant import, avec tests de somme des contributions et idempotence.
+**Décision d'architecture : consolidation déterministe par poste, sans changer la contrainte d'unicité.** Lorsque plusieurs mesures qualifiées concernent le même `side/category_id`, conserver chaque mesure source, ses preuves et son montant dans `proposals.csv` ; produire une proposition technique `pivot-<side>-<category_id>` dont `source_origin=pivot_consolidation`, `notes=members=<sourceKey>:<montant>|...` et `description` détaille le rapprochement ; une seule écriture consolidée apparaît dans `impacts.csv` pour ce poste. Les mesures constitutives sont marquées `source_status=grouped_into_pivot` pour éviter leur double comptage dans les cartes UI, mais demeurent traçables en sous-lignes du groupe. La somme des contributions doit être strictement égale à la ligne consolidée ; interdire toute référence orpheline, catégorie divergente ou inclusion non validée. Ce regroupement est **déterministe après qualification agentique**, pas une nouvelle décision de l'agent et ne demande aucune modification de schéma.
 
 ## Exemple LFI 2027 — décisions préexistantes
 
@@ -73,8 +73,9 @@ Les données existantes contiennent 28 propositions chiffrées (14 recettes, 14 
 | Proposition | Écriture candidate étayée | Remarque |
 | --- | --- | --- |
 | `src-4` CVAE +3 | `revenues/business/+3.000` | effet direct revendiqué |
-| `src-19` enseignants +0,5 | `expenses/education/+0.500` | même poste que `src-21` : contributions distinctes |
-| `src-21` places universitaires +3,5 | `expenses/education/+3.500` | ne pas écraser `src-19` |
+| `src-19` enseignants +0,5 | composante `expenses/education/+0.500` | conservée comme source du groupe |
+| `src-21` places universitaires +3,5 | composante `expenses/education/+3.500` | conservée comme source du groupe |
+| `pivot-expenses-education` | **`expenses/education/+4.000`** | seule écriture persistée pour ce poste ; les deux composantes restent visibles |
 | `src-22` hôpitaux +3 | `expenses/health/+3.000` | effets indirects exclus |
 | `src-27` retraites +9 | `expenses/social/+9.000` | effets cotisations exclus |
 | `src-28` chômage +3 | `expenses/unemployment/+3.000` | vérifier conditions millésimées |
