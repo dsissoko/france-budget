@@ -24,7 +24,7 @@ React 19 + TypeScript + Vite + Recharts (navigateur)
 
 ## Modèle relationnel (voir [schema.md](schema.md), référence vérifiée en base)
 
-Le [schéma détaillé](schema.md) est la **référence technique** (colonnes, FK, index, tables de préparation et état de validation). Le fichier [`db/schema.sql`](../db/schema.sql) est un bootstrap historique, **pas un miroir à jour de la base de production**.
+Le [schéma détaillé](schema.md) est la **référence technique** (colonnes, FK, index, tables de préparation et état de validation). Le fichier [`db/archive/v1/schema.sql`](../db/archive/v1/schema.sql) est un bootstrap historique, **pas un miroir à jour de la base de production**.
 
 | Table | Responsabilité | Identité / contraintes majeures |
 |---|---|---|
@@ -94,4 +94,4 @@ Les libellés `title` et `name` ne doivent **jamais** identifier un parti ou dé
 - **v1.0.0** : quatre parcours, base Neon unifiée, comparaison A/B en deux clics, campagne de recette et migration de paramètres à terminer.
 - **v1.1.0** : modèle pluriannuel avec dette/PIB, intérêts, sensibilité, indicateurs de désendettement validés ; **non implémenté dans la v1.0.0**.
 
-Voir aussi **[schema.md](schema.md)** (schéma réel et statut des migrations), [vision.md](vision.md), [neon-integration.md](neon-integration.md) et [../db/schema.sql](../db/schema.sql) (bootstrap historique).
+Voir aussi **[schema.md](schema.md)** (schéma réel et statut des migrations), [vision.md](vision.md), [neon-integration.md](neon-integration.md) et [../db/archive/v1/schema.sql](../db/archive/v1/schema.sql) (bootstrap historique).
