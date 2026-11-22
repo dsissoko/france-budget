@@ -54,7 +54,7 @@ ALTER TABLE v2.budgets
   ADD COLUMN IF NOT EXISTS confirmation_evidence_url text,
   ADD COLUMN IF NOT EXISTS confirmed_at timestamptz;
 
--- QA presentation snapshot for source programmes only; do not import citizen test budgets.
+-- QA snapshot for political programme presentation (no citizen test migration).
 UPDATE v2.budgets t
 SET featured=s.featured,
     featured_order=s.featured_order,
@@ -62,12 +62,12 @@ SET featured=s.featured,
     confirmation_organization=s.confirmation_organization,
     confirmation_evidence_url=s.confirmation_evidence_url,
     confirmed_at=s.confirmed_at
-FROM public.budgets s
-WHERE t.origin='party' AND s.origin='party'
-  AND t.party_code=s.party_code
-  AND (t.source_year IS NOT DISTINCT FROM
-       NULLIF(regexp_replace(t.budget_key,'^.*-([0-9]{4})$','\\1'),'')::integer)
-  AND s.visibility='public';
+FROM (SELECT DISTINCT ON (party_code) party_code,featured,featured_order,
+      maturity_status,confirmation_organization,confirmation_evidence_url,confirmed_at
+      FROM public.budgets
+      WHERE origin='party' AND visibility='public' AND party_code IS NOT NULL
+      ORDER BY party_code,published_at DESC) s
+WHERE t.origin='party' AND t.party_code=s.party_code;
 
 UPDATE v2.budgets
 SET featured=true,featured_order=1,maturity_status='non_verifie'
