@@ -56,11 +56,13 @@ export function seedSql(d){
   "DO $$ BEGIN IF (SELECT count(*) FROM v2.reference_posts WHERE reference_year=2025)<>27 THEN RAISE EXCEPTION 'missing_reference_posts'; END IF; END $$;\n";
 }
 
-export function bootstrapSql(d){
+export function bootstrapSql(d,appRole=''){
+ if(appRole&&!/^[a-z_][a-z0-9_]*$/.test(appRole))throw Error('Unsafe V2_APP_ROLE');
+ const roleSetting=appRole?"SET LOCAL v2.application_role = '"+appRole+"';\n":'';
  const guard="DO $guard$ BEGIN IF to_regclass('v2.budgets') IS NOT NULL THEN IF EXISTS(SELECT 1 FROM v2.budgets) THEN RAISE EXCEPTION 'db:init refuses nonempty v2.budgets'; END IF; END IF; END $guard$;";
  const parts=['db/v2/001_schema.sql','db/v2/003_citizen_crud.sql',
-  'db/v2/004_votes.sql','db/v2/initial_ui.sql'];
- return 'BEGIN;\n'+guard+'\n'+parts.map(read).join('\n')+'\n'+seedSql(d)+'COMMIT;\n';
+  'db/v2/004_votes.sql','db/v2/initial_ui.sql','db/v2/006_runtime_permissions.sql'];
+ return 'BEGIN;\n'+guard+'\n'+roleSetting+parts.map(read).join('\n')+'\n'+seedSql(d)+'COMMIT;\n';
 }
 
 async function main(){
@@ -77,7 +79,7 @@ async function main(){
  if(!args.includes('--confirm-empty-v2'))throw Error('--confirm-empty-v2 required');
  if(!process.env.V2_DATABASE_URL)throw Error('V2_DATABASE_URL required');
  const result=spawnSync('psql',['-X','--set=ON_ERROR_STOP=1','--quiet'],{
-  input:bootstrapSql(data),encoding:'utf8',
+  input:bootstrapSql(data,process.env.V2_APP_ROLE||''),encoding:'utf8',
   env:{...process.env,PGDATABASE:process.env.V2_DATABASE_URL},maxBuffer:2*1024*1024
  });
  if(result.error)throw result.error;
