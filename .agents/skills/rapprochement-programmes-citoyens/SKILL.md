@@ -1,7 +1,7 @@
 ---
 name: rapprochement-programmes-citoyens
 description: Collecter, préserver et regrouper les mesures de programmes politiques dans les CSV de Mon Budget Citoyen, avec classification agentique auditée et calcul comptable déterministe.
-version: 0.4.0
+version: 0.5.0
 ---
 
 # Skill — Rapprochement des programmes avec les postes citoyens
@@ -64,9 +64,9 @@ Lorsqu'au moins deux mesures qualifiées alimentent le même poste **à l'intér
 **Public cible : une personne sans connaissances économiques ou budgétaires.** Les textes issus des programmes politiques constituent la base éditoriale privilégiée : conserver leurs formulations courantes lorsqu'elles sont compréhensibles, sans recopier inutilement leur jargon ou leur rhétorique partisane. La mission de l'agent est de **rendre la proposition immédiatement compréhensible**, pas de rédiger une note d'expertise.
 
 - Produire pour chaque proposition et regroupement un **titre court**, puis une **description de une à trois phrases courtes** : ce qui est proposé, à qui cela s'adresse, et éventuellement pourquoi cela concerne le poste citoyen.
-- **Longueur maximale : respecter la limite de caractères propre à chaque champ telle qu'elle est définie dans l'UI et dans ses validations effectives.** Lire ces limites dans le code et les considérer comme contrat éditorial, sans fixer une taille universelle dans le skill. La génération doit viser une marge de sécurité et produire immédiatement un texte complet tenant dans le champ, espaces et ponctuation compris. Ne jamais tronquer automatiquement une phrase ni confier à une ellipse CSS la correction d'un texte trop long.
+- **Longueur maximale : utiliser la limite du champ définie dans l'UI et/ou dans le schéma et les contraintes Neon.** Inspecter les deux sources ainsi que leurs validations API. Lorsqu'elles divergent, respecter la limite effective la plus restrictive et signaler l'incohérence. Si aucune limite explicite n'existe, **déduire une longueur cible raisonnable** de l'emplacement et de l'usage réel du champ (carte, titre, résumé, détail), en tenant compte de l'affichage mobile et de la lisibilité. Documenter cette limite proposée dans le contrat éditorial avec sa justification et la faire respecter dans les contrôles de génération ; ne pas prétendre qu'il s'agit déjà d'une contrainte technique. La génération doit viser une marge de sécurité et produire immédiatement un texte complet tenant dans le champ, espaces et ponctuation compris. Ne jamais tronquer automatiquement une phrase ni compter sur une ellipse CSS pour corriger un texte trop long.
 - Pour tout dépassement, reformuler en supprimant les répétitions et détails secondaires, sans perdre le sens, les chiffres essentiels ni la source ; vérifier **après génération** la longueur effective et recommencer si nécessaire. La version longue originale reste dans les données sources, pas dans le champ public limité.
-- Lorsqu'une longueur ou une contrainte change dans l'UI, mettre à jour les contrôles/tests du pipeline et régénérer les champs concernés. Si aucune limite explicite n'est définie pour un champ, la définir dans le contrat UI avant d'en faire un critère bloquant.
+- Lorsqu'une longueur ou une contrainte change dans l'UI ou dans Neon, mettre à jour les contrôles/tests du pipeline et régénérer les champs concernés. Si aucune limite technique explicite n'est définie, utiliser la limite éditoriale déduite, versionnée et testée, puis proposer de l'aligner dans l'UI et Neon lors de l'implémentation.
 - Employer des mots usuels, des verbes concrets, une seule idée par phrase. Préférer « Créer des places à l'université » à « Accroître la capacité d'accueil de l'enseignement supérieur ».
 - Ne pas introduire des notions comme « APU », « COFOG », « imputation », « agrégats », « rendement fiscal » ou « catégorie comptable » dans les textes destinés aux citoyens. Les réserver aux champs techniques et aux sources.
 - **Priorité à la pédagogie plutôt qu'à l'exhaustivité technique** : omettre les détails techniques qui n'aident pas le lecteur, sans déformer l'intention, changer les bénéficiaires, les conditions, les chiffres, l'année ou le sens d'une mesure. Ne jamais inventer un effet ou transformer une promesse en fait établi.
@@ -131,3 +131,7 @@ Après chaque campagne, conserver dans la PR les nouvelles ambiguïtés rencontr
 - Les limites de longueur du texte généré sont **celles des champs UI**, non des constantes arbitraires du skill.
 - Génération sous plafond et contrôle déterministe des caractères ; réécriture plutôt que troncature.
 - Adaptation des contrôles lorsque l'UI fait évoluer ses contraintes.
+
+### v0.5.0 — 2026-11-22
+- Recherche des limites dans l'UI, les validations API **et** Neon, avec priorité à la contrainte effective la plus restrictive.
+- À défaut, déduction d'un plafond éditorial justifié par le contexte d'affichage, documenté et testé, sans le présenter comme une limite technique préexistante.
