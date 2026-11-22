@@ -50,7 +50,7 @@ describe('V2 accounting parity with unchanged engine',()=>{
   const r=computeBudget(noPasaran,reference);
   expect(r.entries).toHaveLength(8);
   expect(r.expenses.defense).toBe(30.4);
-  expect(r.offBudget['business-tax-relief']).toBe(9.7);
+  expect(r.offBudget['business-tax-relief']).toBeCloseTo(9.7,5);
   expect(r.revenues.business).toBeCloseTo(139.8,5);
   expect(r.revenues.contributions).toBeCloseTo(483.2,5);
   expect(r.balanceDelta).toBeCloseTo(179.2,5);
