@@ -42,7 +42,7 @@ function Gauge({item,value,onChange,tone,editing,id}:{
   <span className="muted tiny">Référence {money(item.amount)}{Math.abs(value-item.amount)>.001?' · Écart '+(value>item.amount?'+':'')+money(value-item.amount):''}</span></div>;
 }
 function MaturityTag({b}:{b:PublishedBudget}){
- const m=budgetMaturity(b);return m?<span className={'budget-maturity budget-maturity--'+m.tone} title={m.description}>{m.label}</span>:null;
+ const m=b.origin==='educational'?null:budgetMaturity({...b,origin:b.origin});return m?<span className={'budget-maturity budget-maturity--'+m.tone} title={m.description}>{m.label}</span>:null;
 }
 function Champion({b,championId}:{b:PublishedBudget;championId:string|null}){
  return b.origin==='citizen'&&b.id===championId?<span className="citizen-champion"><Trophy size={13}/> Champion citoyen</span>:null;
