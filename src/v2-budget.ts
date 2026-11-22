@@ -12,7 +12,9 @@ export type BudgetMode='PARTIAL'|'AGGREGATE';
 export type BudgetDocumentary={
  sources?:Array<{source_url?:string;sourceUrl?:string;title?:string}>;
  aggregates?:Array<{basis?:'delta'|'total';year?:number;revenues_bn?:string|number;expenses_bn?:string|number;balance_delta_bn?:string|number;source_url?:string;scope?:string}>;
- citizenSource?:{budgetKey:string;title:string;aggregate:PublishedAggregate};
+ citizenSource?:{budgetKey:string;title:string;budgetMode?:BudgetMode;
+   aggregate?:BudgetDocumentary['aggregates'] extends Array<infer T>?T|null:never;
+   proposals?:BudgetProposal[]};
 };
 export type PublishedBudget={
  id:string;budgetKey:string;version:string;origin:'party'|'citizen'|'educational';
@@ -49,6 +51,27 @@ export function proposalEntries(proposals:ReadonlyArray<BudgetProposal>):Sourced
  })));
 }
 export function computeBudget(b:PublishedBudget,reference:ReferenceModel):Result{
+ const source=b.documentary?.citizenSource;
+ if(b.origin==='citizen'&&source){
+   const base:PublishedBudget={...b,origin:'party',budgetMode:source.budgetMode??'PARTIAL',
+      documentary:{aggregates:source.aggregate?[source.aggregate]:[]},
+      proposals:source.proposals??[]};
+   const baseResult=computeBudget(base,reference);
+   const baseline=calculateScenario([],emptyBudgetOverrides(),[],reference);
+   const additions=calculateScenario([],emptyBudgetOverrides(),proposalEntries(b.proposals),reference);
+   const merge=(first:Record<string,number>,added:Record<string,number>,original:Record<string,number>)=>
+    Object.fromEntries(Object.entries(first).map(([key,value])=>[key,value+(added[key]??0)-(original[key]??0)]));
+   const revenues=merge(baseResult.revenues,additions.revenues,baseline.revenues);
+   const expenses=merge(baseResult.expenses,additions.expenses,baseline.expenses);
+   const offBudget=merge(baseResult.offBudget,additions.offBudget,baseline.offBudget);
+   const round=(v:number)=>Math.round(v*100)/100;
+   const revenueTotal=round(Object.values(revenues).reduce((a,b)=>a+b,0));
+   const expenseTotal=round(Object.values(expenses).reduce((a,b)=>a+b,0));
+   return {entries:[...baseResult.entries,...additions.entries],revenues,expenses,offBudget,
+      revenueTotal,expenseTotal,deficit:round(expenseTotal-revenueTotal),
+      balanceDelta:round(baseline.deficit-(expenseTotal-revenueTotal)),
+      warnings:[...baseResult.warnings,...additions.warnings]};
+ }
  const aggregate=reportedAggregate(b);
  if(aggregate){
    const baseRevenue=reference.revenues.reduce((n,r)=>n+r.amount,0);
