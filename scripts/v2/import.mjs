@@ -52,6 +52,44 @@ export function validateBatch(budget,proposals,impacts) {
     if(!proposals.find(p=>p.proposal_key===i.proposal_key)?.description?.trim())
       throw Error('Impacted proposal requires a documented description: '+i.proposal_key);
   }
+  // Deterministic pivot grouping: retain source measures, validate their additive
+  // contributions, and persist exactly one impact per citizen budget post.
+  const groupedSources=new Set();
+  for(const group of proposals.filter(p=>p.source_origin==='pivot_consolidation')){
+    const match=/^members=([a-zA-Z0-9_.-]+:-?\\d+(?:\\.\\d{1,3})?)(\\|[a-zA-Z0-9_.-]+:-?\\d+(?:\\.\\d{1,3})?)*$/.exec(group.notes??'');
+    if(!match)throw Error('Invalid pivot group members '+group.proposal_key);
+    const members=group.notes.slice(8).split('|').map(part=>{
+      const cut=part.lastIndexOf(':');
+      return {key:part.slice(0,cut),amount:part.slice(cut+1)};
+    });
+    if(members.length<2)throw Error('Pivot group requires multiple source measures: '+group.proposal_key);
+    const groupImpacts=impacts.filter(i=>i.proposal_key===group.proposal_key);
+    if(groupImpacts.length!==1)throw Error('Pivot group requires exactly one impact '+group.proposal_key);
+    const destination=groupImpacts[0];
+    const sourceDirection=destination.side==='revenues'?'revenue_increase':destination.side==='expenses'?'expense_increase':null;
+    if(!sourceDirection||group.direction!==sourceDirection)
+      throw Error('Pivot group direction does not match accounting side '+group.proposal_key);
+    let totalMilli=0;
+    for(const member of members){
+      const source=proposals.find(p=>p.proposal_key===member.key);
+      if(!source||source.source_origin==='pivot_consolidation'||groupedSources.has(member.key))
+        throw Error('Invalid or repeated pivot group source '+member.key);
+      if(source.source_status!=='grouped_into_pivot'||source.direction!==group.direction||
+         source.source_year!==group.source_year||source.source_url!==group.source_url)
+        throw Error('Pivot member not traceable to group '+member.key);
+      if(!decimal.test(member.amount)||source.claimed_amount_bn!==member.amount)
+        throw Error('Pivot member amount differs from source '+member.key);
+      groupedSources.add(member.key);
+      totalMilli+=Math.round(Number(member.amount)*1000);
+      if(impacts.some(i=>i.proposal_key===member.key))
+        throw Error('Pivot source is also directly impacted '+member.key);
+    }
+    if(totalMilli!==Math.round(Number(destination.delta_amount_bn)*1000))
+      throw Error('Pivot group sum mismatch '+group.proposal_key);
+  }
+  for(const p of proposals.filter(p=>p.source_status==='grouped_into_pivot')){
+    if(!groupedSources.has(p.proposal_key))throw Error('Unlinked pivot source '+p.proposal_key);
+  }
   let documentary={};
   if(budget.documentary_json){
     try{documentary=JSON.parse(budget.documentary_json)}

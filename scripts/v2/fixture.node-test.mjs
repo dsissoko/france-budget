@@ -1,6 +1,6 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {loadBatch} from './import.mjs';
+import {loadBatch,validateBatch} from './import.mjs';
 
 test('NoPasaran baseline: 8 proposals / 8 impacts and latest version',()=>{
  const x=loadBatch('data/programmes/nopasaran/2025');
@@ -69,4 +69,15 @@ test('LFI 2027: 28 source measures and a single grouped education pivot impact',
  assert.equal(x.impacts.filter(i=>i.side==='revenues').reduce((sum,i)=>sum+Number(i.delta_amount_bn),0),3);
  assert.equal(x.impacts.filter(i=>i.side==='expenses').reduce((sum,i)=>sum+Number(i.delta_amount_bn),0),19);
  assert.equal(Number(x.budget.documentary.aggregates[0].balance_delta_bn),24.7,'global aggregate remains authoritative');
+});
+
+test('deterministic pivot validation rejects inconsistent and orphan source groups',()=>{
+ const batch=loadBatch('data/programmes/lfi/2027');
+ const {budget,proposals,impacts}=batch;
+ const changes=JSON.parse(JSON.stringify({budget,proposals,impacts}));
+ changes.impacts.find(i=>i.proposal_key==='pivot-expenses-education').delta_amount_bn='4.100';
+ assert.throws(()=>validateBatch(changes.budget,changes.proposals,changes.impacts),/sum mismatch/);
+ const orphan=JSON.parse(JSON.stringify({budget,proposals,impacts}));
+ orphan.proposals.find(p=>p.proposal_key==='src-21').source_status='validated';
+ assert.throws(()=>validateBatch(orphan.budget,orphan.proposals,orphan.impacts),/not traceable/);
 });
