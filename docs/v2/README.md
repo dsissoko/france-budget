@@ -31,6 +31,6 @@ Toute évolution de modèle, contrat API, règle métier, import, UX ou exploita
 ## Points ouverts vérifiés
 
 - Les migrations 002 et 005 utilisent encore des données de `public` : le bootstrap V2 totalement autonome reste à réaliser après la recette.
-- Le handler `GET /api/v2/budgets/{key}/positions` renvoie actuellement des positions vides pour un programme AGGREGATE.
-- Les 28 lignes sources, 11 regroupements et 11 allocations LFI validées dans la recette #145 doivent être portées et testées en V2.
-- Le nettoyage des migrations V1 est **postérieur à la recette**, conformément à la décision de projet.
+- Le handler `GET /api/v2/budgets/{key}/positions` restitue les positions AGGREGATE **si des allocations qualifiées sont présentes** ; les autres programmes sans allocations restent documentaires.
+- Les 28 lignes sources, 11 regroupements et 11 allocations LFI de #145 sont repris dans la branche V2 (CI validée) ; la parité avec Neon QA et le rendu Preview restent à tester.
+- Le nouveau `db:init` indépendant du schéma V1 et le contrôle `db:check` sont présents et testés en CI, mais pas encore validés en base vierge. Le nettoyage des migrations V1 reste **postérieur à la recette**.
