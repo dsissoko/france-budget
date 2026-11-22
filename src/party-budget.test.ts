@@ -22,6 +22,25 @@ describe('Moteur à deux modes : agrégats sourcés ou référence + deltas',()=
   expect(result.entries).toHaveLength(2);
   expect(aggregateMode(party)).toBe(true);
  });
+ it('projette automatiquement les ventilations CSV sur les postes sans modifier les agrégats',()=>{
+  const allocated={...party,scenario:{...party.scenario,claimedAllocations:[
+    {side:'revenues' as const,categoryId:'business',amount:19.9},
+    {side:'expenses' as const,categoryId:'education',amount:7.6},
+  ]}};
+  const result=calculatePublishedBudget(allocated,reference);
+  expect(result.revenues.business).toBeCloseTo(119.9);
+  expect(result.revenues.other).toBeCloseTo(86.5);
+  expect(result.expenses.education).toBeCloseTo(127.6);
+  expect(result.expenses['other-expenses']).toBeCloseTo(84.1);
+  expect(result.revenueTotal).toBeCloseTo(206.4);
+  expect(result.expenseTotal).toBeCloseTo(211.7);
+  expect(result.balanceDelta).toBeCloseTo(24.7);
+  expect(result.entries).toHaveLength(4);
+ });
+ it('refuse une ventilation qui dépasse les masses revendiquées',()=>{
+  const wrong={...party,scenario:{...party.scenario,claimedAllocations:[{side:'revenues' as const,categoryId:'business',amount:200}]}};
+  expect(()=>calculatePublishedBudget(wrong,reference)).toThrow('supérieure aux agrégats');
+ });
  it('restitue un budget global avec deux masses seulement, sans troisième chiffre',()=>{
   const {balanceDeltaBn:_,...twoNumbers}=claim;
   const result=calculatePublishedBudget({...party,scenario:{...party.scenario,claimedTotals:twoNumbers}},reference);
