@@ -9,7 +9,7 @@
     "preview": "vite preview --host 0.0.0.0",
     "check": "tsc --noEmit",
     "test": "vitest run",
-    "test:programmes": "node scripts/import-programmes.mjs"
+    "test:programmes": "node scripts/import-programmes.mjs && node scripts/build-programme-preview.mjs lfi 2027 --check"
   },
   "dependencies": {
     "@vitejs/plugin-react": "^4.7.0",
