@@ -52,6 +52,43 @@ Produire une décision structurée dans un **registre de travail** séparé (ex.
 6. **PARTIAL** : seuls les impacts validés modifient les postes citoyens. Un montant `claimed_amount_bn` non ventilé **n'est pas** automatiquement un impact.
 7. **Traçabilité** : ne jamais valoriser un code `category_id`, un `source_status` « validé » ou un montant par simple analogie ou faute de mieux ; ne jamais supprimer une proposition simplement parce qu'elle n'est pas ventilable.
 
+## Regroupements citoyens issus de la PR #145 (contrat V2)
+
+La qualification amont peut produire, en complément du triplet CSV canonique, les fichiers **versionnés et contrôlables** suivants dans le même dossier programme :
+
+- `presentation.csv` : titre et description publique du budget ; aucune URL brute dans la description.
+- `groupes-citoyens.csv` : groupes pédagogiques et réservation des postes citoyens, ainsi que les identifiants des mesures sources.
+- `rattachements-citoyens.csv` : relation explicite entre chaque proposition source et son groupe, avec page et justification.
+- `impacts-citoyens.csv` : un enregistrement par poste réservé, son statut, le montant attribuable ou vide, la justification et `simulation_applied`.
+
+**Ces CSV ne remplacent pas** `budget.csv`, `proposals.csv`, `impacts.csv`. Le triplet reste le contrat commun des citoyens et des partis ; les quatre fichiers supplémentaires apportent le détail documentaire et les ventilations **internes** d'un AGGREGATE. L'importeur `scripts/v2/import.mjs` les joint en `v2.budgets.documentary.citizenGroups` et `claimedAllocations`, avec contrôle des identifiants, de l'exhaustivité et de la non-duplication.
+
+### Règle de regroupement transitive
+
+Construire un graphe biparti entre les mesures sources et les postes citoyens retenus par l'analyse. Les groupes correspondent aux **composantes connexes** de ce graphe, y compris lorsque le lien passe par plusieurs mesures :
+
+- A concerne Éducation et Santé, B concerne Santé, C concerne Retraites : groupes {A,B} et {C}.
+- Si B concerne également Retraites, les trois propositions A, B, C sont **un seul groupe**.
+- Une mesure sans poste fiable reste visible comme documentaire ; elle n'autorise pas à inventer un impact.
+- Pour un budget, un poste ne peut appartenir à deux groupes, même si les thèmes sont distincts. Ne jamais recréer une ligne source en raison de son caractère multi-postes.
+- Les identifiants sont stables ; un groupe doit conserver la liste exacte des propositions sources.
+
+La classification initiale des liens est agentique et argumentée. **Le calcul des composantes connexes, le contrôle des exclusivités et l'import sont déterministes.** Les titres, thèmes, et orientations partisanes ne servent jamais de clés de regroupement.
+
+### Activation financière
+
+Pour les budgets `AGGREGATE`, `simulation_applied=true` signifie que le montant documenté peut être **ventilé à l'intérieur** de la masse annoncée, sans augmenter le total. La différence entre la masse annoncée et les ventilations justifiées reste dans les postes de rapprochement (reliquat), pas attribuée arbitrairement.
+
+Pour les budgets `PARTIAL`, seules les lignes de `impacts.csv` approuvées constituent des variations calculées. Le montant revendiqué d'une proposition n'est jamais une preuve d'impact.
+
+L'exemple LFI 2027 porte **28 mesures sources → 11 groupes → 15 postes réservés, dont 11 allocations**, pour +106,4 Md€ de recettes et +81,7 Md€ de dépenses. Les 84,4 Md€ et 37,7 Md€ ventilés laissent des reliquats de +22 Md€ et +44 Md€ sans modification du solde +24,7 Md€. Ces invariants sont vérifiés par `scripts/v2/grouping.node-test.mjs`.
+
+### Contraintes éditoriales et preuve
+
+Chercher les limites réellement imposées par l'UI, l'API et Neon. Si aucune longueur maximale n'existe, adopter une cible éditoriale justifiée plutôt que créer une fausse contrainte métier. Tout impact doit indiquer sa source, l'année, le poste, le sens, l'unité, les incertitudes et son statut. **Une proposition sourcée reste visible même sans impact activé.**
+
+Références : [métier V2](../../docs/v2/metier.md), [MCD](../../docs/v2/mcd.md), [intégration](../../docs/v2/integration.md) et [contrat API](../../docs/v2/api.md).
+
 ## Sorties attendues
 
 - **Registre de qualification** exhaustif, incluant aussi les décisions de non-imputation et leurs raisons, avec identifiants stables et preuves.
