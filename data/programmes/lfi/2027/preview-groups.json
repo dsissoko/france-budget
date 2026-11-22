@@ -15,7 +15,7 @@
         "claimedAmountBn": 9,
         "status": "documentary_claimed",
         "rationale": "Montant annoncé pour des mesures rattachées à ce poste ; aucune imputation au simulateur.",
-        "simulated": false
+        "simulated": true
       }
     ],
     "sourceLines": [
@@ -48,7 +48,7 @@
         "claimedAmountBn": 45,
         "status": "documentary_claimed",
         "rationale": "Montant annoncé pour des mesures rattachées à ce poste ; aucune imputation au simulateur.",
-        "simulated": false
+        "simulated": true
       }
     ],
     "sourceLines": [
@@ -103,7 +103,7 @@
         "claimedAmountBn": 10.5,
         "status": "documentary_partial",
         "rationale": "22 Md€ concernent plusieurs familles de recettes et ne sont pas ventilés entre postes.",
-        "simulated": false
+        "simulated": true
       },
       {
         "side": "revenues",
@@ -189,7 +189,7 @@
         "claimedAmountBn": 19.9,
         "status": "documentary_claimed",
         "rationale": "Montant annoncé pour des mesures rattachées à ce poste ; aucune imputation au simulateur.",
-        "simulated": false
+        "simulated": true
       }
     ],
     "sourceLines": [
@@ -310,7 +310,7 @@
         "claimedAmountBn": 9,
         "status": "documentary_partial",
         "rationale": "Deux mesures de 8 et 2 Md€ concernent plusieurs postes ; leurs montants ne sont pas arbitrairement répartis.",
-        "simulated": false
+        "simulated": true
       },
       {
         "side": "expenses",
@@ -328,7 +328,7 @@
         "claimedAmountBn": 3,
         "status": "documentary_partial",
         "rationale": "Deux mesures de 8 et 2 Md€ concernent plusieurs postes ; leurs montants ne sont pas arbitrairement répartis.",
-        "simulated": false
+        "simulated": true
       },
       {
         "side": "expenses",
@@ -337,7 +337,7 @@
         "claimedAmountBn": 2.6,
         "status": "documentary_partial",
         "rationale": "Deux mesures de 8 et 2 Md€ concernent plusieurs postes ; leurs montants ne sont pas arbitrairement répartis.",
-        "simulated": false
+        "simulated": true
       }
     ],
     "sourceLines": [
@@ -414,7 +414,7 @@
         "claimedAmountBn": 9.5,
         "status": "documentary_claimed",
         "rationale": "Montant annoncé pour des mesures rattachées à ce poste ; aucune imputation au simulateur.",
-        "simulated": false
+        "simulated": true
       }
     ],
     "sourceLines": [
@@ -447,7 +447,7 @@
         "claimedAmountBn": 7.6,
         "status": "documentary_claimed",
         "rationale": "Montant annoncé pour des mesures rattachées à ce poste ; aucune imputation au simulateur.",
-        "simulated": false
+        "simulated": true
       }
     ],
     "sourceLines": [
@@ -502,7 +502,7 @@
         "claimedAmountBn": 3,
         "status": "documentary_claimed",
         "rationale": "Montant annoncé pour des mesures rattachées à ce poste ; aucune imputation au simulateur.",
-        "simulated": false
+        "simulated": true
       }
     ],
     "sourceLines": [
@@ -568,7 +568,7 @@
         "claimedAmountBn": 3,
         "status": "documentary_claimed",
         "rationale": "Montant annoncé pour des mesures rattachées à ce poste ; aucune imputation au simulateur.",
-        "simulated": false
+        "simulated": true
       }
     ],
     "sourceLines": [
