@@ -56,5 +56,8 @@ jobs:
       - name: Vérifier V2 (tests unitaires + CSV intégral, sans Neon)
         run: npm run test:v2
 
+      - name: Auditer les textes publiables V2 (rapport non destructif)
+        run: npm run audit:editorial:v2
+
       - name: Vérifier le build de production
         run: npm run build
