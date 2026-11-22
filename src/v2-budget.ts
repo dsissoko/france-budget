@@ -8,6 +8,7 @@ export type BudgetProposal={
  proposalKey:string;title:string;description:string;
  impacts:BudgetImpact[];sourceUrl?:string|null;claimedAmountBn?:string|null;
  sourceStatus?:string|null;direction?:string|null;
+ sourceOrigin?:string|null;notes?:string|null;
 };
 export type BudgetMode='PARTIAL'|'AGGREGATE';
 export type BudgetDocumentary={
@@ -46,7 +47,15 @@ export const declaredAmountForDisplay=(p:BudgetProposal):number|null=>{
    (p.sourceUrl??'').startsWith('https://')?amount:null;
 };
 export const measuredProposals=(b:PublishedBudget)=>b.proposals.filter(p=>
- p.impacts.some(i=>Number(i.deltaAmountBn)!==0)||declaredAmountForDisplay(p)!==null);
+ p.sourceStatus!=='grouped_into_pivot' && (p.impacts.some(i=>Number(i.deltaAmountBn)!==0)||declaredAmountForDisplay(p)!==null));
+/** Count real source measures, not pivot grouping containers. */
+export const measuredSourceCount=(b:PublishedBudget)=>measuredProposals(b).reduce((n,p)=>
+ n+(p.sourceOrigin==='pivot_consolidation'?pivotGroupMembers(b,p).length:1),0);
+export const pivotGroupMembers=(b:PublishedBudget,p:BudgetProposal):BudgetProposal[]=>{
+ if(p.sourceOrigin!=='pivot_consolidation'||!p.notes?.startsWith('members='))return [];
+ const keys=p.notes.slice('members='.length).split('|').map(x=>x.split(':')[0]);
+ return keys.map(key=>b.proposals.find(x=>x.proposalKey===key)).filter((x):x is BudgetProposal=>!!x);
+};
 export const hasQualifiedBudgetImpact=(b:PublishedBudget)=>impactedProposals(b).length>0||!!reportedAggregate(b)||!!b.documentary?.citizenSource;
 
 export function reportedAggregate(b:Pick<PublishedBudget,'documentary'|'budgetMode'>):PublishedAggregate|null{

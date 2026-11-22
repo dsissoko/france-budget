@@ -7,7 +7,7 @@ import {voteQualification} from './engine/vote-qualification';
 import {budgetMaturity} from './budget-maturity';
 import {
  computeBudget,computeCitizenDraft,readDraftProposals,eligibleForDisplay,measuredProposals,
- reportedAggregate,hasQualifiedBudgetImpact,declaredAmountForDisplay,availablePost,updateImpact,validExclusiveProposals,
+ reportedAggregate,hasQualifiedBudgetImpact,declaredAmountForDisplay,measuredSourceCount,pivotGroupMembers,availablePost,updateImpact,validExclusiveProposals,
  type PublishedBudget,type BudgetProposal,type BudgetImpact,type BudgetSide
 } from './v2-budget';
 import DeficitTrajectory from './components/DeficitTrajectory';
@@ -217,7 +217,7 @@ export default function AppV2(){
      g.items.filter(c=>Math.abs((r[g.side][c.id]??c.amount)-c.amount)>.005).map(c=>
       <Gauge key={c.id} id={'view-'+b.id+'-'+c.id} item={c} value={r[g.side][c.id]} tone={g.tone}/>)
    }</div>)}</div><div className="card"><div className="card-title"><h3>Présentation et mesures</h3>
-    <span className="pill">{measuredProposals(b).length} mesures chiffrées</span></div>
+    <span className="pill">{measuredSourceCount(b)} mesures chiffrées</span></div>
     {b.description&&<p className="muted small">{b.description}</p>}
     {b.origin==='party'&&measuredProposals(b).length===0&&
      <p className="muted small" role="status">
@@ -234,6 +234,7 @@ export default function AppV2(){
       <span className="compact-measure-title">{p.title}</span><ChevronDown size={17}/></button></div>
      {openedProposal===p.proposalKey&&<div className="compact-measure-detail proposal-panel vote-proposal-readonly">
       {p.description?.trim()&&<p className="muted small">{p.description}</p>}
+      {pivotGroupMembers(b,p).length>0&&<ul className="muted small">{pivotGroupMembers(b,p).map(m=><li key={m.proposalKey}>{m.title} : {money(Number(m.claimedAmountBn??0))} revendiqués</li>)}</ul>}
       {declaredAmountForDisplay(p)!==null&&p.impacts.length===0&&
         <p className="muted small"><strong>Montant annoncé : {money(declaredAmountForDisplay(p)!)}</strong>
          {' · '}Chiffrage déclaré par son auteur, non imputé aux postes comptables.
@@ -387,7 +388,7 @@ export default function AppV2(){
       <div className="vote-card-badges"><MaturityTag b={b}/><Champion b={b} championId={championId}/>
        <span className={'vote-impact vote-impact--'+q.tone} title={q.title}>{q.label}</span></div>
       <h3>{b.title}</h3><p className="muted small">{b.description||'Consulter les propositions de ce budget.'}</p>
-      <div className="vote-meta"><span><ListChecks size={15}/>{measuredProposals(b).length} mesures</span>
+      <div className="vote-meta"><span><ListChecks size={15}/>{measuredSourceCount(b)} mesures</span>
        <span><Heart size={15}/>{b.votes} votes</span></div></button>
       <button className="primary vote-action" disabled={busy} onClick={()=>vote(b.id)}><Heart size={16}/> Soutenir</button></article>;
     })}</div>

@@ -51,3 +51,22 @@ test('NoPasaran 8 accounting positions match the recorded V1 QA benchmark',()=>{
   assert.ok(Math.abs(baseline[k]+Number(i.delta_amount_bn)-expected[k])<0.0001,k+' must conserve V1 values');
  }
 });
+
+test('LFI 2027: 28 source measures and a single grouped education pivot impact',()=>{
+ const x=loadBatch('data/programmes/lfi/2027');
+ assert.equal(x.budget.budget_mode,'AGGREGATE');
+ assert.equal(x.proposals.filter(p=>p.proposal_key.startsWith('src-')).length,28);
+ assert.equal(x.proposals.length,29,'28 sources plus 1 deterministic pivot group');
+ assert.equal(x.impacts.length,5,'six qualified contributions on five unique pivot posts');
+ const edu=x.impacts.filter(i=>i.side==='expenses'&&i.category_id==='education');
+ assert.equal(edu.length,1);
+ assert.equal(edu[0].proposal_key,'pivot-expenses-education');
+ assert.equal(edu[0].delta_amount_bn,'4.000');
+ const members=x.proposals.filter(p=>['src-19','src-21'].includes(p.proposal_key));
+ assert.equal(members.reduce((total,p)=>total+Number(p.claimed_amount_bn),0),4);
+ assert.ok(members.every(p=>p.source_status==='grouped_into_pivot'));
+ assert.deepEqual(new Set(x.impacts.map(i=>i.side+':'+i.category_id)).size,x.impacts.length);
+ assert.equal(x.impacts.filter(i=>i.side==='revenues').reduce((sum,i)=>sum+Number(i.delta_amount_bn),0),3);
+ assert.equal(x.impacts.filter(i=>i.side==='expenses').reduce((sum,i)=>sum+Number(i.delta_amount_bn),0),19);
+ assert.equal(Number(x.budget.documentary.aggregates[0].balance_delta_bn),24.7,'global aggregate remains authoritative');
+});
