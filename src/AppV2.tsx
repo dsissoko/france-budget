@@ -247,7 +247,7 @@ export default function AppV2(){
         return c?<Gauge id={'proposal-'+p.proposalKey+'-'+i.categoryId} key={i.categoryId}
           item={c} value={c.amount+Number(i.deltaAmountBn)} tone={g.tone}/>:null;
        })}</div>:null})}
-      {(p.measures?.find(m=>m.sourceUrl?.startsWith('https://'))?.sourceUrl??p.sourceUrl)?.startsWith('https://')&&<a href={p.measures?.find(m=>m.sourceUrl?.startsWith('https://'))?.sourceUrl??p.sourceUrl??undefined} target="_blank" rel="noreferrer">Source officielle <ExternalLink size={13}/></a>}
+      {p.measures?.some(m=>m.sourceUrl?.startsWith('https://'))&&<a href={p.measures.find(m=>m.sourceUrl?.startsWith('https://'))?.sourceUrl??undefined} target="_blank" rel="noreferrer">Source officielle <ExternalLink size={13}/></a>}
      </div>}</div>)}</div></div>
    <div className="card">{hasQualifiedBudgetImpact(b)?<DeficitTrajectory primary={project(r.balanceDelta)}/>:<><p className="muted small">Aucun impact chiffré qualifié : les montants de référence ne doivent pas être attribués à ce programme.</p><DeficitTrajectory primary={project(0)} referenceOnly/></>}</div></>;
  };
