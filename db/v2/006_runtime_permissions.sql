@@ -15,7 +15,7 @@ BEGIN
     RAISE EXCEPTION 'V2 application role does not exist: %', app_role;
   END IF;
   EXECUTE format('GRANT USAGE ON SCHEMA v2 TO %I',app_role);
-  EXECUTE format('GRANT SELECT ON TABLE v2.reference_posts,v2.reference_parameters,v2.budgets,v2.budget_proposals,v2.budget_proposal_impacts,v2.votes,v2.latest_budgets TO %I',app_role);
+  EXECUTE format('GRANT SELECT ON TABLE v2.reference_posts,v2.reference_parameters,v2.budgets,v2.budget_proposals,v2.budget_impacts,v2.votes,v2.latest_budgets TO %I',app_role);
   EXECUTE format('GRANT INSERT ON TABLE v2.votes TO %I',app_role);
   EXECUTE format('GRANT USAGE ON SEQUENCE v2.votes_id_seq TO %I',app_role);
   EXECUTE format('GRANT EXECUTE ON FUNCTION v2.write_citizen_budget(jsonb,text,text,integer) TO %I',app_role);
