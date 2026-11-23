@@ -47,14 +47,14 @@ body:
     id: ventilation
     attributes:
       label: "Qualification comptable V2 et impacts proposés"
-      description: "Distinguer montant revendiqué et impact validé. Justifier la ventilation sur les postes citoyens, les reliquats et les risques de double compte, ou indiquer revue en attente. Format de référence : budget.csv, proposals.csv, impacts.csv."
+      description: "Distinguer montant revendiqué et impact validé. Justifier la ventilation sur les postes citoyens, les reliquats et les risques de double compte, ou indiquer revue en attente. Format de référence : budget.csv, measures.csv, proposals.csv, impacts.csv."
     validations:
       required: true
   - type: textarea
     id: identity
     attributes:
       label: "Identifiants existants ou proposés (non obligatoires pour une première soumission)"
-      description: "Code de formation, source_year, budget_key, proposal_key et source_measure_id éventuels ; jamais le titre comme clé. Voir docs/v2/mcd.md."
+      description: "Code de formation, source_year, budget_key, measure_key et proposal_key éventuels ; jamais le titre comme clé. Voir docs/v2/mcd.md."
   - type: textarea
     id: coverage
     attributes:
