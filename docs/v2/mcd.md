@@ -1,6 +1,6 @@
 # MCD et schéma logique V2
 
-**Référence physique :** [SQL 001](../../db/v2/001_schema.sql), [003](../../db/v2/003_citizen_crud.sql), [004](../../db/v2/004_votes.sql), [005](../../db/v2/initial_ui.sql).
+**Référence physique :** [SQL 001](../../db/v2/001_schema.sql), [003](../../db/v2/003_citizen_crud.sql), [004](../../db/v2/004_votes.sql), [UI](../../db/v2/initial_ui.sql), [007](../../db/v2/007_citizen_featured.sql).
 
 ```mermaid
 erDiagram
@@ -72,3 +72,5 @@ erDiagram
 La vue `v2.latest_budgets` filtre la version `latest` et l'état `published`.
 
 **Intégration #145 dans la V2 :** les groupes documentaires, lignes sources et allocations internes sont actuellement conservés en `v2.budgets.documentary` (JSONB structuré, validé à l'import), **pas** dans `v2.budget_proposal_impacts`. Ce choix évite les impacts additionnels, mais pourra être normalisé en tables relationnelles lorsque les besoins de requêtage le justifient.
+
+Le trigger `v2.trg_refresh_featured_citizen_votes` et son homologue sur `v2.budgets` maintiennent `featured` pour les citoyens publiés (maximum un), sans modifier les programmes des partis. Le quota de 100 budgets citoyens publiés est verrouillé transactionnellement dans `v2.write_citizen_budget` ; pas de plafond glissant à 24 heures.
