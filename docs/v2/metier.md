@@ -9,7 +9,8 @@ Rendre compréhensibles les recettes, les dépenses et le solde des administrati
 | Concept | Définition |
 |---|---|
 | Budget | Scénario versionné, d'origine `citizen`, `party` ou `educational` |
-| Mesure | Engagement élémentaire extrait d'un programme politique par le skill, conservé avec sa source et son éventuel chiffrage |\n| Proposition | Regroupement de zéro à N mesures sources, réalisé par le skill ; peut aussi être créée directement par un citoyen |
+| Mesure | Engagement élémentaire extrait d'un programme politique par le skill, conservé avec sa source et son éventuel chiffrage |
+| Proposition | Regroupement de zéro à N mesures sources, réalisé par le skill ; peut aussi être créée directement par un citoyen |
 | Montant revendiqué | Chiffre annoncé par une source ; sans portée comptable automatique |
 | Impact | Répartition financière qualifiée d'une proposition sur une ligne budgétaire citoyenne, lorsque le montant est justifiable |
 | Poste | Catégorie de recettes, dépenses ou hors budget ; pivot commun de 27 postes |
