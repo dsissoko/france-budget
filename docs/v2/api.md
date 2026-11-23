@@ -9,7 +9,7 @@ Les endpoints ci-dessous sont ceux de l'API V2 publiée sur [Mon Budget Citoyen]
 | GET | `/api/v2/reference` | Postes (`revenues`, `expenses`, `offBudget`, `posts`), `simulation`, `referenceYear`, `referenceVersion` |
 | GET | `/api/v2/budgets` | `{budgets:[...],version:"latest"}`, filtre facultatif `?origin=citizen|party|educational` |
 | POST | `/api/v2/budgets` | Création citoyenne ; identifiant, clé, révision, statut, jeton d'édition |
-| GET | `/api/v2/budgets/{key}` | Budget, présentation et `proposals[]` avec leurs `impacts[]` |
+| GET | `/api/v2/budgets/{key}` | Budget, présentation et `proposals[]` avec leurs `measures[]` et `impacts[]` |
 | PATCH | `/api/v2/budgets/{key}` | Mutation du brouillon avec token Bearer et révision |
 | DELETE | `/api/v2/budgets/{key}` | Retrait logique avec token et révision |
 | GET | `/api/v2/budgets/{key}/positions` | Pour PARTIAL, postes de référence et impacts ; pour AGGREGATE ventilé, positions et statut `aggregate_allocated`, sinon retour documentaire sans positions |
@@ -18,12 +18,12 @@ Les endpoints ci-dessous sont ceux de l'API V2 publiée sur [Mon Budget Citoyen]
 
 ## Distinction de données obligatoire
 
-- `claimedAmountBn` : montant source annoncé, **non imputé automatiquement**.
+- `measures[].measureKey` : identifiant stable de la mesure extraite ; chaque mesure appartient à une proposition via la relation SQL.\n- `proposals[].proposalKey` : identifiant du regroupement. Une proposition citoyenne peut avoir `measures: []`.\n- `claimedAmountBn` : montant annoncé dans une mesure source, **non imputé automatiquement**.
 - `deltaAmountBn` : impact comptable validé.
 - `budgetMode` : `PARTIAL` ou `AGGREGATE`.
 - `documentary` : références, contexte et masses publiées ; ses chiffres ne sont pas ajoutés aux impacts.
 
-Le handler `GET /budgets/{key}/positions` restitue désormais les postes ventilés pour les AGGREGATE possédant `documentary.claimedAllocations` ; il continue de renvoyer `positions:[]` pour les agrégats sans ventilation qualifiée. Les allocations issues de #145 ont été importées dans `v2.budgets.documentary` pour LFI 2027. Les accès PostgreSQL du rôle applicatif ont été accordés au schéma V2 sans autorisation d'import administratif.
+Le listing renvoie aussi `measureCount` et `proposalCount` calculés indépendamment en SQL. Le handler `GET /budgets/{key}/positions` restitue désormais les postes ventilés pour les AGGREGATE possédant `documentary.claimedAllocations` ; il continue de renvoyer `positions:[]` pour les agrégats sans ventilation qualifiée. Les allocations issues de #145 ont été importées dans `v2.budgets.documentary` pour LFI 2027. Les accès PostgreSQL du rôle applicatif ont été accordés au schéma V2 sans autorisation d'import administratif.
 
 ## Erreurs, sécurité et limites
 
