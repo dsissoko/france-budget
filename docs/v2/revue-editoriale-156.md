@@ -42,9 +42,9 @@ Import des **14 budgets modifiés**, au moyen de la fonction V2 `v2.import_budge
 | Mesures | 279 | 279 |
 | Impacts | 14 | 14 |
 | Votes | 1 | 1 |
-| Propositions à description vide | 242 avant enrichissement | 0 après enrichissement |
+| Propositions à description vide dans les CSV des programmes concernés | 232 | 0 |
 
-La ligne « descriptions vides avant » est une estimation issue des CSV source : 143 LFI 2026 + 75 RN 2026 + 14 Équinoxe 2027 = **232**, et non 242 ; les 10 LR 2026 avaient une description non vide mais pauvre. En QA après import, le contrôle SQL `TRIM(description) = ''` retourne **0**. La recette confirme aussi **0 impact orphelin** et 11 regroupements LFI 2027 conservés.
+Les **232 descriptions vides** correspondent à 143 LFI 2026, 75 RN 2026 et 14 Équinoxe 2027 ; les 10 LR 2026 avaient une description non vide mais insuffisamment informative. En QA après import, le contrôle SQL `TRIM(description) = ''` retourne **0**. La recette confirme aussi **0 impact orphelin** et 11 regroupements LFI 2027 conservés.
 
 **Limites :** l'import a été exercé avec le rôle propriétaire de QA, sans déploiement HTTP dédié. La revue éditoriale humaine, la résolution de l'attribution `pp/2026` et le feu vert pour la production restent nécessaires. Aucune écriture n'a été effectuée sur Neon `main` au titre de #156.
 
