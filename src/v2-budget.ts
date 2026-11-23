@@ -72,6 +72,9 @@ export const declaredAmountForDisplay=(p:BudgetProposal):number|null=>{
    (source.sourceUrl??'').startsWith('https://')?amount:null;
 };
 export const measuredProposals=(b:PublishedBudget):BudgetProposal[]=>{
+ // In V2 the proposals are already the canonical regroupings; documentary
+ // citizenGroups is legacy display metadata and must not supersede the SQL model.
+ if(b.proposals.some(p=>p.measures!==undefined))return b.proposals;
  if(b.origin==='party'&&b.documentary?.citizenGroups?.length)
   return b.documentary.citizenGroups.map(g=>({
    proposalKey:'group-'+g.id,title:g.title,description:g.description,
