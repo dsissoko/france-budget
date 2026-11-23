@@ -228,3 +228,21 @@
 .citizen-champion{display:inline-flex;align-items:center;gap:5px;max-width:100%;padding:4px 8px;border:1px solid #e8d6a4;border-radius:999px;background:#fff8e5;color:#805b1f;font-size:11px;font-weight:700;line-height:1.25;white-space:nowrap}
 .citizen-champion svg{flex:none}
 .compare-choice-label .citizen-champion{width:max-content;max-width:100%;margin-top:4px}
+
+/* V2 — accueil Comprendre : KPI compacts sur petit écran, sans perdre les libellés. */
+@media (max-width: 760px) {
+  .stage > .stats.three { gap: 8px; margin-bottom: 12px; }
+  .stage > .stats.three .stat {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    column-gap: 12px;
+    row-gap: 3px;
+    padding: 12px 15px;
+    border-radius: 13px;
+  }
+  .stage > .stats.three .stat .eyebrow { grid-column: 1; grid-row: 1; font-size: 12px; }
+  .stage > .stats.three .stat strong { grid-column: 2; grid-row: 1 / 3; font-size: clamp(19px, 5.5vw, 24px); letter-spacing: -0.7px; text-align: right; white-space: nowrap; }
+  .stage > .stats.three .stat small { grid-column: 1; grid-row: 2; font-size: 11px; }
+  .stage > .card .ratio { height: 18px; }
+}
