@@ -6,8 +6,8 @@ import {simulationService,yearsFor,type SimulationParameters} from './engine/sim
 import {voteQualification} from './engine/vote-qualification';
 import {budgetMaturity} from './budget-maturity';
 import {
- computeBudget,computeCitizenDraft,readDraftProposals,eligibleForDisplay,comparisonBudgets,measuredProposals,
- reportedAggregate,hasQualifiedBudgetImpact,declaredAmountForDisplay,measuredSourceCount,pivotGroupMembers,availablePost,updateImpact,validExclusiveProposals,
+ computeBudget,computeCitizenDraft,readDraftProposals,eligibleForDisplay,comparisonBudgets,displayedProposals,
+ reportedAggregate,hasQualifiedBudgetImpact,declaredAmountForDisplay,sourceMeasureCount,proposalSourceMeasures,availablePost,updateImpact,validExclusiveProposals,
  type PublishedBudget,type BudgetProposal,type BudgetImpact,type BudgetSide
 } from './v2-budget';
 import DeficitTrajectory from './components/DeficitTrajectory';
@@ -217,29 +217,29 @@ export default function AppV2(){
       <Gauge key={c.id} id={'view-'+b.id+'-'+c.id} item={c} value={r[g.side][c.id]} tone={g.tone}/>)
    }</div>)}</div><div className="card"><div className="card-title"><h3>Présentation et propositions</h3>
     <span className="pill">{b.proposals.length} propositions</span></div>
-    {b.origin==='party'&&measuredSourceCount(b)>0&&
-      <p className="muted small">Issues de {measuredSourceCount(b)} mesures du programme</p>}
+    {b.origin==='party'&&sourceMeasureCount(b)>0&&
+      <p className="muted small">Issues de {sourceMeasureCount(b)} mesures du programme</p>}
     {b.description&&<p className="muted small">{b.description}</p>}
-    {b.origin==='party'&&measuredProposals(b).length===0&&
+    {b.origin==='party'&&displayedProposals(b).length===0&&
      <p className="muted small" role="status">
       {b.proposals.length>0?
-       b.proposals.length+' propositions sont recensées dans les sources, mais aucun chiffrage individuel n’est encore suffisamment qualifié pour être affiché comme mesure.':
-       'Aucune mesure chiffrée individuelle n’est encore disponible pour ce programme.'}
+       b.proposals.length+' propositions sont recensées, mais aucun impact chiffré n’est encore suffisamment qualifié.':
+       'Aucune proposition n’est encore disponible pour ce programme.'}
       {' '}Les agrégats du programme, lorsqu’ils sont documentés, sont présentés séparément.
      </p>}
-    {measuredProposals(b).some(p=>p.impacts.length===0)&&<p className="muted small">Les montants annoncés des propositions sont présentés à titre documentaire ; ils ne sont pas ajoutés aux agrégats ni à la simulation.</p>}
+    {displayedProposals(b).some(p=>p.impacts.length===0)&&<p className="muted small">Les montants annoncés des propositions sont présentés à titre documentaire ; ils ne sont pas ajoutés aux agrégats ni à la simulation.</p>}
     <div className="compact-measure-list" aria-label="Propositions en lecture seule">
-    {measuredProposals(b).map(p=><div key={p.proposalKey} className="compact-measure-item">
+    {displayedProposals(b).map(p=><div key={p.proposalKey} className="compact-measure-item">
      <div className="compact-measure-row"><button className="compact-measure-content compact-measure-open"
       aria-expanded={openedProposal===p.proposalKey} onClick={()=>setOpenedProposal(x=>x===p.proposalKey?null:p.proposalKey)}>
       <span className="compact-measure-title">{p.title}</span><ChevronDown size={17}/></button></div>
      {openedProposal===p.proposalKey&&<div className="compact-measure-detail proposal-panel vote-proposal-readonly">
       {p.description?.trim()&&<p className="muted small">{p.description}</p>}
-      {pivotGroupMembers(b,p).length>0&&<ul className="muted small">{pivotGroupMembers(b,p).map(m=><li key={m.proposalKey}>{m.title} : {money(Number(m.claimedAmountBn??0))} revendiqués</li>)}</ul>}
+      {proposalSourceMeasures(b,p).length>0&&<ul className="muted small">{proposalSourceMeasures(b,p).map(m=><li key={m.measureKey}>{m.title}{m.claimedAmountBn?<> : {money(Number(m.claimedAmountBn))} revendiqués</>:<> — montant non renseigné</>}</li>)}</ul>}
       {declaredAmountForDisplay(p)!==null&&p.impacts.length===0&&
         <p className="muted small"><strong>Montant annoncé : {money(declaredAmountForDisplay(p)!)}</strong>
          {' · '}Chiffrage déclaré par son auteur, non imputé aux postes comptables.
-         {p.sourceStatus==='primary_source_checked_apu_review_pending'&&' · Qualification comptable en attente.'}
+         {p.measures?.some(m=>m.sourceStatus==='primary_source_checked_apu_review_pending')&&' · Qualification comptable en attente.'}
         </p>}
       {groups.map(g=>{const impacts=p.impacts.filter(i=>i.side===g.side);
        return impacts.length?<div className="card" key={g.side}><h4>{g.title}</h4>{impacts.map(i=>{
@@ -247,7 +247,7 @@ export default function AppV2(){
         return c?<Gauge id={'proposal-'+p.proposalKey+'-'+i.categoryId} key={i.categoryId}
           item={c} value={c.amount+Number(i.deltaAmountBn)} tone={g.tone}/>:null;
        })}</div>:null})}
-      {p.sourceUrl?.startsWith('https://')&&<a href={p.sourceUrl} target="_blank" rel="noreferrer">Source officielle <ExternalLink size={13}/></a>}
+      {(p.measures?.find(m=>m.sourceUrl?.startsWith('https://'))?.sourceUrl??p.sourceUrl)?.startsWith('https://')&&<a href={p.measures?.find(m=>m.sourceUrl?.startsWith('https://'))?.sourceUrl??p.sourceUrl} target="_blank" rel="noreferrer">Source officielle <ExternalLink size={13}/></a>}
      </div>}</div>)}</div></div>
    <div className="card">{hasQualifiedBudgetImpact(b)?<DeficitTrajectory primary={project(r.balanceDelta)}/>:<><p className="muted small">Aucun impact chiffré qualifié : les montants de référence ne doivent pas être attribués à ce programme.</p><DeficitTrajectory primary={project(0)} referenceOnly/></>}</div></>;
  };
@@ -389,7 +389,7 @@ export default function AppV2(){
       <div className="vote-card-badges"><MaturityTag b={b}/><Champion b={b} championId={championId}/>
        <span className={'vote-impact vote-impact--'+q.tone} title={q.title}>{q.label}</span></div>
       <h3>{b.title}</h3><p className="muted small">{b.description||'Consulter les propositions de ce budget.'}</p>
-      <div className="vote-meta"><span><ListChecks size={15}/>{measuredSourceCount(b)} mesures</span>
+      <div className="vote-meta"><span><ListChecks size={15}/>{sourceMeasureCount(b)} mesures</span>
        <span><Heart size={15}/>{b.votes} votes</span></div></button>
       <button className="primary vote-action" disabled={busy} onClick={()=>vote(b.id)}><Heart size={16}/> Soutenir</button></article>;
     })}</div>
