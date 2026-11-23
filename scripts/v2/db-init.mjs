@@ -56,10 +56,12 @@ export function seedSql(d){
   "DO $$ BEGIN IF (SELECT count(*) FROM v2.reference_posts WHERE reference_year=2025)<>27 THEN RAISE EXCEPTION 'missing_reference_posts'; END IF; END $$;\n";
 }
 
-export function bootstrapSql(d,appRole=''){
+export function bootstrapSql(d,appRole='',force=false){
  if(appRole&&!/^[a-z_][a-z0-9_]*$/.test(appRole))throw Error('Unsafe V2_APP_ROLE');
  const roleSetting=appRole?"SET LOCAL v2.application_role = '"+appRole+"';\n":'';
- const guard="DO $guard$ BEGIN IF to_regclass('v2.budgets') IS NOT NULL THEN IF EXISTS(SELECT 1 FROM v2.budgets) THEN RAISE EXCEPTION 'db:init refuses nonempty v2.budgets'; END IF; END IF; END $guard$;";
+ const guard=force
+  ? "DROP SCHEMA IF EXISTS v2 CASCADE;"
+  : "DO $guard$ BEGIN IF to_regclass('v2.budgets') IS NOT NULL THEN IF EXISTS(SELECT 1 FROM v2.budgets) THEN RAISE EXCEPTION 'db:init refuses nonempty v2.budgets'; END IF; END IF; END $guard$;";
  const parts=['db/v2/001_schema.sql','db/v2/003_citizen_crud.sql',
   'db/v2/004_votes.sql','db/v2/initial_ui.sql','db/v2/007_citizen_featured.sql',
   'db/v2/006_runtime_permissions.sql'];
@@ -68,8 +70,13 @@ export function bootstrapSql(d,appRole=''){
 
 async function main(){
  const args=process.argv.slice(2),apply=args.includes('--apply');
- if(args.some(a=>!['--apply','--confirm-empty-v2'].includes(a)))
-  throw Error('Usage: npm run db:init -- [--apply --confirm-empty-v2]');
+ const force=args.includes('--force');
+ if(args.some(a=>!['--apply','--confirm-empty-v2','--force','--confirm-reset-v2'].includes(a)))
+  throw Error('Usage: npm run db:init -- [--apply --confirm-empty-v2] [--force --confirm-reset-v2]');
+ if(force&&(!apply||!args.includes('--confirm-reset-v2')))
+  throw Error('--force requires --apply and --confirm-reset-v2 (destructive V2 reset)');
+ if(!force&&args.includes('--confirm-reset-v2'))
+  throw Error('--confirm-reset-v2 requires --force');
  const data=JSON.parse(read('data/reference/2025-v2.json'));
  const counts=validateFixture(data);
  if(!apply){
@@ -77,10 +84,10 @@ async function main(){
     posts:data.posts.length,counts,productionWrites:false},null,2));
   return;
  }
- if(!args.includes('--confirm-empty-v2'))throw Error('--confirm-empty-v2 required');
+ if(!force&&!args.includes('--confirm-empty-v2'))throw Error('--confirm-empty-v2 required');
  if(!process.env.V2_DATABASE_URL)throw Error('V2_DATABASE_URL required');
  const result=spawnSync('psql',['-X','--set=ON_ERROR_STOP=1','--quiet'],{
-  input:bootstrapSql(data,process.env.V2_APP_ROLE||''),encoding:'utf8',
+  input:bootstrapSql(data,process.env.V2_APP_ROLE||'',force),encoding:'utf8',
   env:{...process.env,PGDATABASE:process.env.V2_DATABASE_URL},maxBuffer:2*1024*1024
  });
  if(result.error)throw result.error;
@@ -88,7 +95,7 @@ async function main(){
   process.stderr.write(result.stderr||'psql failed');
   throw Error('V2 initialization rolled back');
  }
- console.log('V2 schema initialized. V1 public remains unchanged.');
+ console.log(force?'V2 schema reset and initialized. V1 public remains unchanged.':'V2 schema initialized. V1 public remains unchanged.');
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(resolve(process.argv[1])).href)
  main().catch(e=>{console.error(e.message);process.exitCode=1});

@@ -17,14 +17,18 @@ export default async function handler(req:any,res:any){
       const budget=rows[0];
       const proposals=await sql`
         SELECT p.id,p.proposal_key AS "proposalKey",p.title,p.description,
-          p.claimed_amount_bn::text AS "claimedAmountBn",p.source_url AS "sourceUrl",
-          p.source_year AS "sourceYear",p.direction,p.amount_unit AS "amountUnit",
-          p.source_section AS "sourceSection",p.source_status AS "sourceStatus",
-          p.source_origin AS "sourceOrigin",p.source_excerpt AS "sourceExcerpt",p.notes,
+          (SELECT COALESCE(jsonb_agg(jsonb_build_object(
+            'measureKey',m.measure_key,'title',m.title,'description',m.description,
+            'claimedAmountBn',m.claimed_amount_bn::text,'sourceUrl',m.source_url,
+            'sourceYear',m.source_year,'direction',m.direction,'amountUnit',m.amount_unit,
+            'sourceSection',m.source_section,'sourceStatus',m.source_status,
+            'sourceOrigin',m.source_origin,'sourceExcerpt',m.source_excerpt,'notes',m.notes)
+            ORDER BY m.measure_key),'[]'::jsonb)
+            FROM v2.budget_measures m WHERE m.proposal_id=p.id) AS measures,
           (SELECT COALESCE(jsonb_agg(jsonb_build_object(
             'side',i.side,'categoryId',i.category_id,'deltaAmountBn',i.delta_amount_bn::text)
             ORDER BY i.side,i.category_id),'[]'::jsonb)
-           FROM v2.budget_proposal_impacts i WHERE i.proposal_id=p.id) AS impacts
+           FROM v2.budget_impacts i WHERE i.proposal_id=p.id) AS impacts
         FROM v2.budget_proposals p WHERE p.budget_id=${budget.id}::uuid
         ORDER BY p.proposal_key`;
       return respond(res,200,{budget:{...budget,id:budget.legacyBudgetId||budget.id,proposals}});

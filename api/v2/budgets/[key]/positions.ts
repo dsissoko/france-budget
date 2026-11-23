@@ -67,7 +67,7 @@ export default async function handler(req:any,res:any){
         COALESCE(i.delta_amount_bn,0)::text AS "deltaAmountBn",
         (r.reference_amount_bn+COALESCE(i.delta_amount_bn,0))::text AS "resultAmountBn"
       FROM v2.reference_posts r
-      LEFT JOIN v2.budget_proposal_impacts i ON
+      LEFT JOIN v2.budget_impacts i ON
         i.budget_id=${b.id}::uuid AND i.reference_year=r.reference_year
         AND i.side=r.side AND i.category_id=r.category_id
       WHERE r.reference_year=${b.referenceYear}

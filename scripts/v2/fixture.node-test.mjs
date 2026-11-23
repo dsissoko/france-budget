@@ -7,6 +7,7 @@ test('NoPasaran baseline: 8 proposals / 8 impacts and latest version',()=>{
  assert.equal(x.budget.version,'latest');
  assert.equal(x.budget.origin,'citizen');
  assert.equal(x.proposals.length,8);
+ assert.equal(x.measures.length,0,'direct citizen proposals do not invent source measures');
  assert.equal(x.impacts.length,8);
  assert.equal(x.impacts.find(i=>i.category_id==='defense')?.delta_amount_bn,'-25');
 });
@@ -17,10 +18,13 @@ test('same structure for all political budgets; documentary sources survive pars
  assert.equal(eco.budget.version,'latest');
  assert.equal(eco.budget.origin,'party');
  assert.equal(eco.proposals.length,4);
+ assert.equal(eco.measures.length,4);
  assert.ok(eco.budget.documentary.sources.length>0);
  assert.equal(eqx.proposals.length,14);
+ assert.equal(eqx.measures.length,14);
  assert.ok(eqx.budget.documentary.aggregates.length>0);
  assert.equal(rn.proposals.length,78);
+ assert.equal(rn.measures.length,78);
  assert.equal(rn.impacts.length,0,'no invented impacts in political CSV');
 });
 
@@ -55,14 +59,14 @@ test('NoPasaran 8 accounting positions match the recorded V1 QA benchmark',()=>{
 test('LFI 2027: 28 source measures and a single grouped education pivot impact',()=>{
  const x=loadBatch('data/programmes/lfi/2027');
  assert.equal(x.budget.budget_mode,'AGGREGATE');
- assert.equal(x.proposals.filter(p=>p.proposal_key.startsWith('src-')).length,28);
- assert.equal(x.proposals.length,29,'28 sources plus 1 deterministic pivot group');
+ assert.equal(x.measures.length,28);
+ assert.equal(x.proposals.length,11,'eleven consolidated citizen proposals');
  assert.equal(x.impacts.length,5,'six qualified contributions on five unique pivot posts');
  const edu=x.impacts.filter(i=>i.side==='expenses'&&i.category_id==='education');
  assert.equal(edu.length,1);
- assert.equal(edu[0].proposal_key,'pivot-expenses-education');
+ assert.equal(edu[0].proposal_key,'citizen-19');
  assert.equal(edu[0].delta_amount_bn,'4.000');
- const members=x.proposals.filter(p=>['src-19','src-21'].includes(p.proposal_key));
+ const members=x.measures.filter(m=>['src-19','src-21'].includes(m.measure_key));
  assert.equal(members.reduce((total,p)=>total+Number(p.claimed_amount_bn),0),4);
  assert.ok(members.every(p=>p.source_status==='grouped_into_pivot'));
  assert.deepEqual(new Set(x.impacts.map(i=>i.side+':'+i.category_id)).size,x.impacts.length);
@@ -73,11 +77,11 @@ test('LFI 2027: 28 source measures and a single grouped education pivot impact',
 
 test('deterministic pivot validation rejects inconsistent and orphan source groups',()=>{
  const batch=loadBatch('data/programmes/lfi/2027');
- const {budget,proposals,impacts}=batch;
- const changes=JSON.parse(JSON.stringify({budget,proposals,impacts}));
- changes.impacts.find(i=>i.proposal_key==='pivot-expenses-education').delta_amount_bn='4.100';
- assert.throws(()=>validateBatch(changes.budget,changes.proposals,changes.impacts),/sum mismatch/);
- const orphan=JSON.parse(JSON.stringify({budget,proposals,impacts}));
- orphan.proposals.find(p=>p.proposal_key==='src-21').source_status='validated';
- assert.throws(()=>validateBatch(orphan.budget,orphan.proposals,orphan.impacts),/not traceable/);
+ const {budget,proposals,impacts,measures}=batch;
+ const changes=JSON.parse(JSON.stringify({budget,proposals,impacts,measures}));
+ changes.impacts.find(i=>i.proposal_key==='citizen-19').delta_amount_bn='4.100';
+ assert.throws(()=>validateBatch(changes.budget,changes.proposals,changes.impacts,changes.measures),/sum mismatch/);
+ const orphan=JSON.parse(JSON.stringify({budget,proposals,impacts,measures}));
+ orphan.measures.find(m=>m.measure_key==='src-21').proposal_key='nonexistent';
+ assert.throws(()=>validateBatch(orphan.budget,orphan.proposals,orphan.impacts,orphan.measures),/Orphan measure/);
 });

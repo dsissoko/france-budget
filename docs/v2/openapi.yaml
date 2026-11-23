@@ -302,6 +302,9 @@ components:
         description: {type: string}
         author: {type: string}
         documentary: {type: object}
+        proposalCount: {type: integer, minimum: 0}
+        measureCount: {type: integer, minimum: 0}
+        impactCount: {type: integer, minimum: 0}
         proposals:
           type: array
           items: {$ref: '#/components/schemas/Proposal'}
@@ -311,12 +314,29 @@ components:
         proposalKey: {type: string}
         title: {type: string}
         description: {type: string}
-        claimedAmountBn: {type: [string, 'null']}
-        sourceUrl: {type: [string, 'null']}
-        sourceStatus: {type: string}
+        measures:
+          type: array
+          description: Mesures élémentaires extraites, éventuellement vide pour une proposition citoyenne directe.
+          items: {$ref: '#/components/schemas/Measure'}
         impacts:
           type: array
           items: {$ref: '#/components/schemas/Impact'}
+    Measure:
+      type: object
+      required: [measureKey, title]
+      properties:
+        measureKey: {type: string}
+        title: {type: string}
+        description: {type: string}
+        claimedAmountBn: {type: [string, 'null']}
+        sourceUrl: {type: [string, 'null']}
+        sourceYear: {type: [integer, 'null']}
+        sourceSection: {type: [string, 'null']}
+        sourceExcerpt: {type: [string, 'null']}
+        sourceStatus: {type: [string, 'null']}
+        sourceOrigin: {type: [string, 'null']}
+        direction: {type: [string, 'null']}
+        notes: {type: [string, 'null']}
     Impact:
       type: object
       required: [side, categoryId, deltaAmountBn]

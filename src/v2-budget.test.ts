@@ -1,5 +1,5 @@
 import {describe,it,expect} from 'vitest';
-import {readDraftProposals,proposalEntries,reportedAggregate,validExclusiveProposals,measuredProposals,impactedProposals,declaredAmountForDisplay,hasQualifiedBudgetImpact,updateImpact,computeBudget,computeCitizenDraft,comparisonBudgets,type PublishedBudget} from './v2-budget';
+import {readDraftProposals,proposalEntries,reportedAggregate,validExclusiveProposals,displayedProposals,sourceMeasureCount,proposalSourceMeasures,impactedProposals,declaredAmountForDisplay,hasQualifiedBudgetImpact,updateImpact,computeBudget,computeCitizenDraft,comparisonBudgets,type PublishedBudget} from './v2-budget';
 import {simulationService,V1_ASSUMPTIONS,yearsFor} from './engine/simulation';
 import type {ReferenceModel} from './projection-core';
 describe('V2 canonical frontend domain',()=>{
@@ -86,15 +86,15 @@ describe('Party declared quantified proposals - display without accounting',()=>
  budgetMode:'PARTIAL' as const,documentary:{},votes:0,featured:false,featured_order:null,
  proposals:[
   {proposalKey:'sourced',title:'Recette annoncée',description:'',impacts:[],
-   claimedAmountBn:'106.400',sourceUrl:'https://example.org/source.pdf',sourceStatus:'publié'},
+   measures:[{measureKey:'src-1',title:'Recette',description:'',claimedAmountBn:'106.400',sourceUrl:'https://example.org/source.pdf',sourceStatus:'publié'}]},
   {proposalKey:'preliminary',title:'Inventaire non validé',description:'',impacts:[],
-   claimedAmountBn:'99.000',sourceUrl:'https://example.org/source.pdf',
-   sourceStatus:'preliminary_source_inventory_unverified'}
+   measures:[{measureKey:'src-2',title:'Inventaire',description:'',claimedAmountBn:'99.000',sourceUrl:'https://example.org/source.pdf',sourceStatus:'preliminary_source_inventory_unverified'}]}
  ]};
  it('shows source-qualified amounts but not preliminary inventory',()=>{
-  const shown=measuredProposals(base);
-  expect(shown.map(x=>x.proposalKey)).toEqual(['sourced']);
+  const shown=displayedProposals(base);
+  expect(shown.map(x=>x.proposalKey)).toEqual(['sourced','preliminary']);
   expect(declaredAmountForDisplay(shown[0])).toBe(106.4);
+  expect(declaredAmountForDisplay(shown[1])).toBeNull();
   expect(impactedProposals(base)).toEqual([]);
  });
  it('never injects declared amounts into engine or impact qualification',()=>{
@@ -105,20 +105,20 @@ describe('Party declared quantified proposals - display without accounting',()=>
  });
 });
 
-describe('V2 pivot-consolidation display and source-count',()=>{
+describe('Canonical proposal grouping and source measure count',()=>{
  const grouped={...makeBudget([]),origin:'party' as const,proposals:[
-  {proposalKey:'src-19',title:'Enseignants',description:'',claimedAmountBn:'0.500',sourceStatus:'grouped_into_pivot',sourceUrl:'https://example.org',impacts:[]},
-  {proposalKey:'src-21',title:'Universités',description:'',claimedAmountBn:'3.500',sourceStatus:'grouped_into_pivot',sourceUrl:'https://example.org',impacts:[]},
-  {proposalKey:'pivot-expenses-education',title:'Éducation',description:'Consolidation',sourceOrigin:'pivot_consolidation',notes:'members=src-19:0.500|src-21:3.500',impacts:[{side:'expenses' as const,categoryId:'education',deltaAmountBn:4}]}
+  {proposalKey:'citizen-19',title:'Éducation',description:'Consolidation',
+   measures:[
+    {measureKey:'src-19',title:'Enseignants',description:'',claimedAmountBn:'0.500',sourceStatus:'validated',sourceUrl:'https://example.org'},
+    {measureKey:'src-21',title:'Universités',description:'',claimedAmountBn:'3.500',sourceStatus:'validated',sourceUrl:'https://example.org'}],
+   impacts:[{side:'expenses' as const,categoryId:'education',deltaAmountBn:4}]}
  ]};
- it('renders one grouped row and counts both source measures',async()=>{
-  const {pivotGroupMembers,measuredSourceCount}=await import('./v2-budget');
-  expect(measuredProposals(grouped).map(p=>p.proposalKey)).toEqual(['pivot-expenses-education']);
-  expect(measuredSourceCount(grouped)).toBe(2);
-  expect(pivotGroupMembers(grouped,grouped.proposals[2]).map(x=>x.proposalKey)).toEqual(['src-19','src-21']);
+ it('renders a single grouped proposal and counts two extracted measures',()=>{
+  expect(displayedProposals(grouped).map(p=>p.proposalKey)).toEqual(['citizen-19']);
+  expect(sourceMeasureCount(grouped)).toBe(2);
+  expect(proposalSourceMeasures(grouped,grouped.proposals[0]).map(x=>x.measureKey)).toEqual(['src-19','src-21']);
  });
 });
-
 
 describe('PR 145 grouped allocation inside V2 published AGGREGATE',()=>{
  const group={id:'citizen-04',title:'Fiscalité des entreprises',
@@ -132,8 +132,9 @@ describe('PR 145 grouped allocation inside V2 published AGGREGATE',()=>{
    claimedAmountBn:19.9,status:'claimed_allocated_in_aggregate',rationale:'Justifié',simulated:true}]
  };
  const aggregate=makeBudget([
-  {proposalKey:'src-1',title:'Mesure A',description:'',claimedAmountBn:'10',sourceUrl:'https://example.org/source.pdf',impacts:[]},
-  {proposalKey:'src-2',title:'Mesure B',description:'',claimedAmountBn:'9.9',sourceUrl:'https://example.org/source.pdf',impacts:[]}
+  {proposalKey:'citizen-04',title:'Fiscalité des entreprises',description:'Regroupement sourcé',
+   measures:[{measureKey:'src-1',title:'Mesure A',description:'',claimedAmountBn:'10',sourceUrl:'https://example.org/source.pdf'},
+    {measureKey:'src-2',title:'Mesure B',description:'',claimedAmountBn:'9.9',sourceUrl:'https://example.org/source.pdf'}],impacts:[]}
  ],'AGGREGATE',{
   aggregates:[{year:2027,basis:'delta',revenues_bn:106.4,expenses_bn:81.7,
    balance_delta_bn:24.7,source_url:'https://example.org/source.pdf'}],
@@ -142,12 +143,13 @@ describe('PR 145 grouped allocation inside V2 published AGGREGATE',()=>{
  });
  aggregate.origin='party';
  it('displays one citizen group sourced by two measures',async()=>{
-  const {pivotGroupMembers,measuredSourceCount}=await import('./v2-budget');
-  const shown=measuredProposals(aggregate);
+  const {proposalSourceMeasures,sourceMeasureCount}=await import('./v2-budget');
+  const shown=displayedProposals(aggregate);
   expect(shown).toHaveLength(1);
-  expect(measuredSourceCount(aggregate)).toBe(2);
-  expect(pivotGroupMembers(aggregate,shown[0]).map(p=>p.proposalKey)).toEqual(['src-1','src-2']);
-  expect(shown[0].impacts).toEqual([{side:'revenues',categoryId:'business',deltaAmountBn:19.9}]);
+  expect(sourceMeasureCount(aggregate)).toBe(2);
+  expect(proposalSourceMeasures(aggregate,shown[0]).map(m=>m.measureKey)).toEqual(['src-1','src-2']);
+  expect(shown[0].impacts).toEqual([]);
+  expect(aggregate.documentary.citizenGroups?.[0].citizenImpacts[0].claimedAmountBn).toBe(19.9);
  });
  it('allocates claim internally without creating extra revenue',()=>{
   const r=computeBudget(aggregate,reference);

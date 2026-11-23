@@ -58,13 +58,7 @@ export function normalizeCitizenBody(body:any,key:string){
     demand(Array.isArray(p.impacts)&&p.impacts.length<=100,'Impacts invalides');
     demand(!publish||p.impacts.length>0,'Proposition publiée sans impact');
     demand(!p.impacts.length||pd.length>0,'Impact non expliqué');
-    let sourceUrl=text(p.sourceUrl);
-    demand(!sourceUrl||(/^https:\/\//.test(sourceUrl)&&sourceUrl.length<=2000),'URL source invalide');
-    proposals.push({budget_key:key,proposal_key:proposalKey,title:pt,description:pd,
-      claimed_amount_bn:amount(p.claimedAmountBn,false,'proposition '+index)??'',
-      source_url:sourceUrl,source_status:'citizen_declared',
-      source_origin:'citizen',source_year:'',direction:'',amount_unit:'Md EUR',
-      source_section:'',notes:''});
+    proposals.push({budget_key:key,proposal_key:proposalKey,title:pt,description:pd});
     for(const impact of p.impacts){
       demand(impact&&typeof impact==='object','Impact invalide');
       const side=impact.side,categoryId=text(impact.categoryId),postKey=side+':'+categoryId;
@@ -78,7 +72,7 @@ export function normalizeCitizenBody(body:any,key:string){
   demand(impacts.length<=100,'Trop d’impacts');
   return {budget:{budget_key:key,version:'latest',origin:'citizen',party_code:'',
     author,title,description,reference_year:'2025',source_year:'',
-    budget_mode:mode,documentary:{}},proposals,impacts,publish};
+    budget_mode:mode,documentary:{}},proposals,measures:[],impacts,publish};
 }
 export function parseRevision(raw:unknown):number{
   const n=Number(raw);
