@@ -35,7 +35,7 @@ if(live){
  const params=await sql.query("SELECT reference_year,reference_version,baseline_rate_per_index::text AS baseline_rate_per_index,budget_year,application_year,horizon_year,balance_threshold::text AS balance_threshold,change_threshold::text AS change_threshold,momentum_threshold::text AS momentum_threshold FROM v2.reference_parameters WHERE reference_year=2025");
  if(params.length!==1||Object.keys(fixture.parameters).some(k=>String(params[0][k])!==String(fixture.parameters[k])))
    throw Error('Reference parameter mismatch');
- const state=await sql.query("SELECT b.budget_key,b.version, (SELECT count(*)::int FROM v2.budget_proposals p WHERE p.budget_id=b.id) AS proposals,(SELECT count(*)::int FROM v2.budget_proposal_impacts i WHERE i.budget_id=b.id) AS impacts FROM v2.budgets b");
+ const state=await sql.query("SELECT b.budget_key,b.version, (SELECT count(*)::int FROM v2.budget_proposals p WHERE p.budget_id=b.id) AS proposals,(SELECT count(*)::int FROM v2.budget_impacts i WHERE i.budget_id=b.id) AS impacts FROM v2.budgets b");
  for(const b of batches){
   const row=state.find(x=>x.budget_key===b.budget.budget_key&&x.version===b.budget.version);
   if(!row||row.proposals!==b.proposals.length||row.impacts!==b.impacts.length)
