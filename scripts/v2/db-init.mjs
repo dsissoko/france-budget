@@ -61,7 +61,8 @@ export function bootstrapSql(d,appRole=''){
  const roleSetting=appRole?"SET LOCAL v2.application_role = '"+appRole+"';\n":'';
  const guard="DO $guard$ BEGIN IF to_regclass('v2.budgets') IS NOT NULL THEN IF EXISTS(SELECT 1 FROM v2.budgets) THEN RAISE EXCEPTION 'db:init refuses nonempty v2.budgets'; END IF; END IF; END $guard$;";
  const parts=['db/v2/001_schema.sql','db/v2/003_citizen_crud.sql',
-  'db/v2/004_votes.sql','db/v2/initial_ui.sql','db/v2/006_runtime_permissions.sql'];
+  'db/v2/004_votes.sql','db/v2/initial_ui.sql','db/v2/007_citizen_featured.sql',
+  'db/v2/006_runtime_permissions.sql'];
  return 'BEGIN;\n'+guard+'\n'+roleSetting+parts.map(read).join('\n')+'\n'+seedSql(d)+'COMMIT;\n';
 }
 
