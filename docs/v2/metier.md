@@ -9,9 +9,9 @@ Rendre compréhensibles les recettes, les dépenses et le solde des administrati
 | Concept | Définition |
 |---|---|
 | Budget | Scénario versionné, d'origine `citizen`, `party` ou `educational` |
-| Proposition | Engagement documenté ou choix citoyen, rattaché à un budget |
+| Mesure | Engagement élémentaire extrait d'un programme politique par le skill, conservé avec sa source et son éventuel chiffrage |\n| Proposition | Regroupement de zéro à N mesures sources, réalisé par le skill ; peut aussi être créée directement par un citoyen |
 | Montant revendiqué | Chiffre annoncé par une source ; sans portée comptable automatique |
-| Impact | Variation signée, validée et exclusive d'un poste de référence |
+| Impact | Répartition financière qualifiée d'une proposition sur une ligne budgétaire citoyenne, lorsque le montant est justifiable |
 | Poste | Catégorie de recettes, dépenses ou hors budget ; pivot commun de 27 postes |
 | AGGREGATE | Deux masses financières annoncées, dont les mesures détaillées font partie |
 | PARTIAL | Programme partiellement chiffré ; seules les écritures qualifiées peuvent modifier la référence |
@@ -30,9 +30,9 @@ Rendre compréhensibles les recettes, les dépenses et le solde des administrati
 
 **RG-05 — Provenance.** Conserver année, source primaire, statut, réserves et, quand disponibles, page et extrait. `validated` n'est pas équivalent à `primary_source_checked_apu_review_pending`.
 
-**RG-06 — Modèle commun.** Partis et citoyens utilisent Budget → Proposition → Impact. L'origine contrôle les opérations autorisées, pas la structure de données.
+**RG-06 — Modèle commun.** Partis et citoyens utilisent Budget → Proposition → Impact, avec Mesure source rattachée à Proposition quand un programme est extrait. L'origine contrôle les opérations autorisées, pas la structure de données.
 
-**RG-07 — Publication.** Brouillon modifiable avec jeton et révision ; publication définitive ; retrait logique. Les contributions réalisées après le passage en V2 ne sont jamais supprimées par réimport de CSV.
+**RG-07 — Publication.** Brouillon modifiable avec jeton et révision ; publication définitive ; retrait logique. L'import de jeux initiaux ne doit pas effacer une contribution citoyenne créée après le bootstrap ; une reconstruction explicite de la base peut en revanche repartir de zéro, selon la décision métier #154.
 
 **RG-08 — Projection.** Trajectoire mécanique jusqu'en 2032, toujours assortie de limites d'interprétation.
 
