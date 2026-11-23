@@ -175,13 +175,17 @@ describe('V2 Comparer political budget visibility regression',()=>{
  });
  it('shows every political budget even without featured flag and without a nine-item cap',()=>{
   const parties=Array.from({length:15},(_,i)=>budget('party-'+i,'party'));
-  const list=comparisonBudgets([...parties,budget('citizen-featured','citizen',true),budget('citizen-other','citizen')],null);
+  const list=comparisonBudgets([...parties,budget('citizen-featured','citizen',true),budget('citizen-other','citizen')]);
   expect(list.filter(b=>b.origin==='party')).toHaveLength(15);
   expect(list.some(b=>b.id==='citizen-featured')).toBe(true);
   expect(list.some(b=>b.id==='citizen-other')).toBe(false);
  });
- it('keeps citizen champion even when not featured, excludes educational duplicates',()=>{
-  const list=comparisonBudgets([budget('champion','citizen'),budget('insee','educational')],'champion');
+ it('excludes unfeatured citizens even if displayed elsewhere as champion',()=>{
+  const list=comparisonBudgets([budget('champion','citizen'),budget('insee','educational')]);
+  expect(list).toEqual([]);
+ });
+ it('includes a featured champion as any other featured citizen',()=>{
+  const list=comparisonBudgets([budget('champion','citizen',true)]);
   expect(list.map(b=>b.id)).toEqual(['champion']);
  });
 });
