@@ -40,12 +40,12 @@ export type CitizenBudgetDraft={
 export const emptyBudgetOverrides=()=>({revenues:{},expenses:{},offBudget:{}});
 
 export const eligibleForDisplay=(b:PublishedBudget)=>b.origin==='citizen'||b.origin==='party';
-/** Comparer is an exhaustive directory of published political budgets.
- * The featured flag controls the citizen shortlist only; it must never hide a party.
+/** All public party budgets are comparable. Citizens require featured=true.
+ * Champion status remains a display badge, not a selection exception.
  */
-export const comparisonBudgets=(budgets:PublishedBudget[],championId:string|null):PublishedBudget[]=>
+export const comparisonBudgets=(budgets:PublishedBudget[]):PublishedBudget[]=>
  budgets.filter(b=>eligibleForDisplay(b)&&
-  (b.origin==='party'||b.featured||b.id===championId))
+  (b.origin==='party'||b.featured))
   .sort((a,b)=>(a.featured_order??999)-(b.featured_order??999)||
    (a.origin==='party'?0:1)-(b.origin==='party'?0:1)||a.title.localeCompare(b.title,'fr'));
 
