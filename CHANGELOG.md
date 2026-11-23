@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0](https://github.com/dsissoko/france-budget/compare/v1.1.0...v1.1.0) (2026-11-23)
+
+
+### Bug Fixes
+
+* aligner le Champion citoyen et le featured sur votes → propositions → date ([#170](https://github.com/dsissoko/france-budget/issues/170)) ([#171](https://github.com/dsissoko/france-budget/issues/171)) ([13808b5](https://github.com/dsissoko/france-budget/commit/13808b54a40652df2f815c0e50bd7c07e6e6513f))
+
 ## [1.1.0](https://github.com/dsissoko/france-budget/compare/v1.0.0...v1.1.0) (2026-11-23)
 
 
