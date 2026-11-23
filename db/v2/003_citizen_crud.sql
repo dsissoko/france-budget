@@ -1,4 +1,5 @@
 -- V2-only citizen write lifecycle. Never modifies V1 / public.
+-- Keep one global cap of 100 published citizen budgets; no rolling 24h cap.
 ALTER TABLE v2.budgets
   ADD COLUMN IF NOT EXISTS publication_status text NOT NULL DEFAULT 'published'
     CHECK(publication_status IN ('draft','published','withdrawn')),
@@ -45,9 +46,6 @@ BEGIN
       PERFORM pg_advisory_xact_lock(hashtext('v2_citizen_publication_quota'));
       IF (SELECT count(*) FROM v2.budgets WHERE origin='citizen' AND publication_status='published')>=100
         THEN RAISE EXCEPTION 'publication_limit_reached'; END IF;
-      IF (SELECT count(*) FROM v2.budgets WHERE origin='citizen'
-          AND published_at > now()-interval '24 hours')>=100
-        THEN RAISE EXCEPTION 'publication_rate_limited'; END IF;
     END IF;
     IF b->>'origin' IS DISTINCT FROM 'citizen' OR b->>'version' IS DISTINCT FROM 'latest'
       THEN RAISE EXCEPTION 'invalid_citizen_origin_or_version'; END IF;
@@ -96,9 +94,6 @@ BEGIN
     PERFORM pg_advisory_xact_lock(hashtext('v2_citizen_publication_quota'));
     IF (SELECT count(*) FROM v2.budgets WHERE origin='citizen' AND publication_status='published')>=100
       THEN RAISE EXCEPTION 'publication_limit_reached'; END IF;
-    IF (SELECT count(*) FROM v2.budgets WHERE origin='citizen'
-        AND published_at > now()-interval '24 hours')>=100
-      THEN RAISE EXCEPTION 'publication_rate_limited'; END IF;
   END IF;
   saved_id := v2.import_budget(payload);
   IF saved_id<>current_id THEN RAISE EXCEPTION 'unexpected_identity_change'; END IF;
