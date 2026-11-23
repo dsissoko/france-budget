@@ -28,6 +28,15 @@ describe('Bootstrap V2 indépendant de public',()=>{
   assert.doesNotMatch(sql.replace(/^--.*$/gm,''),/(?:FROM|INTO|UPDATE|JOIN|ALTER TABLE)\s+public\./i);
   assert.match(sql,/REVOKE ALL ON FUNCTION v2\.import_budget\(jsonb\) FROM PUBLIC/);
   assert.match(sql,/SECURITY DEFINER/);
+  assert.match(sql,/CREATE TRIGGER trg_refresh_featured_citizen_votes/);
+  assert.match(sql,/CREATE TRIGGER trg_refresh_featured_citizen_budgets/);
+  assert.match(sql,/SELECT v2\.refresh_featured_citizen_budget\(\)/);
+  assert.match(sql,/publication_limit_reached/);
+  assert.doesNotMatch(sql,/publication_rate_limited|now\(\)-interval '24 hours'/);
+  assert.match(sql,/b\.origin='citizen' AND b\.version='latest'/);
+  assert.match(sql,/AND b\.publication_status='published'/);
+  assert.match(sql,/ORDER BY count\(v\.id\) DESC,b\.published_at DESC NULLS LAST,b\.id/);
+
   assert.match(bootstrapSql(d,'france_budget_app'),/SET LOCAL v2\.application_role = 'france_budget_app'/);
   assert.throws(()=>bootstrapSql(d,'unsafe;role'),/Unsafe V2_APP_ROLE/);
  });
