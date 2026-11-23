@@ -27,7 +27,7 @@ export default async function handler(req:any,res:any){
               'claimedAmountBn',m.claimed_amount_bn::text,'sourceUrl',m.source_url,
               'sourceYear',m.source_year,'sourceSection',m.source_section,
               'sourceExcerpt',m.source_excerpt,'sourceStatus',m.source_status,
-              'sourceOrigin',m.source_origin,'direction',m.direction,'notes',m.notes)
+              'sourceOrigin',m.source_origin,'direction',m.direction,'amountUnit',m.amount_unit,'notes',m.notes)
               ORDER BY m.measure_key),'[]'::jsonb) FROM v2.budget_measures m WHERE m.proposal_id=p.id),
             'impacts',(SELECT COALESCE(jsonb_agg(jsonb_build_object(
               'side',i.side,'categoryId',i.category_id,'deltaAmountBn',i.delta_amount_bn::text)
