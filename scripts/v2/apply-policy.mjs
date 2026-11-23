@@ -22,7 +22,10 @@ export function policySql(){
  if(!featured.includes('CREATE TRIGGER trg_refresh_featured_citizen_votes')||
     !featured.includes('SECURITY DEFINER'))
    throw Error('Missing V2 featured trigger safety requirements');
- return 'BEGIN;\n'+functionSql+'\n'+featured+'\nCOMMIT;\n';
+ return 'BEGIN;\n'+functionSql+'\n'+
+  'ALTER FUNCTION v2.write_citizen_budget(jsonb,text,text,integer) SECURITY DEFINER;\n'+
+  'REVOKE ALL ON FUNCTION v2.write_citizen_budget(jsonb,text,text,integer) FROM PUBLIC;\n'+
+  featured+'\nCOMMIT;\n';
 }
 async function main(){
  const args=process.argv.slice(2);
