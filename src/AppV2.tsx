@@ -127,12 +127,12 @@ export default function AppV2(){
  const navigate=(next:Tab)=>{setTab(next);window.scrollTo({top:0,behavior:'instant'})};
  const reset=()=>{setSourceBudget(null);setDraftProposals([]);setBaseName('Référence INSEE '+(simulationParams?.referenceYear??2025))};
  const applyOrigin=()=>{
-  const hasWork=draftProposals.length>0||sourceBudget!==null;
-  if(hasWork&&!window.confirm('Remplacer ton budget actuel ? Les modifications non enregistrées seront perdues.'))return;
-  if(originChoice==='reference'){reset()}
-  else{
+  if(originChoice==='reference'){
+   setSourceBudget(null);
+   setBaseName('Référence INSEE '+(simulationParams?.referenceYear??2025));
+  }else{
    const b=published.find(x=>x.id===originChoice),s=saved.find(x=>x.id===originChoice);
-   if(b){setSourceBudget(b);setDraftProposals([]);setBaseName(b.title)}
+   if(b){setSourceBudget(b);setBaseName(b.title)}
    else if(s){setSourceBudget(published.find(x=>x.budgetKey===s.sourceBudgetKey)??null);
      setDraftProposals(readDraftProposals(s.proposals));setBaseName(s.name)}
   }
@@ -280,7 +280,10 @@ export default function AppV2(){
       className={'compare-choice '+(compareA===b.id?'chosen-a':compareB===b.id?'chosen-b':'')}
       onClick={()=>chooseCompare(b.id)}><span className="compare-choice-icon">{b.origin==='party'?<Landmark size={19}/>:<UserRound size={19}/>}</span>
       <span className="compare-choice-label"><strong>{b.title}</strong><small>{b.origin==='party'?'Parti politique':b.origin==='citizen'?'Budget citoyen':'Référence INSEE'}</small>
-      <MaturityTag b={b}/><Champion b={b} championId={championId}/></span></button>)}</div>
+      <MaturityTag b={b}/><Champion b={b} championId={championId}/>
+      {b.origin!=='educational'&&(()=>{const r=computeBudget(b,ref);
+       const q=hasQualifiedBudgetImpact(b)?voteQualification(baseDeficit,r.balanceDelta,years,simulationParams):{label:'Non qualifié',tone:'neutral',title:'Aucun impact chiffré qualifié'};
+       return <span className={'vote-impact vote-impact--'+q.tone} title={q.title}>{q.label}</span>})()}</span></button>)}</div>
     <button className="secondary" onClick={()=>{setCompareA(null);setCompareB(null)}}>Réinitialiser</button></div>
    {compareBudgetA&&compareBudgetB&&<div className="compare-summary-pair">{([compareBudgetA,compareBudgetB] as const).map((b,i)=>{
     const r=computeBudget(b,ref);
@@ -377,9 +380,13 @@ export default function AppV2(){
      <option value="balance">Proximité de l'équilibre</option></select></label></div>
    <div className="vote-list">{published.filter(b=>eligibleForDisplay(b)&&(voteFilter==='all'||b.origin===voteFilter))
     .map(b=>({budget:b,result:computeBudget(b,ref)}))
-    .sort((a,b)=>voteSort==='popular'?b.budget.votes-a.budget.votes:
-     voteSort==='recent'?new Date(b.budget.published_at??0).getTime()-new Date(a.budget.published_at??0).getTime():
-     Math.abs(a.result.deficit)-Math.abs(b.result.deficit))
+    .sort((a,b)=>{
+     const primary=voteSort==='popular'?b.budget.votes-a.budget.votes:
+      voteSort==='recent'?new Date(b.budget.published_at??0).getTime()-new Date(a.budget.published_at??0).getTime():
+      Math.abs(a.result.deficit)-Math.abs(b.result.deficit);
+     return primary||sourceMeasureCount(b.budget)-sourceMeasureCount(a.budget)||
+      a.budget.budgetKey.localeCompare(b.budget.budgetKey);
+    })
     .map(({budget:b,result:r})=>{
      const q=hasQualifiedBudgetImpact(b)?voteQualification(baseDeficit,r.balanceDelta,years,simulationParams):{label:'Non qualifié',tone:'neutral',title:'Aucun impact chiffré qualifié'};
      return <article className="vote-card" key={b.id}><button className="vote-card-main" onClick={()=>{setVoteDetail(b.id);setOpenedProposal(null)}} aria-label={'Voir le détail de '+b.title}>
