@@ -10,10 +10,11 @@ BEGIN
   SELECT b.id INTO winner
     FROM v2.budgets b
     LEFT JOIN v2.votes v ON v.budget_id=b.id
+    LEFT JOIN LATERAL (SELECT count(*) AS proposal_count FROM v2.budget_proposals p WHERE p.budget_id=b.id) pc ON true
     WHERE b.origin='citizen' AND b.version='latest'
       AND b.publication_status='published'
-    GROUP BY b.id,b.published_at
-    ORDER BY count(v.id) DESC,b.published_at DESC NULLS LAST,b.id
+    GROUP BY b.id,b.published_at,pc.proposal_count
+    ORDER BY count(v.id) DESC,pc.proposal_count DESC,b.published_at DESC NULLS LAST,b.id
     LIMIT 1;
 
   UPDATE v2.budgets b SET
@@ -43,6 +44,12 @@ DROP TRIGGER IF EXISTS trg_refresh_featured_citizen_budgets ON v2.budgets;
 CREATE TRIGGER trg_refresh_featured_citizen_budgets
   AFTER INSERT OR DELETE OR UPDATE OF publication_status,origin,version,published_at
   ON v2.budgets
+  FOR EACH STATEMENT EXECUTE FUNCTION v2.refresh_featured_citizen_budget_trigger();
+
+-- Recompute if the number of proposals changes (publication edits/imports).
+DROP TRIGGER IF EXISTS trg_refresh_featured_citizen_proposals ON v2.budget_proposals;
+CREATE TRIGGER trg_refresh_featured_citizen_proposals
+  AFTER INSERT OR DELETE OR UPDATE OF budget_id ON v2.budget_proposals
   FOR EACH STATEMENT EXECUTE FUNCTION v2.refresh_featured_citizen_budget_trigger();
 
 -- Bring already-published V2 records in line with the restored business rule.

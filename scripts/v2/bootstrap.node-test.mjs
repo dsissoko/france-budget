@@ -31,12 +31,13 @@ describe('Bootstrap V2 indépendant de public',()=>{
   assert.match(sql,/SECURITY DEFINER/);
   assert.match(sql,/CREATE TRIGGER trg_refresh_featured_citizen_votes/);
   assert.match(sql,/CREATE TRIGGER trg_refresh_featured_citizen_budgets/);
+  assert.match(sql,/CREATE TRIGGER trg_refresh_featured_citizen_proposals/);
   assert.match(sql,/SELECT v2\.refresh_featured_citizen_budget\(\)/);
   assert.match(sql,/publication_limit_reached/);
   assert.doesNotMatch(sql,/publication_rate_limited|now\(\)-interval '24 hours'/);
   assert.match(sql,/b\.origin='citizen' AND b\.version='latest'/);
   assert.match(sql,/AND b\.publication_status='published'/);
-  assert.match(sql,/ORDER BY count\(v\.id\) DESC,b\.published_at DESC NULLS LAST,b\.id/);
+  assert.match(sql,/ORDER BY count\(v\.id\) DESC,pc\.proposal_count DESC,b\.published_at DESC NULLS LAST,b\.id/);
 
   assert.match(bootstrapSql(d,'france_budget_app'),/SET LOCAL v2\.application_role = 'france_budget_app'/);
   assert.throws(()=>bootstrapSql(d,'unsafe;role'),/Unsafe V2_APP_ROLE/);
@@ -52,6 +53,7 @@ describe('Migration non destructive V2 des règles citoyennes',()=>{
   assert.match(sql,/CREATE OR REPLACE FUNCTION v2\.write_citizen_budget/);
   assert.match(sql,/CREATE TRIGGER trg_refresh_featured_citizen_votes/);
   assert.match(sql,/CREATE TRIGGER trg_refresh_featured_citizen_budgets/);
+  assert.match(sql,/CREATE TRIGGER trg_refresh_featured_citizen_proposals/);
   assert.match(sql,/SECURITY DEFINER/);
   assert.doesNotMatch(sql,/DROP VIEW|DROP SCHEMA|DELETE FROM v2\.budgets/);
   assert.doesNotMatch(sql,/publication_rate_limited|now\(\)-interval '24 hours'/);
