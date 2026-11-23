@@ -48,14 +48,14 @@ function withDirectories(action){
  const before=join(root,'before'),after=join(root,'after');
  mkdirSync(before);mkdirSync(after);
  const fixtures={
-  'budget.csv':'budget_key,version,title,description,origin,reference_year,budget_mode,party_code,documentary_json\\nexample-2027,latest,Exemple,Ancien,party,2025,PARTIAL,EX,\"{\"\"sources\"\":[{\"\"source_url\"\":\"\"https://example.org\"\"}]}\"\\n',
-  'proposals.csv':'budget_key,proposal_key,title,description\\nexample-2027,p1,Titre,Description\\n',
-  'measures.csv':'budget_key,measure_key,proposal_key,title,description,claimed_amount_bn,source_url\\nexample-2027,m1,p1,Mesure,Description,1.000,https://example.org\\n',
-  'impacts.csv':'budget_key,proposal_key,side,category_id,delta_amount_bn\\nexample-2027,p1,expenses,education,1.000\\n'
+  'budget.csv':'budget_key,version,title,description,origin,reference_year,budget_mode,party_code,documentary_json\nexample-2027,latest,Exemple,Ancien,party,2025,PARTIAL,EX,"{""sources"":[{""source_url"":""https://example.org""}]}"\n',
+  'proposals.csv':'budget_key,proposal_key,title,description\nexample-2027,p1,Titre,Description\n',
+  'measures.csv':'budget_key,measure_key,proposal_key,title,description,claimed_amount_bn,source_url\nexample-2027,m1,p1,Mesure,Description,1.000,https://example.org\n',
+  'impacts.csv':'budget_key,proposal_key,side,category_id,delta_amount_bn\nexample-2027,p1,expenses,education,1.000\n'
  };
  for(const [name,text] of Object.entries(fixtures)){
-  writeFileSync(join(before,name),text.replaceAll('\\n','\n'));
-  writeFileSync(join(after,name),text.replaceAll('\\n','\n'));
+  writeFileSync(join(before,name),text);
+  writeFileSync(join(after,name),text);
  }
  try{action(before,after);}finally{rmSync(root,{recursive:true,force:true});}
 }
