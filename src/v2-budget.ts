@@ -62,48 +62,23 @@ export const comparisonBudgets=(budgets:PublishedBudget[]):PublishedBudget[]=>
 const qualifiedDeclaredStatuses=new Set(['publié','validated','primary_source_checked_apu_review_pending']);
 export const impactedProposals=(b:PublishedBudget)=>b.proposals.filter(p=>p.impacts.some(i=>Number(i.deltaAmountBn)!==0));
 export const declaredAmountForDisplay=(p:BudgetProposal):number|null=>{
- const sources=p.measures?.length?p.measures:[p];
- // A consolidated claim is displayable only when its sole source was qualified.
- if(sources.length!==1)return null;
- const source=sources[0];
- const amount=source.claimedAmountBn===null||source.claimedAmountBn===undefined||source.claimedAmountBn===''?NaN:Number(source.claimedAmountBn);
+ // A claim is documentary only: no automatic accounting impact. Do not sum
+ // distinct source amounts as if they were a qualified consolidation.
+ if(p.measures?.length!==1)return null;
+ const source=p.measures[0];
+ const amount=source.claimedAmountBn===null||source.claimedAmountBn===undefined||
+   source.claimedAmountBn===''?NaN:Number(source.claimedAmountBn);
  return Number.isFinite(amount)&&amount!==0&&
    qualifiedDeclaredStatuses.has(source.sourceStatus??'')&&
    (source.sourceUrl??'').startsWith('https://')?amount:null;
 };
-export const measuredProposals=(b:PublishedBudget):BudgetProposal[]=>{
- // In V2 the proposals are already the canonical regroupings; documentary
- // citizenGroups is legacy display metadata and must not supersede the SQL model.
- if(b.proposals.some(p=>p.measures!==undefined))return b.proposals;
- if(b.origin==='party'&&b.documentary?.citizenGroups?.length)
-  return b.documentary.citizenGroups.map(g=>({
-   proposalKey:'group-'+g.id,title:g.title,description:g.description,
-   sourceUrl:g.sourceUrl??null,sourceOrigin:'citizen_group',
-   sourceStatus:'validated',notes:'members='+g.sourceLines.map(l=>l.id).join('|'),
-   impacts:g.citizenImpacts.filter(i=>i.simulated&&i.claimedAmountBn!=null&&
-    (i.side==='revenues'||i.side==='expenses')).map(i=>({
-      side:i.side as BudgetSide,categoryId:i.categoryId,
-      deltaAmountBn:i.claimedAmountBn as number
-   }))
-  }));
- return b.proposals.filter(p=>
-  p.sourceStatus!=='grouped_into_pivot' && (p.impacts.some(i=>Number(i.deltaAmountBn)!==0)||declaredAmountForDisplay(p)!==null));
-};
-/** Count real source measures, not pivot grouping containers. */
-export const measuredSourceCount=(b:PublishedBudget)=>
- b.proposals.some(p=>p.measures!==undefined)?
- b.proposals.reduce((n,p)=>n+(p.measures?.length??0),0):
- b.origin==='party'&&b.documentary?.citizenGroups?.length?
- b.documentary.citizenGroups.reduce((n,g)=>n+g.sourceCount,0):
- measuredProposals(b).reduce((n,p)=>
- n+(p.sourceOrigin==='pivot_consolidation'?pivotGroupMembers(b,p).length:1),0);
-export const pivotGroupMembers=(b:PublishedBudget,p:BudgetProposal):BudgetProposal[]=>{
- if(p.measures?.length)return p.measures.map(m=>({...m,proposalKey:m.measureKey,impacts:[]}));
- if(!['pivot_consolidation','citizen_group'].includes(p.sourceOrigin??'')||
-    !p.notes?.startsWith('members='))return [];
- const keys=p.notes.slice('members='.length).split('|').map(x=>x.split(':')[0]);
- return keys.map(key=>b.proposals.find(x=>x.proposalKey===key)).filter((x):x is BudgetProposal=>!!x);
-};
+/** V2 proposals are already grouped. The UI never synthesizes source rows as proposals. */
+export const displayedProposals=(b:PublishedBudget):BudgetProposal[]=>b.proposals;
+/** Number of extracted program measures, independent of proposition count and impacts. */
+export const sourceMeasureCount=(b:PublishedBudget):number=>
+ b.proposals.reduce((count,p)=>count+(p.measures?.length??0),0);
+/** Source measures linked to this consolidated proposal (empty for direct citizen proposals). */
+export const proposalSourceMeasures=(_b:PublishedBudget,p:BudgetProposal):BudgetMeasure[]=>p.measures??[];
 export const hasQualifiedBudgetImpact=(b:PublishedBudget)=>impactedProposals(b).length>0||!!reportedAggregate(b)||!!b.documentary?.citizenSource;
 
 export function reportedAggregate(b:Pick<PublishedBudget,'documentary'|'budgetMode'>):PublishedAggregate|null{
