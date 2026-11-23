@@ -52,7 +52,16 @@ function Gauge({item,value,onChange,tone,editing,id}:{
  return <div className="slider-item"><div className="slider-label"><label htmlFor={id}>{item.label} <InfoHint item={item}/></label><strong>{money(value)}</strong></div>
   <div className="gauge-container"><div className="gauge-track"><div className={'gauge-fill '+tone} style={{width:Math.max(0,Math.min(100,100*value/max))+'%'}}/></div>
   {editing&&<input type="range" id={id} className="gauge-input" aria-label={'Modifier '+item.label} min={0} max={item.amount*2} step={0.1} value={value}
-   onPointerDown={()=>{dragScrollY.current=window.scrollY}}
+   onPointerDown={()=>{
+    // Release any focused text editor before a drag so Android does not
+    // reopen its virtual keyboard or scroll back to the description field.
+    const active=document.activeElement;
+    if(active instanceof HTMLElement &&
+       (active instanceof HTMLTextAreaElement ||
+        (active instanceof HTMLInputElement && active.type!=='range') ||
+        active.isContentEditable))active.blur();
+    dragScrollY.current=window.scrollY;
+   }}
    onPointerUp={restoreAfterRelease}
    onPointerCancel={()=>{dragScrollY.current=null}}
    onChange={e=>onChange?.(Number(e.target.value))}/>}</div>
