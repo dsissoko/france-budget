@@ -12,7 +12,7 @@
 
 ## Fichiers CSV versionnés
 - `budget.csv` :
-- `proposals.csv` :
+- `measures.csv` : engagements extraits, sources et `measure_key` → `proposal_key` ;\n- `proposals.csv` : propositions consolidées uniquement ;
 - `impacts.csv` :
 - Données éditoriales et sources conservées :
 - Justification des identifiants, sans titre comme clé :
@@ -20,7 +20,7 @@
 - Incertitudes et montants non ventilables :
 
 ## Qualification comptable
-- [ ] Chaque montant déclaré est distinct d'un impact calculé.
+- [ ] Toutes les mesures sourcées sont conservées, même sans montant.\n- [ ] Chaque mesure source appartient à une proposition unique ; aucune mesure n'est fabriquée pour un budget citoyen direct.\n- [ ] Chaque montant déclaré est distinct d'un impact calculé.
 - [ ] Aucun poste citoyen n'est compté deux fois.
 - [ ] Aucune ventilation inventée.
 - [ ] AGGREGATE : ventilations incluses dans l'agrégat, sans addition.
@@ -28,7 +28,7 @@
 - [ ] Contrôle des totaux, reliquats et sources.
 
 ## Import, API et documentation
-- [ ] Import V2 déterministe/idempotent en Neon QA.
+- [ ] Contrat des quatre CSV validé et import V2 déterministe/idempotent en Neon QA.
 - [ ] Parité CSV ↔ PostgreSQL ↔ API V2 ↔ UI.
 - [ ] Métier, MCD, diagrammes Mermaid et contrat API à jour si concernés.
 - [ ] Aucun script de migration V1 ajouté ou réactivé.
