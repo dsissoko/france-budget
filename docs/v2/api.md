@@ -18,7 +18,9 @@ Les endpoints ci-dessous sont ceux de l'API V2 publiée sur [Mon Budget Citoyen]
 
 ## Distinction de données obligatoire
 
-- `measures[].measureKey` : identifiant stable de la mesure extraite ; chaque mesure appartient à une proposition via la relation SQL.\n- `proposals[].proposalKey` : identifiant du regroupement. Une proposition citoyenne peut avoir `measures: []`.\n- `claimedAmountBn` : montant annoncé dans une mesure source, **non imputé automatiquement**.
+- `measures[].measureKey` : identifiant stable de la mesure extraite ; chaque mesure appartient à une proposition via la relation SQL.
+- `proposals[].proposalKey` : identifiant du regroupement. Une proposition citoyenne peut avoir `measures: []`.
+- `claimedAmountBn` : montant annoncé dans une mesure source, **non imputé automatiquement**.
 - `deltaAmountBn` : impact comptable validé.
 - `budgetMode` : `PARTIAL` ou `AGGREGATE`.
 - `documentary` : références, contexte et masses publiées ; ses chiffres ne sont pas ajoutés aux impacts.
