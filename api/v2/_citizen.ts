@@ -58,8 +58,6 @@ export function normalizeCitizenBody(body:any,key:string){
     demand(Array.isArray(p.impacts)&&p.impacts.length<=100,'Impacts invalides');
     demand(!publish||p.impacts.length>0,'Proposition publiée sans impact');
     demand(!p.impacts.length||pd.length>0,'Impact non expliqué');
-    let sourceUrl=text(p.sourceUrl);
-    demand(!sourceUrl||(/^https:\/\//.test(sourceUrl)&&sourceUrl.length<=2000),'URL source invalide');
     proposals.push({budget_key:key,proposal_key:proposalKey,title:pt,description:pd});
     for(const impact of p.impacts){
       demand(impact&&typeof impact==='object','Impact invalide');
