@@ -8,7 +8,7 @@ export type BudgetMeasure={
  measureKey:string;title:string;description:string;claimedAmountBn?:string|null;
  sourceUrl?:string|null;sourceYear?:number|null;sourceSection?:string|null;
  sourceExcerpt?:string|null;sourceStatus?:string|null;sourceOrigin?:string|null;
- direction?:string|null;notes?:string|null;
+ direction?:string|null;amountUnit?:string|null;notes?:string|null;
 };
 export type BudgetProposal={
  measures?:BudgetMeasure[];
