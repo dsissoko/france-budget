@@ -156,7 +156,7 @@ export default function AppV2(){
   budgetMode:'PARTIAL',documentary:{},proposals:[],featured:true,featured_order:0,votes:0,
   published_at:''
  };
- const featured=[publishedReference,...comparisonBudgets(published,championId)];
+ const featured=[publishedReference,...comparisonBudgets(published)];
  const compareBudgetA=featured.find(b=>b.id===compareA);
  const compareBudgetB=featured.find(b=>b.id===compareB);
  const lastPublished=published.find(b=>b.budgetKey===lastPublishedKey);
