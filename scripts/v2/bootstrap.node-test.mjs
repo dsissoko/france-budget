@@ -3,6 +3,7 @@ import {strict as assert} from 'node:assert';
 import {readFileSync} from 'node:fs';
 import {resolve} from 'node:path';
 import {validateFixture,seedSql,bootstrapSql} from './db-init.mjs';
+import {policySql} from './apply-policy.mjs';
 
 const d=JSON.parse(readFileSync(resolve('data/reference/2025-v2.json'),'utf8'));
 describe('Bootstrap V2 indépendant de public',()=>{
@@ -39,5 +40,21 @@ describe('Bootstrap V2 indépendant de public',()=>{
 
   assert.match(bootstrapSql(d,'france_budget_app'),/SET LOCAL v2\.application_role = 'france_budget_app'/);
   assert.throws(()=>bootstrapSql(d,'unsafe;role'),/Unsafe V2_APP_ROLE/);
+ });
+});
+
+
+describe('Migration non destructive V2 des règles citoyennes',()=>{
+ it('ne réexécute ni le bootstrap ni les opérations de suppression de vues',()=>{
+  const sql=policySql();
+  assert.match(sql,/^BEGIN;/);
+  assert.match(sql,/COMMIT;\s*$/);
+  assert.match(sql,/CREATE OR REPLACE FUNCTION v2\.write_citizen_budget/);
+  assert.match(sql,/CREATE TRIGGER trg_refresh_featured_citizen_votes/);
+  assert.match(sql,/CREATE TRIGGER trg_refresh_featured_citizen_budgets/);
+  assert.match(sql,/SECURITY DEFINER/);
+  assert.doesNotMatch(sql,/DROP VIEW|DROP SCHEMA|DELETE FROM v2\.budgets/);
+  assert.doesNotMatch(sql,/publication_rate_limited|now\(\)-interval '24 hours'/);
+  assert.match(sql,/publication_limit_reached/);
  });
 });
