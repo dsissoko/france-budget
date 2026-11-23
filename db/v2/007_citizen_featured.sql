@@ -2,7 +2,7 @@
 -- Parties' featured fields are never updated. No dependency on public/V1 schema.
 -- Safe to apply on an already populated V2 database, including production.
 CREATE OR REPLACE FUNCTION v2.refresh_featured_citizen_budget()
-RETURNS void LANGUAGE plpgsql SECURITY DEFINER SET search_path=v2,pg_temp AS $
+RETURNS void LANGUAGE plpgsql SECURITY DEFINER SET search_path=v2,pg_temp AS $$
 DECLARE winner uuid;
 BEGIN
   -- Serialize competing vote and publication events.
@@ -27,7 +27,7 @@ END;
 $$;
 
 CREATE OR REPLACE FUNCTION v2.refresh_featured_citizen_budget_trigger()
-RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path=v2,pg_temp AS $
+RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path=v2,pg_temp AS $$
 BEGIN
   PERFORM v2.refresh_featured_citizen_budget();
   RETURN NULL;
