@@ -4,7 +4,14 @@ import {calculatePublishedBudget,type PublishedAggregate,type ClaimedAllocation}
 
 export type BudgetSide='revenues'|'expenses'|'offBudget';
 export type BudgetImpact={side:BudgetSide;categoryId:string;deltaAmountBn:number};
+export type BudgetMeasure={
+ measureKey:string;title:string;description:string;claimedAmountBn?:string|null;
+ sourceUrl?:string|null;sourceYear?:number|null;sourceSection?:string|null;
+ sourceExcerpt?:string|null;sourceStatus?:string|null;sourceOrigin?:string|null;
+ direction?:string|null;notes?:string|null;
+};
 export type BudgetProposal={
+ measures?:BudgetMeasure[];
  proposalKey:string;title:string;description:string;
  impacts:BudgetImpact[];sourceUrl?:string|null;claimedAmountBn?:string|null;
  sourceStatus?:string|null;direction?:string|null;
@@ -55,10 +62,14 @@ export const comparisonBudgets=(budgets:PublishedBudget[]):PublishedBudget[]=>
 const qualifiedDeclaredStatuses=new Set(['publié','validated','primary_source_checked_apu_review_pending']);
 export const impactedProposals=(b:PublishedBudget)=>b.proposals.filter(p=>p.impacts.some(i=>Number(i.deltaAmountBn)!==0));
 export const declaredAmountForDisplay=(p:BudgetProposal):number|null=>{
- const amount=p.claimedAmountBn===null||p.claimedAmountBn===undefined||p.claimedAmountBn===''?NaN:Number(p.claimedAmountBn);
+ const sources=p.measures?.length?p.measures:[p];
+ // A consolidated claim is displayable only when its sole source was qualified.
+ if(sources.length!==1)return null;
+ const source=sources[0];
+ const amount=source.claimedAmountBn===null||source.claimedAmountBn===undefined||source.claimedAmountBn===''?NaN:Number(source.claimedAmountBn);
  return Number.isFinite(amount)&&amount!==0&&
-   qualifiedDeclaredStatuses.has(p.sourceStatus??'')&&
-   (p.sourceUrl??'').startsWith('https://')?amount:null;
+   qualifiedDeclaredStatuses.has(source.sourceStatus??'')&&
+   (source.sourceUrl??'').startsWith('https://')?amount:null;
 };
 export const measuredProposals=(b:PublishedBudget):BudgetProposal[]=>{
  if(b.origin==='party'&&b.documentary?.citizenGroups?.length)
@@ -77,11 +88,14 @@ export const measuredProposals=(b:PublishedBudget):BudgetProposal[]=>{
 };
 /** Count real source measures, not pivot grouping containers. */
 export const measuredSourceCount=(b:PublishedBudget)=>
+ b.proposals.some(p=>p.measures!==undefined)?
+ b.proposals.reduce((n,p)=>n+(p.measures?.length??0),0):
  b.origin==='party'&&b.documentary?.citizenGroups?.length?
  b.documentary.citizenGroups.reduce((n,g)=>n+g.sourceCount,0):
  measuredProposals(b).reduce((n,p)=>
  n+(p.sourceOrigin==='pivot_consolidation'?pivotGroupMembers(b,p).length:1),0);
 export const pivotGroupMembers=(b:PublishedBudget,p:BudgetProposal):BudgetProposal[]=>{
+ if(p.measures?.length)return p.measures.map(m=>({...m,proposalKey:m.measureKey,impacts:[]}));
  if(!['pivot_consolidation','citizen_group'].includes(p.sourceOrigin??'')||
     !p.notes?.startsWith('members='))return [];
  const keys=p.notes.slice('members='.length).split('|').map(x=>x.split(':')[0]);
