@@ -121,8 +121,11 @@ export default function AppV2(){
  const project=(balanceDelta:number)=>simulationService.simulate(baseDeficit,balanceDelta,years,simulationParams??undefined);
  const projected=computeCitizenDraft(ref,draftProposals,sourceBudget);
  const localProjection=project(projected.balanceDelta);
- const championId=published.filter(b=>b.origin==='citizen')
-  .sort((a,b)=>b.votes-a.votes||a.budgetKey.localeCompare(b.budgetKey))[0]?.id??null;
+ const citizenRank=(a:PublishedBudget,b:PublishedBudget)=>b.votes-a.votes||
+  b.proposals.length-a.proposals.length||
+  (new Date(b.published_at??0).getTime()-new Date(a.published_at??0).getTime())||
+  a.id.localeCompare(b.id);
+ const championId=published.filter(b=>b.origin==='citizen').sort(citizenRank)[0]?.id??null;
  useEffect(()=>{let live=true;fetch('/api/v2/reference').then(async r=>{
   if(!r.ok)throw Error('Référentiel indisponible');return r.json();
  }).then(data=>{
@@ -412,8 +415,7 @@ export default function AppV2(){
      const primary=voteSort==='popular'?b.budget.votes-a.budget.votes:
       voteSort==='recent'?new Date(b.budget.published_at??0).getTime()-new Date(a.budget.published_at??0).getTime():
       Math.abs(a.result.deficit)-Math.abs(b.result.deficit);
-     return primary||sourceMeasureCount(b.budget)-sourceMeasureCount(a.budget)||
-      a.budget.budgetKey.localeCompare(b.budget.budgetKey);
+     return primary||citizenRank(a.budget,b.budget);
     })
     .map(({budget:b,result:r})=>{
      const q=hasQualifiedBudgetImpact(b)?voteQualification(baseDeficit,r.balanceDelta,years,simulationParams):{label:'Non qualifié',tone:'neutral',title:'Aucun impact chiffré qualifié'};
