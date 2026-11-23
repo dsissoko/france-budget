@@ -41,3 +41,10 @@ Rendre compréhensibles les recettes, les dépenses et le solde des administrati
 **NoPasaran** : 8 propositions, 8 impacts, depuis [les CSV versionnés](../../data/programmes/nopasaran/2025/). Les anciens budgets citoyens V1 et leurs votes ont été déclarés jetables.
 
 **LFI 2027 (recette #145)** : 28 mesures sources → 11 regroupements → 15 lignes de postes, dont 11 allocations activées. Recettes annoncées +106,4 Md€, dépenses +81,7 Md€, solde +24,7 Md€. Ventilation connue : +84,4 Md€ de recettes et +37,7 Md€ de dépenses. Reliquats : +22 et +44 Md€. **Ces données ne sont pas encore considérées comme intégrées à l'API V2.**
+
+## Sélection citoyenne et quota de publication (23 novembre 2026)
+
+- Tous les budgets politiques publiés restent comparables indépendamment de `featured`.
+- Parmi les budgets citoyens publiés, seul le budget le plus voté reçoit automatiquement `featured=true` et `featured_order=40` ; les autres citoyens sont `featured=false`. À égalité de votes, publication la plus récente puis UUID déterminent le gagnant. La sélection est recalculée en base lors des votes et des changements de publication, sans règle spécifique liée au badge « champion citoyen ».
+- Le plafond est **100 budgets citoyens publiés simultanément**, avec verrou transactionnel ; il n'existe **aucune limitation glissante à 24 heures**.
+- La validation humaine des confirmations et la non-historisation des changements de maturité sont des décisions explicites : aucun trigger de validation documentaire ni historique de maturité à recréer.
