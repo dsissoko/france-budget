@@ -210,12 +210,14 @@ export default function AppV2(){
   const groups=[{title:'Dépenses',side:'expenses' as const,items:expenses,tone:'coral' as const},
    {title:'Recettes',side:'revenues' as const,items:revenues,tone:'green' as const},
    {title:'Manques à gagner hors budget',side:'offBudget' as const,items:offBudget,tone:'green' as const}];
-  return <><div className="card"><div className="card-title"><h3>Référence 2025 vs {b.title}</h3><span className="pill">Écarts par poste</span></div>
-   <p className="muted small">Gris : référence · couleur : scénario. Seuls les postes modifiés sont affichés.</p>
-   {groups.map(g=><div key={g.side} className="compare-group"><h4>{g.title}</h4>{
-     g.items.filter(c=>Math.abs((r[g.side][c.id]??c.amount)-c.amount)>.005).map(c=>
+  const changedGroups=groups.map(g=>({
+   ...g,changedItems:g.items.filter(c=>Math.abs((r[g.side][c.id]??c.amount)-c.amount)>.005)
+  })).filter(g=>g.changedItems.length>0);
+  return <>{changedGroups.length>0&&<div className="card"><div className="card-title"><h3>Référence 2025 vs {b.title}</h3><span className="pill">Écarts par poste</span></div>
+   {changedGroups.map(g=><div key={g.side} className="compare-group"><h4>{g.title}</h4>{
+     g.changedItems.map(c=>
       <Gauge key={c.id} id={'view-'+b.id+'-'+c.id} item={c} value={r[g.side][c.id]} tone={g.tone}/>)
-   }</div>)}</div><div className="card"><div className="card-title"><h3>Présentation et propositions</h3>
+   }</div>)}</div>}<div className="card"><div className="card-title"><h3>Présentation et propositions</h3>
     <span className="pill">{b.proposals.length} propositions</span></div>
     {b.origin==='party'&&sourceMeasureCount(b)>0&&
       <p className="muted small">Issues de {sourceMeasureCount(b)} mesures du programme</p>}
