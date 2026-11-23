@@ -6,7 +6,7 @@ import {simulationService,yearsFor,type SimulationParameters} from './engine/sim
 import {voteQualification} from './engine/vote-qualification';
 import {budgetMaturity} from './budget-maturity';
 import {
- computeBudget,computeCitizenDraft,readDraftProposals,eligibleForDisplay,measuredProposals,
+ computeBudget,computeCitizenDraft,readDraftProposals,eligibleForDisplay,comparisonBudgets,measuredProposals,
  reportedAggregate,hasQualifiedBudgetImpact,declaredAmountForDisplay,measuredSourceCount,pivotGroupMembers,availablePost,updateImpact,validExclusiveProposals,
  type PublishedBudget,type BudgetProposal,type BudgetImpact,type BudgetSide
 } from './v2-budget';
@@ -156,8 +156,7 @@ export default function AppV2(){
   budgetMode:'PARTIAL',documentary:{},proposals:[],featured:true,featured_order:0,votes:0,
   published_at:''
  };
- const featured=[publishedReference,...published.filter(b=>(b.featured||b.id===championId)&&eligibleForDisplay(b))
-  .sort((a,b)=>(a.featured_order??999)-(b.featured_order??999)).slice(0,9)];
+ const featured=[publishedReference,...comparisonBudgets(published,championId)];
  const compareBudgetA=featured.find(b=>b.id===compareA);
  const compareBudgetB=featured.find(b=>b.id===compareB);
  const lastPublished=published.find(b=>b.budgetKey===lastPublishedKey);
