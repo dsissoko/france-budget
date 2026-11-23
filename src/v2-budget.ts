@@ -11,11 +11,8 @@ export type BudgetMeasure={
  direction?:string|null;amountUnit?:string|null;notes?:string|null;
 };
 export type BudgetProposal={
- measures?:BudgetMeasure[];
  proposalKey:string;title:string;description:string;
- impacts:BudgetImpact[];sourceUrl?:string|null;claimedAmountBn?:string|null;
- sourceStatus?:string|null;direction?:string|null;
- sourceOrigin?:string|null;notes?:string|null;
+ impacts:BudgetImpact[];measures?:BudgetMeasure[];
 };
 export type BudgetMode='PARTIAL'|'AGGREGATE';
 export type BudgetDocumentary={
@@ -179,7 +176,6 @@ export function readDraftProposals(value:unknown):BudgetProposal[]{
      return ['revenues','expenses','offBudget'].includes(side)&&typeof categoryId==='string'&&Number.isFinite(amount)&&Math.abs(amount)>0.000001?
       [{side:side as BudgetSide,categoryId,deltaAmountBn:amount}]:[];
    }):[];
-   return [{proposalKey,title:String(x.title??''),description:String(x.description??''),impacts,
-     sourceUrl:typeof x.sourceUrl==='string'?x.sourceUrl:null}];
+   return [{proposalKey,title:String(x.title??''),description:String(x.description??''),impacts}];
  });
 }
