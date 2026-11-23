@@ -47,8 +47,8 @@ function MaturityTag({b}:{b:PublishedBudget}){
 function Champion({b,championId}:{b:PublishedBudget;championId:string|null}){
  return b.origin==='citizen'&&b.id===championId?<span className="citizen-champion"><Trophy size={13}/> Champion citoyen</span>:null;
 }
-function Stat({title,value,detail}:{title:string;value:number;detail:string}){
- return <div className="stat"><span className="eyebrow">{title}</span><strong>{money(value)}</strong><small>{detail}</small></div>;
+function Stat({title,value,detail,tone}:{title:string;value:number;detail:string;tone?:'green-text'|'coral-text'}){
+ return <div className="stat"><span className="eyebrow">{title}</span><strong className={tone??''}>{money(value)}</strong><small>{detail}</small></div>;
 }
 export default function AppV2(){
  const [reference,setReference]=useState<ReferenceModel|null>(null);
@@ -263,9 +263,9 @@ export default function AppV2(){
   </nav>
   {tab==='comprendre'&&<section className="stage"><div className="section-header"><div className="kicker">01 / COMPRENDRE</div>
    <h2>Où va l'argent public ?</h2><p>Une lecture simple des grands équilibres d'un budget public.</p></div>
-   <div className="stats three"><Stat title="Recettes publiques" value={referenceRevenue} detail="L'argent qui entre"/>
+   <div className="stats three"><Stat title="Recettes publiques" value={referenceRevenue} detail="L'argent qui entre" tone="green-text"/>
     <Stat title="Dépenses publiques" value={referenceExpense} detail="L'argent qui sort"/>
-    <Stat title="Déficit annuel" value={baseDeficit} detail="Ce qu'il manque pour équilibrer"/></div>
+    <Stat title="Déficit annuel" value={baseDeficit} detail="Ce qu'il manque pour équilibrer" tone="coral-text"/></div>
    <div className="card"><h3>Chaque euro dépensé</h3><div className="ratio"><div className="ratio-paid" style={{width:referenceRevenue/referenceExpense*100+'%'}}/><div className="ratio-gap"/></div>
     <p className="muted small">{Math.round(referenceRevenue/referenceExpense*1000)/10} % des dépenses sont financées par les recettes.</p></div>
    <div className="split"><div className="card"><h3>D’où viennent les recettes publiques ?</h3><Bars items={[...revenues]} tone="green"/></div>
