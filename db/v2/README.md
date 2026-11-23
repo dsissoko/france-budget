@@ -20,7 +20,8 @@ Le script `npm run db:init` effectue, **en une transaction**, l'ordre suivant :
 
 ```bash
 npm run db:init                 # dry-run local, pas de connexion DB
-npm run db:init -- --apply --confirm-empty-v2    # uniquement base vierge/QA, confirmation requise
+npm run db:init -- --apply --confirm-empty-v2    # initialisation normale, refuse les budgets existants
+npm run db:init -- --apply --force --confirm-reset-v2  # DESTRUCTIF : réinitialise uniquement le schéma v2
 npm run db:import               # dry-run des CSV initiaux
 npm run db:import -- --apply    # import dans V2_DATABASE_URL ; jamais sans contrôle de cible
 npm run db:check                # contrôles locaux
@@ -31,7 +32,7 @@ npm run docs:check              # Markdown et Mermaid
 
 Pour `--apply`, fournir `V2_DATABASE_URL`. Le rôle PostgreSQL de l'application doit préexister et être indiqué facultativement par `V2_APP_ROLE` au moment d'un bootstrap : le script SQL construit des `GRANT` limités. La fonction citoyenne s'exécute en `SECURITY DEFINER` ; l'import administratif `v2.import_budget` n'est **pas** directement exécutable par le rôle serveur.
 
-**Important : `db:init` refuse une base V2 contenant déjà des budgets.** La décision #154 autorise une reconstruction explicite à zéro, avec perte assumée des votes et contributions, mais uniquement après identification de l'environnement cible et remise à zéro contrôlée ; `db:init` n'efface jamais une base peuplée implicitement.
+**Important :** sans `--force`, `db:init` refuse une base V2 contenant des budgets. L'option `--force` exige **`--apply --confirm-reset-v2`** et exécute dans **la même transaction** `DROP SCHEMA IF EXISTS v2 CASCADE`, puis le bootstrap complet (tables, vues, fonctions, triggers, permissions et référentiel). Les contributions et votes V2 sont supprimés et les budgets doivent être réimportés avec `npm run db:import -- --apply`. Le schéma historique `public` n'est pas ciblé, mais les dépendances SQL externes à `v2` pourraient être affectées par `CASCADE` : vérifier la base visée et ses dépendances avant d'utiliser cette option. Aucune remise à zéro automatique au merge ou au déploiement Vercel.
 
 ## Données et invariants
 
