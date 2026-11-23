@@ -46,6 +46,6 @@ Rendre compréhensibles les recettes, les dépenses et le solde des administrati
 ## Sélection citoyenne et quota de publication (23 novembre 2026)
 
 - Tous les budgets politiques publiés restent comparables indépendamment de `featured`.
-- Parmi les budgets citoyens publiés, seul le budget le plus voté reçoit automatiquement `featured=true` et `featured_order=40` ; les autres citoyens sont `featured=false`. À égalité de votes, publication la plus récente puis UUID déterminent le gagnant. La sélection est recalculée en base lors des votes et des changements de publication, sans règle spécifique liée au badge « champion citoyen ».
+- Parmi les budgets citoyens publiés, seul le budget le plus voté reçoit automatiquement `featured=true` et `featured_order=40` ; les autres citoyens sont `featured=false`. À égalité de votes, le budget ayant le plus de propositions l'emporte ; à égalité de propositions, la publication la plus récente (dates nulles en dernier) puis l'UUID déterminent le gagnant. La sélection est recalculée en base lors des votes, des changements de publication et des changements de nombre de propositions, sans règle spécifique liée au badge « champion citoyen ».
 - Le plafond est **100 budgets citoyens publiés simultanément**, avec verrou transactionnel ; il n'existe **aucune limitation glissante à 24 heures**.
 - La validation humaine des confirmations et la non-historisation des changements de maturité sont des décisions explicites : aucun trigger de validation documentaire ni historique de maturité à recréer.
