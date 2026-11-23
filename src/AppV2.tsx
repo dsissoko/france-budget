@@ -1,4 +1,4 @@
-import {useEffect,useState} from 'react';
+import {useEffect,useRef,useState} from 'react';
 import {Landmark,ChevronDown,RefreshCcw,SlidersHorizontal,ArrowRight,ExternalLink,BookOpen,Scale,Heart,UserRound,ListChecks,Trash2,Trophy,X,Check} from 'lucide-react';
 import {sum,currency,type Category} from './model';
 import type {ReferenceModel,Result} from './projection-core';
@@ -36,9 +36,26 @@ function Gauge({item,value,onChange,tone,editing,id}:{
  item:Category;value:number;onChange?:(value:number)=>void;tone:'green'|'coral';editing?:boolean;id:string
 }){
  const max=Math.max(1,item.amount*2,value);
+ // Android browsers may unexpectedly scroll to the top when a range drag ends.
+ // Capture only pointer interactions; never interfere with ordinary page scrolling.
+ const dragScrollY=useRef<number|null>(null);
+ const restoreAfterRelease=()=>{
+  const expected=dragScrollY.current;
+  dragScrollY.current=null;
+  if(expected===null)return;
+  // Wait until the browser has completed its native pointer/focus handling.
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+   if(Math.abs(window.scrollY-expected)>100)
+    window.scrollTo({top:expected,behavior:'instant'});
+  }));
+ };
  return <div className="slider-item"><div className="slider-label"><label htmlFor={id}>{item.label} <InfoHint item={item}/></label><strong>{money(value)}</strong></div>
   <div className="gauge-container"><div className="gauge-track"><div className={'gauge-fill '+tone} style={{width:Math.max(0,Math.min(100,100*value/max))+'%'}}/></div>
-  {editing&&<input type="range" id={id} className="gauge-input" aria-label={'Modifier '+item.label} min={0} max={item.amount*2} step={0.1} value={value} onChange={e=>onChange?.(Number(e.target.value))}/>}</div>
+  {editing&&<input type="range" id={id} className="gauge-input" aria-label={'Modifier '+item.label} min={0} max={item.amount*2} step={0.1} value={value}
+   onPointerDown={()=>{dragScrollY.current=window.scrollY}}
+   onPointerUp={restoreAfterRelease}
+   onPointerCancel={()=>{dragScrollY.current=null}}
+   onChange={e=>onChange?.(Number(e.target.value))}/>}</div>
   <span className="muted tiny">Référence {money(item.amount)}{Math.abs(value-item.amount)>.001?' · Écart '+(value>item.amount?'+':'')+money(value-item.amount):''}</span></div>;
 }
 function MaturityTag({b}:{b:PublishedBudget}){
