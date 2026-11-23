@@ -1,5 +1,5 @@
 import {describe,it,expect} from 'vitest';
-import {readDraftProposals,proposalEntries,reportedAggregate,validExclusiveProposals,measuredProposals,impactedProposals,declaredAmountForDisplay,hasQualifiedBudgetImpact,updateImpact,computeBudget,computeCitizenDraft,type PublishedBudget} from './v2-budget';
+import {readDraftProposals,proposalEntries,reportedAggregate,validExclusiveProposals,measuredProposals,impactedProposals,declaredAmountForDisplay,hasQualifiedBudgetImpact,updateImpact,computeBudget,computeCitizenDraft,comparisonBudgets,type PublishedBudget} from './v2-budget';
 import {simulationService,V1_ASSUMPTIONS,yearsFor} from './engine/simulation';
 import type {ReferenceModel} from './projection-core';
 describe('V2 canonical frontend domain',()=>{
@@ -165,5 +165,27 @@ describe('PR 145 grouped allocation inside V2 published AGGREGATE',()=>{
   }});
   expect(computeBudget(copied,reference).revenues.business).toBeCloseTo(106.5,5);
   expect(computeBudget(copied,reference).balanceDelta).toBeCloseTo(24.7,5);
+ });
+});
+
+
+describe('V2 Comparer political budget visibility regression',()=>{
+ const budget=(id:string,origin:'party'|'citizen'|'educational',featured=false):PublishedBudget=>({
+  ...makeBudget([]),id,budgetKey:id,title:id,origin,featured,featured_order:null
+ });
+ it('shows every political budget even without featured flag and without a nine-item cap',()=>{
+  const parties=Array.from({length:15},(_,i)=>budget('party-'+i,'party'));
+  const list=comparisonBudgets([...parties,budget('citizen-featured','citizen',true),budget('citizen-other','citizen')]);
+  expect(list.filter(b=>b.origin==='party')).toHaveLength(15);
+  expect(list.some(b=>b.id==='citizen-featured')).toBe(true);
+  expect(list.some(b=>b.id==='citizen-other')).toBe(false);
+ });
+ it('excludes unfeatured citizens even if displayed elsewhere as champion',()=>{
+  const list=comparisonBudgets([budget('champion','citizen'),budget('insee','educational')]);
+  expect(list).toEqual([]);
+ });
+ it('includes a featured champion as any other featured citizen',()=>{
+  const list=comparisonBudgets([budget('champion','citizen',true)]);
+  expect(list.map(b=>b.id)).toEqual(['champion']);
  });
 });

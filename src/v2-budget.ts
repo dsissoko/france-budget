@@ -40,6 +40,15 @@ export type CitizenBudgetDraft={
 export const emptyBudgetOverrides=()=>({revenues:{},expenses:{},offBudget:{}});
 
 export const eligibleForDisplay=(b:PublishedBudget)=>b.origin==='citizen'||b.origin==='party';
+/** All public party budgets are comparable. Citizens require featured=true.
+ * Champion status remains a display badge, not a selection exception.
+ */
+export const comparisonBudgets=(budgets:PublishedBudget[]):PublishedBudget[]=>
+ budgets.filter(b=>eligibleForDisplay(b)&&
+  (b.origin==='party'||b.featured))
+  .sort((a,b)=>(a.featured_order??999)-(b.featured_order??999)||
+   (a.origin==='party'?0:1)-(b.origin==='party'?0:1)||a.title.localeCompare(b.title,'fr'));
+
 /** Numeric proposals shown to readers: assigned impacts OR a sourced, qualified declared
  * amount. The latter is DISPLAY ONLY: never feed claimed amounts into the calculation.
  * Preliminary inventories and editorial groupings are excluded until reviewed. */
