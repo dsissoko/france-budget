@@ -24,7 +24,8 @@ sequenceDiagram
 ## Source de vérité
 
 - `budget.csv` : identité/version, présentation, documents et agrégats annoncés.
-- `measures.csv` : mesures extraites, `measure_key`, `proposal_key`, sources, statuts et montants revendiqués éventuels.\n- `proposals.csv` : regroupements avec `proposal_key`, titre et description ; zéro mesure source possible pour une proposition citoyenne directe.
+- `measures.csv` : mesures extraites, `measure_key`, `proposal_key`, sources, statuts et montants revendiqués éventuels.
+- `proposals.csv` : regroupements avec `proposal_key`, titre et description ; zéro mesure source possible pour une proposition citoyenne directe.
 - `impacts.csv` : `proposal_key`, poste citoyen et variation signée *validée* ; un seul impact par budget/côté/poste.
 - `scripts/v2/import.mjs` : validation et persistance sans raisonnement agentique.
 - `skills/budget-impact-qualification/SKILL.md` : méthode d'analyse des sources et de décision.
