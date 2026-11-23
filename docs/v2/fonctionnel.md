@@ -35,3 +35,7 @@ Pour le cas LFI 2027, le compteur doit indiquer 11 propositions issues de 28 mes
 ## Critères de recette
 
 Comparer les jauges et les soldes NoPasaran, un budget PARTIAL et un AGGREGATE. Tester la création, modification de brouillon, publication, impossibilité de modification d'un publié, retrait, vote double, partage et écran mobile. Tester l'absence de double comptage LFI. Ces tests E2E restent requis avant le cutover.
+
+## Sélection de Comparer et publication
+
+La comparaison contient toujours la référence INSEE et tous les programmes politiques publics. Les budgets citoyens ne sont proposés que si leur champ `featured` vaut `true`, attribué par PostgreSQL au budget citoyen publié ayant le plus de votes. Le badge « champion citoyen » ne crée pas d'exception de sélection. Une publication est refusée si 100 budgets citoyens sont déjà publiés ; aucun compteur glissant de 24 heures ne s'applique.
