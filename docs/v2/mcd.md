@@ -1,12 +1,13 @@
 # MCD et schéma logique V2
 
-**Référence physique :** [SQL 001](../../db/v2/001_schema.sql), [003](../../db/v2/003_citizen_crud.sql), [004](../../db/v2/004_votes.sql), [UI](../../db/v2/initial_ui.sql), [007](../../db/v2/007_citizen_featured.sql).
+**Source physique :** [DDL canonique](../../db/v2/001_schema.sql), [publication](../../db/v2/003_citizen_crud.sql), [votes](../../db/v2/004_votes.sql), [règle featured](../../db/v2/007_citizen_featured.sql).
 
 ```mermaid
 erDiagram
     BUDGET ||--o{ PROPOSITION : contient
-    BUDGET ||--o{ IMPACT : porte
+    PROPOSITION ||--o{ MESURE : regroupe
     PROPOSITION ||--o{ IMPACT : justifie
+    BUDGET ||--o{ IMPACT : porte
     POSTE_REFERENCE ||--o{ IMPACT : concerne
     BUDGET ||--o{ VOTE : recoit
     BUDGET ||--o| AUTORISATION_EDITION : autorise
@@ -25,10 +26,20 @@ erDiagram
     PROPOSITION {
         uuid id PK
         uuid budget_id FK
-        text proposal_key
+        text proposal_key UK
         text title
+        text description
+    }
+    MESURE {
+        uuid id PK
+        uuid budget_id FK
+        uuid proposal_id FK
+        text measure_key UK
+        text title
+        text description
         numeric claimed_amount_bn
         text source_url
+        int source_year
         text source_status
     }
     IMPACT {
@@ -52,25 +63,30 @@ erDiagram
         text voter_hash
     }
     AUTORISATION_EDITION {
-        uuid budget_id PK,FK
+        uuid budget_id PK
         text token_hash UK
     }
 ```
 
-## Invariants physiques
+## Cardinalités et invariants
 
-| Table | Contrainte importante |
+- **Budget → Proposition :** un budget contient zéro à N propositions ; chaque proposition appartient à un budget.
+- **Proposition → Mesure :** zéro à N mesures extraites ; une mesure appartient exactement à une proposition consolidée. Une proposition citoyenne directe peut n'avoir aucune mesure source.
+- **Proposition → Impact :** zéro à N impacts qualifiés, éventuellement répartis sur plusieurs postes ; une mesure source ne crée jamais directement une écriture dans la table d'impacts.
+- **Exclusivité comptable :** `UNIQUE(budget_id, side, category_id)` sur `v2.budget_impacts` garantit un seul impact par poste citoyen et par budget.
+- **Concordance d'identité :** la FK composite `(proposal_id, budget_id)` interdit de rattacher une mesure ou un impact à une proposition d'un autre budget.
+- **Montants :** `budget_measures.claimed_amount_bn` = montant annoncé dans le programme ; `budget_impacts.delta_amount_bn` = variation qualifiée, jamais une simple copie automatique.
+- **AGGREGATE :** les `claimedAllocations` documentaires ventilent *en interne* les agrégats annoncés ; elles ne constituent pas des deltas supplémentaires.
+- **Publication :** `v2.latest_budgets` expose uniquement la version `latest` publiée ; les triggers calculent le `featured` citoyen d'après les votes.
+
+## Tables canoniques
+
+| Table | Clé ou contrainte |
 |---|---|
-| `v2.budgets` | PK UUID ; UNIQUE (`budget_key`, `version`), `origin` citoyen/parti/pédagogique |
-| `v2.budget_proposals` | UNIQUE (`budget_id`, `proposal_key`), FK budget |
-| `v2.budget_proposal_impacts` | FK composites vers budget/proposition/poste ; UNIQUE (`budget_id`, `side`, `category_id`) ; montant non nul |
-| `v2.reference_posts` | PK (`reference_year`, `side`, `category_id`) |
-| `v2.reference_parameters` | Paramètres de simulation indexés par année |
-| `v2.citizen_edit_grants` | Token haché, clé sur le budget |
-| `v2.votes` | Unicité (`budget_id`, `voter_hash`) |
+| `v2.budgets` | `UNIQUE(budget_key, version)` |
+| `v2.budget_proposals` | `UNIQUE(budget_id, proposal_key)` |
+| `v2.budget_measures` | `UNIQUE(budget_id, measure_key)` et FK composite vers la proposition |
+| `v2.budget_impacts` | FK composite et `UNIQUE(budget_id, side, category_id)` |
+| `v2.reference_posts` | `PRIMARY KEY(reference_year, side, category_id)` |
 
-La vue `v2.latest_budgets` filtre la version `latest` et l'état `published`.
-
-**Intégration #145 dans la V2 :** les groupes documentaires, lignes sources et allocations internes sont actuellement conservés en `v2.budgets.documentary` (JSONB structuré, validé à l'import), **pas** dans `v2.budget_proposal_impacts`. Ce choix évite les impacts additionnels, mais pourra être normalisé en tables relationnelles lorsque les besoins de requêtage le justifient.
-
-Le trigger `v2.trg_refresh_featured_citizen_votes` et son homologue sur `v2.budgets` maintiennent `featured` pour les citoyens publiés (maximum un), sans modifier les programmes des partis. Le quota de 100 budgets citoyens publiés est verrouillé transactionnellement dans `v2.write_citizen_budget` ; pas de plafond glissant à 24 heures.
+Voir également [le contrat CSV](integration.md) et [les règles de domaine](metier.md).
