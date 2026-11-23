@@ -38,4 +38,4 @@ Comparer les jauges et les soldes NoPasaran, un budget PARTIAL et un AGGREGATE. 
 
 ## Sélection de Comparer et publication
 
-La comparaison contient toujours la référence INSEE et tous les programmes politiques publics. Les budgets citoyens ne sont proposés que si leur champ `featured` vaut `true`, attribué par PostgreSQL au budget citoyen publié ayant le plus de votes. Le badge « champion citoyen » ne crée pas d'exception de sélection. Une publication est refusée si 100 budgets citoyens sont déjà publiés ; aucun compteur glissant de 24 heures ne s'applique.
+La comparaison contient toujours la référence INSEE et tous les programmes politiques publics. Les budgets citoyens ne sont proposés que si leur champ `featured` vaut `true`, attribué par PostgreSQL au budget citoyen publié classé par votes décroissants, puis nombre de propositions décroissant, puis date de publication décroissante (dates nulles en dernier), et UUID pour départage stable. Le badge « champion citoyen » ne crée pas d'exception de sélection. Une publication est refusée si 100 budgets citoyens sont déjà publiés ; aucun compteur glissant de 24 heures ne s'applique.
