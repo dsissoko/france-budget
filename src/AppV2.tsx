@@ -215,12 +215,10 @@ export default function AppV2(){
    {groups.map(g=><div key={g.side} className="compare-group"><h4>{g.title}</h4>{
      g.items.filter(c=>Math.abs((r[g.side][c.id]??c.amount)-c.amount)>.005).map(c=>
       <Gauge key={c.id} id={'view-'+b.id+'-'+c.id} item={c} value={r[g.side][c.id]} tone={g.tone}/>)
-   }</div>)}</div><div className="card"><div className="card-title"><h3>Présentation et mesures</h3>
-    {!b.documentary?.citizenGroups?.length&&<span className="pill">{measuredSourceCount(b)} mesures chiffrées</span>}</div>
-    {!!b.documentary?.citizenGroups?.length&&<div style={{display:'flex',flexDirection:'column',alignItems:'flex-start',gap:4,marginBottom:12}}>
-      <span className="pill">{measuredProposals(b).length} propositions</span>
-      <span className="muted small">Issues de {measuredSourceCount(b)} mesures du programme</span>
-    </div>}
+   }</div>)}</div><div className="card"><div className="card-title"><h3>Présentation et propositions</h3>
+    <span className="pill">{b.proposals.length} propositions</span></div>
+    {b.origin==='party'&&measuredSourceCount(b)>0&&
+      <p className="muted small">Issues de {measuredSourceCount(b)} mesures du programme</p>}
     {b.description&&<p className="muted small">{b.description}</p>}
     {b.origin==='party'&&measuredProposals(b).length===0&&
      <p className="muted small" role="status">
