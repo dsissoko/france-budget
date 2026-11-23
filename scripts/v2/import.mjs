@@ -27,68 +27,49 @@ const decimal=/^-?\d+(?:\.\d{1,3})?$/;
 function required(x,key,ctx){if(!String(x[key]??'').trim())throw Error(ctx+': missing '+key)}
 function num(value,ctx){if(value!==''&&!decimal.test(value))throw Error(ctx+': invalid amount '+value)}
 const sides=new Set(['revenues','expenses','offBudget']);
-export function validateBatch(budget,proposals,impacts) {
+export function validateBatch(budget,proposals,impacts,measures=[]) {
   for(const key of ['budget_key','version','title','origin','reference_year'])required(budget,key,'budget');
   if(!['citizen','party','educational'].includes(budget.origin))throw Error('Invalid origin');
   if(!['','PARTIAL','AGGREGATE'].includes(budget.budget_mode??''))throw Error('Invalid mode');
   if(!/^\d{4}$/.test(budget.reference_year))throw Error('Invalid reference_year');
   if(budget.party_code===''&&budget.origin==='party')throw Error('Party code required');
-  const keys=new Set(),posts=new Set();
+  const keys=new Set(),measureKeys=new Set(),posts=new Set();
   for(const p of proposals){
     for(const key of ['proposal_key','title'])required(p,key,'proposal');
     if(p.budget_key!==budget.budget_key)throw Error('Proposal budget mismatch');
     if(keys.has(p.proposal_key))throw Error('Duplicate proposal '+p.proposal_key);
     keys.add(p.proposal_key);
-    num(p.claimed_amount_bn??'','proposal '+p.proposal_key);
-    if(p.source_url&&!/^https?:\/\//.test(p.source_url))throw Error('Invalid source URL '+p.proposal_key);
+  }
+  for(const m of measures){
+    for(const key of ['measure_key','proposal_key','title'])required(m,key,'measure');
+    if(m.budget_key!==budget.budget_key||!keys.has(m.proposal_key))
+      throw Error('Orphan measure '+m.measure_key);
+    if(measureKeys.has(m.measure_key))throw Error('Duplicate measure '+m.measure_key);
+    measureKeys.add(m.measure_key);
+    num(m.claimed_amount_bn??'','measure '+m.measure_key);
+    if(m.source_url&&!/^https?:\/\//.test(m.source_url))throw Error('Invalid source URL '+m.measure_key);
   }
   for(const i of impacts){
     if(i.budget_key!==budget.budget_key||!keys.has(i.proposal_key))throw Error('Orphan impact');
     if(!sides.has(i.side)||!i.category_id)throw Error('Invalid pivot post');
-    if(!decimal.test(i.delta_amount_bn??'')||Number(i.delta_amount_bn)===0)throw Error('Invalid impact amount');
+    if(!decimal.test(i.delta_amount_bn??'')||Number(i.delta_amount_bn)===0)
+      throw Error('Invalid impact amount');
     const key=i.side+':'+i.category_id;
     if(posts.has(key))throw Error('Duplicate impact post '+key);
     posts.add(key);
     if(!proposals.find(p=>p.proposal_key===i.proposal_key)?.description?.trim())
       throw Error('Impacted proposal requires a documented description: '+i.proposal_key);
   }
-  // Deterministic pivot grouping: retain source measures, validate their additive
-  // contributions, and persist exactly one impact per citizen budget post.
-  const groupedSources=new Set();
-  for(const group of proposals.filter(p=>p.source_origin==='pivot_consolidation')){
-    const match=/^members=([a-zA-Z0-9_.-]+:-?\d+(?:\.\d{1,3})?)(\|[a-zA-Z0-9_.-]+:-?\d+(?:\.\d{1,3})?)*$/.exec(group.notes??'');
-    if(!match)throw Error('Invalid pivot group members '+group.proposal_key);
-    const members=group.notes.slice(8).split('|').map(part=>{
-      const cut=part.lastIndexOf(':');
-      return {key:part.slice(0,cut),amount:part.slice(cut+1)};
-    });
-    if(members.length<2)throw Error('Pivot group requires multiple source measures: '+group.proposal_key);
-    const groupImpacts=impacts.filter(i=>i.proposal_key===group.proposal_key);
-    if(groupImpacts.length!==1)throw Error('Pivot group requires exactly one impact '+group.proposal_key);
-    const destination=groupImpacts[0];
-    const sourceDirection=destination.side==='revenues'?'revenue_increase':destination.side==='expenses'?'expense_increase':null;
-    if(!sourceDirection||group.direction!==sourceDirection)
-      throw Error('Pivot group direction does not match accounting side '+group.proposal_key);
-    let totalMilli=0;
-    for(const member of members){
-      const source=proposals.find(p=>p.proposal_key===member.key);
-      if(!source||source.source_origin==='pivot_consolidation'||groupedSources.has(member.key))
-        throw Error('Invalid or repeated pivot group source '+member.key);
-      if(source.source_status!=='grouped_into_pivot'||source.direction!==group.direction||
-         source.source_year!==group.source_year||source.source_url!==group.source_url)
-        throw Error('Pivot member not traceable to group '+member.key);
-      if(!decimal.test(member.amount)||source.claimed_amount_bn!==member.amount)
-        throw Error('Pivot member amount differs from source '+member.key);
-      groupedSources.add(member.key);
-      totalMilli+=Math.round(Number(member.amount)*1000);
-      if(impacts.some(i=>i.proposal_key===member.key))
-        throw Error('Pivot source is also directly impacted '+member.key);
-    }
-    if(totalMilli!==Math.round(Number(destination.delta_amount_bn)*1000))
-      throw Error('Pivot group sum mismatch '+group.proposal_key);
-  }
-  for(const p of proposals.filter(p=>p.source_status==='grouped_into_pivot')){
-    if(!groupedSources.has(p.proposal_key))throw Error('Unlinked pivot source '+p.proposal_key);
+  // The qualification skill may consolidate multiple source measures into one proposal.
+  // Measures marked grouped_into_pivot must reconcile with one qualified impact.
+  const grouped=measures.filter(m=>m.source_status==='grouped_into_pivot');
+  for(const proposalKey of new Set(grouped.map(m=>m.proposal_key))){
+    const members=grouped.filter(m=>m.proposal_key===proposalKey);
+    const booked=impacts.filter(i=>i.proposal_key===proposalKey);
+    if(booked.length!==1)throw Error('Pivot group requires exactly one impact '+proposalKey);
+    const sum=members.reduce((n,m)=>n+Math.round(Number(m.claimed_amount_bn)*1000),0);
+    if(sum!==Math.round(Number(booked[0].delta_amount_bn)*1000))
+      throw Error('Pivot group sum mismatch '+proposalKey);
   }
   let documentary={};
   if(budget.documentary_json){
@@ -97,7 +78,7 @@ export function validateBatch(budget,proposals,impacts) {
     if(!documentary||Array.isArray(documentary)||typeof documentary!=='object')
       throw Error('documentary_json must be an object');
   }
-  return {budget:{...budget,documentary},proposals,impacts};
+  return {budget:{...budget,documentary},proposals,measures,impacts};
 }
 
 /** Optional richer citizen grouping inventory, produced upstream by the qualification skill.
@@ -110,8 +91,7 @@ export function enrichCitizenGroups(directory,batch){
  if(files.every(p=>!existsSync(p)))return batch;
  if(files.some(p=>!existsSync(p)))throw Error('Incomplete citizen grouping CSVs: '+directory);
  const [groups,links,impacts]=files.map(p=>readCsv(readFileSync(p,'utf8')));
- const bySource=new Map(batch.proposals.filter(p=>p.source_origin==='documentary')
-   .map(p=>[p.proposal_key,p]));
+ const bySource=new Map(batch.measures.map(m=>[m.measure_key,m]));
  const ids=new Set(),reserved=new Map(),mapped=new Set();
  const split=s=>String(s??'').split(';').filter(Boolean);
  for(const g of groups){
@@ -129,7 +109,7 @@ export function enrichCitizenGroups(directory,batch){
   for(const post of split(l.citizen_post_ids))
    if(reserved.get(post)!==l.group_id)throw Error('Source links wrong post '+post);
  }
- if(mapped.size!==bySource.size)throw Error('Citizen groups do not cover every source proposal');
+ if(mapped.size!==bySource.size)throw Error('Citizen groups do not cover every source measure');
  const impactPosts=new Set(),claimedAllocations=[];
  for(const i of impacts){
   if(!ids.has(i.group_id)||reserved.get(i.citizen_post_id)!==i.group_id)
@@ -188,7 +168,7 @@ export function loadBatch(directory){
   const read=name=>readCsv(readFileSync(join(directory,name),'utf8'));
   const budgets=read('budget.csv');
   if(budgets.length!==1)throw Error(directory+': exactly one budget required');
-  return enrichCitizenGroups(directory,validateBatch(budgets[0],read('proposals.csv'),read('impacts.csv')));
+  return enrichCitizenGroups(directory,validateBatch(budgets[0],read('proposals.csv'),read('impacts.csv'),read('measures.csv')));
 }
 function discover(base) {
   const found=[];
@@ -215,7 +195,7 @@ async function main(){
     if(!schemas[0]?.ready)throw Error('V2 schema unavailable');
   }
   for(const batch of batches){
-    const meta={budget_key:batch.budget.budget_key,version:batch.budget.version,origin:batch.budget.origin,proposals:batch.proposals.length,impacts:batch.impacts.length,sources:batch.budget.documentary.sources?.length??0,aggregates:batch.budget.documentary.aggregates?.length??0};
+    const meta={budget_key:batch.budget.budget_key,version:batch.budget.version,origin:batch.budget.origin,proposals:batch.proposals.length,measures:batch.measures.length,impacts:batch.impacts.length,sources:batch.budget.documentary.sources?.length??0,aggregates:batch.budget.documentary.aggregates?.length??0};
     if(apply){const rows=await sql.query('SELECT v2.import_budget($1::jsonb) AS id',[JSON.stringify(batch)]);console.log(JSON.stringify({...meta,id:rows[0].id,imported:true}))}
     else console.log(JSON.stringify({...meta,dryRun:true}));
   }
