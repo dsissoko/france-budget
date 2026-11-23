@@ -18,16 +18,21 @@ export default async function handler(req:any,res:any){
           b.confirmation_organization,b.confirmation_evidence_url,b.confirmed_at,
           (SELECT count(*)::int FROM v2.votes v WHERE v.budget_id=b.id) AS votes,
           (SELECT count(*)::int FROM v2.budget_proposals p WHERE p.budget_id=b.id) AS "proposalCount",
-          (SELECT count(*)::int FROM v2.budget_proposal_impacts i WHERE i.budget_id=b.id) AS "impactCount",
+          (SELECT count(*)::int FROM v2.budget_measures m WHERE m.budget_id=b.id) AS "measureCount",
+          (SELECT count(*)::int FROM v2.budget_impacts i WHERE i.budget_id=b.id) AS "impactCount",
           (SELECT COALESCE(jsonb_agg(jsonb_build_object(
             'proposalKey',p.proposal_key,'title',p.title,'description',p.description,
-            'claimedAmountBn',p.claimed_amount_bn::text,'sourceUrl',p.source_url,
-            'sourceStatus',p.source_status,'direction',p.direction,
-            'sourceOrigin',p.source_origin,'notes',p.notes,
+            'measures',(SELECT COALESCE(jsonb_agg(jsonb_build_object(
+              'measureKey',m.measure_key,'title',m.title,'description',m.description,
+              'claimedAmountBn',m.claimed_amount_bn::text,'sourceUrl',m.source_url,
+              'sourceYear',m.source_year,'sourceSection',m.source_section,
+              'sourceExcerpt',m.source_excerpt,'sourceStatus',m.source_status,
+              'sourceOrigin',m.source_origin,'direction',m.direction,'notes',m.notes)
+              ORDER BY m.measure_key),'[]'::jsonb) FROM v2.budget_measures m WHERE m.proposal_id=p.id),
             'impacts',(SELECT COALESCE(jsonb_agg(jsonb_build_object(
               'side',i.side,'categoryId',i.category_id,'deltaAmountBn',i.delta_amount_bn::text)
               ORDER BY i.side,i.category_id),'[]'::jsonb)
-              FROM v2.budget_proposal_impacts i WHERE i.proposal_id=p.id)
+              FROM v2.budget_impacts i WHERE i.proposal_id=p.id)
           ) ORDER BY p.proposal_key),'[]'::jsonb)
           FROM v2.budget_proposals p WHERE p.budget_id=b.id) AS proposals
         FROM v2.latest_budgets b WHERE (${origin}='' OR b.origin=${origin})
@@ -48,7 +53,7 @@ export default async function handler(req:any,res:any){
       if(!source.length)return respond(res,400,{error:'Budget de départ introuvable'});
       const p=await sql`SELECT p.proposal_key AS "proposalKey",p.title,p.description,
          (SELECT COALESCE(jsonb_agg(jsonb_build_object('side',i.side,'categoryId',i.category_id,
-          'deltaAmountBn',i.delta_amount_bn::float8)),'[]'::jsonb) FROM v2.budget_proposal_impacts i WHERE i.proposal_id=p.id) AS impacts
+          'deltaAmountBn',i.delta_amount_bn::float8)),'[]'::jsonb) FROM v2.budget_impacts i WHERE i.proposal_id=p.id) AS impacts
          FROM v2.budget_proposals p WHERE p.budget_id=${source[0].id}::uuid`;
       payload.budget.documentary={citizenSource:{budgetKey:source[0].budget_key,
        title:source[0].title,budgetMode:source[0].budget_mode,
