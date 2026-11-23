@@ -5,7 +5,7 @@
 ## Portée et volumes
 
 - **14 présentations de budget** harmonisées : ECO 2027, Équinoxe 2027, LFI 2026 et 2027, LR 2026, RN 2026, PS 2027, PCF 2026, Horizons 2027, MoDem 2027, Nouvelle Énergie 2027, Reconquête 2027, Renaissance 2027, UPR 2027.
-- **192 descriptions de propositions** rédigées ou enrichies : 143 LFI 2026, 75 RN 2026, 14 Équinoxe 2027 et 10 LR 2026. **Correction de total : 242** descriptions (143 + 75 + 14 + 10), dont 192 était une valeur intermédiaire erronée. Les descriptions déjà documentées sont conservées.
+- **242 descriptions de propositions** rédigées ou enrichies : 143 LFI 2026, 75 RN 2026, 14 Équinoxe 2027 et 10 LR 2026. Les descriptions déjà documentées sont conservées.
 - **NoPasaran** : aucune modification, budget citoyen hors périmètre.
 - **PP 2026** : aucune modification, voir anomalie de provenance ci-dessous.
 - LFI 2027 : `budget.csv.description` et `documentary_json.background_text` sont alignés sur la `presentation.csv` déjà présente, pour éviter que l'importeur donne deux textes divergents.
@@ -38,7 +38,7 @@ Les dossiers sans source budgétaire primaire précise ne reçoivent pas de rés
 - Contrôle à réaliser avec le validateur de la #157, sur deux copies séparées de chaque dossier :
 
 ```bash
-node scripts/v2/editorial-upgrade.mjs path/to/main/data/programmes/RN/2026 path/to/pr/data/programmes/RN/2026
+node scripts/v2/editorial-upgrade.mjs path/to/main/data/programmes/rn/2026 path/to/pr/data/programmes/rn/2026
 npm run db:import
 npm run test:v2
 npm run db:check
