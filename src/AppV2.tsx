@@ -398,7 +398,7 @@ export default function AppV2(){
       <div className="vote-card-badges"><MaturityTag b={b}/><Champion b={b} championId={championId}/>
        <span className={'vote-impact vote-impact--'+q.tone} title={q.title}>{q.label}</span></div>
       <h3>{b.title}</h3><p className="muted small">{b.description||'Consulter les propositions de ce budget.'}</p>
-      <div className="vote-meta"><span><ListChecks size={15}/>{sourceMeasureCount(b)} mesures</span>
+      <div className="vote-meta"><span><ListChecks size={15}/>{b.proposals.length} {b.proposals.length===1?'proposition':'propositions'}</span>
        <span><Heart size={15}/>{b.votes} votes</span></div></button>
       <button className="primary vote-action" disabled={busy} onClick={()=>vote(b.id)}><Heart size={16}/> Soutenir</button></article>;
     })}</div>
