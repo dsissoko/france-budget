@@ -10,7 +10,7 @@ Le script `npm run db:init` effectue, **en une transaction**, l'ordre suivant :
 2. [003_citizen_crud.sql](003_citizen_crud.sql) — états de publication, jetons, quotas et écriture citoyenne ;
 3. [004_votes.sql](004_votes.sql) — votes pseudonymes et compatibilité des UUID ;
 4. [initial_ui.sql](initial_ui.sql) — colonnes UI et paramètres de projection, sans lecture de `public` ;
-5. [007_citizen_featured.sql](007_citizen_featured.sql) — fonctions et triggers de sélection du budget citoyen le plus voté ;
+5. [007_citizen_featured.sql](007_citizen_featured.sql) — fonctions et triggers de sélection du citoyen par votes, propositions, date de publication ;
 6. [006_runtime_permissions.sql](006_runtime_permissions.sql) — permissions minimales, séparation lecture/écriture/import ;
 7. chargement des 27 postes et paramètres 2025 depuis [data/reference/2025-v2.json](../../data/reference/2025-v2.json).
 
