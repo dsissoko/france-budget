@@ -31,6 +31,23 @@ Les dossiers sans source budgétaire primaire précise ne reçoivent pas de rés
 
 `data/programmes/pp/2026/budget.csv` désigne « **Parti patriote** » tandis que `documentary_json.sources` pointe vers un article du mouvement **Place publique** (`place-publique.eu`). Cette incohérence d'identité préexiste à #156 ; changer le titre ou attribuer les prises de position au mauvais mouvement excéderait le seul enrichissement descriptif. **Ne pas enrichir ce budget tant que le porteur n'est pas confirmé.**
 
+## Recette QA effectuée (23 novembre 2026)
+
+Import des **14 budgets modifiés**, au moyen de la fonction V2 `v2.import_budget(jsonb)` et des lots CSV de la branche, sur la base isolée `qa-nopasaran-unified-import-20261122 / v2_issue154_bootstrap_final`. Le dossier LFI 2027 a conservé ses 11 regroupements et ses 11 allocations documentaires déjà importés.
+
+| Contrôle | Avant | Après |
+| --- | ---: | ---: |
+| Budgets (dont un ancien budget de recette QA) | 17 | 17 |
+| Propositions | 271 | 271 |
+| Mesures | 279 | 279 |
+| Impacts | 14 | 14 |
+| Votes | 1 | 1 |
+| Propositions à description vide | 242 avant enrichissement | 0 après enrichissement |
+
+La ligne « descriptions vides avant » est une estimation issue des CSV source : 143 LFI 2026 + 75 RN 2026 + 14 Équinoxe 2027 = **232**, et non 242 ; les 10 LR 2026 avaient une description non vide mais pauvre. En QA après import, le contrôle SQL `TRIM(description) = ''` retourne **0**. La recette confirme aussi **0 impact orphelin** et 11 regroupements LFI 2027 conservés.
+
+**Limites :** l'import a été exercé avec le rôle propriétaire de QA, sans déploiement HTTP dédié. La revue éditoriale humaine, la résolution de l'attribution `pp/2026` et le feu vert pour la production restent nécessaires. Aucune écriture n'a été effectuée sur Neon `main` au titre de #156.
+
 ## Invariants et contrôles
 
 - **Champs autorisés seulement :** `budget.csv.description`, `proposals.csv.title/description`, `documentary_json.background_text`, `presentation.csv.description` si nécessaire.
