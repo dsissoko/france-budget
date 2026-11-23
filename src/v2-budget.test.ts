@@ -1,5 +1,5 @@
 import {describe,it,expect} from 'vitest';
-import {readDraftProposals,proposalEntries,reportedAggregate,validExclusiveProposals,displayedProposals,impactedProposals,declaredAmountForDisplay,hasQualifiedBudgetImpact,updateImpact,computeBudget,computeCitizenDraft,comparisonBudgets,type PublishedBudget} from './v2-budget';
+import {readDraftProposals,proposalEntries,reportedAggregate,validExclusiveProposals,displayedProposals,sourceMeasureCount,proposalSourceMeasures,impactedProposals,declaredAmountForDisplay,hasQualifiedBudgetImpact,updateImpact,computeBudget,computeCitizenDraft,comparisonBudgets,type PublishedBudget} from './v2-budget';
 import {simulationService,V1_ASSUMPTIONS,yearsFor} from './engine/simulation';
 import type {ReferenceModel} from './projection-core';
 describe('V2 canonical frontend domain',()=>{
